@@ -1,6 +1,5 @@
-package org.bugra.persistence.storage;
+package org.bugra.mapper;
 
-import org.bugra.mapper.StorageMapper;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StorageParserTest {
+class StorageMapperTest {
 
     private StorageMapper storageMapper;
 
