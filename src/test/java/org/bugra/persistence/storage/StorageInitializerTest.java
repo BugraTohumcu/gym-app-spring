@@ -11,7 +11,10 @@ import org.bugra.model.Trainer;
 import org.bugra.model.Training;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import java.io.IOException;
@@ -21,8 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class StorageInitializerTest {
 
+    @Mock
     private StorageMapper storageMapper;
     private StorageInitializer storageInitializer;
 
@@ -31,7 +36,6 @@ class StorageInitializerTest {
 
     @BeforeEach
     void setUp() {
-        storageMapper = mock(StorageMapper.class);
         storageInitializer = new StorageInitializer(storageMapper);
     }
 
@@ -55,7 +59,7 @@ class StorageInitializerTest {
         mockTrainee.setId(200L);
 
         Training mockTraining = new Training();
-        mockTraining.setTraineeId(300L); // keyExtractor uses getTraineeId for Training
+        mockTraining.setTraineeId(300L);
 
         // Mocking mapper behavior
         when(storageMapper.parseTrainer("trainer-row-1")).thenReturn(mockTrainer);
