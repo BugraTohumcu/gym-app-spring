@@ -52,7 +52,7 @@ public class StorageInitializer {
                 dataMap.put(keyExtractor.apply(entity), entity);
             }
         } catch (IOException e) {
-            logger.warn("Trainers are not found starting empty");
+            logger.warn("Data is not found starting empty");
         }
     }
 
