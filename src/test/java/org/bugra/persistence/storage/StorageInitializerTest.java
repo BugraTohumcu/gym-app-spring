@@ -38,7 +38,7 @@ class StorageInitializerTest {
     @Test
     @DisplayName("Should successfully load all data into maps when files exist")
     void shouldLoadAllDataSuccessfully() throws IOException {
-        // Arrange: Create temporary files with sample rows
+        // Create temporary files with sample rows
         Path trainerFile = tempDir.resolve("trainers.csv");
         Path traineeFile = tempDir.resolve("trainees.csv");
         Path trainingFile = tempDir.resolve("trainings.csv");
@@ -66,13 +66,13 @@ class StorageInitializerTest {
         Map<Long, Trainee> traineeStorage = new HashMap<>();
         Map<Long, Training> trainingStorage = new HashMap<>();
 
-        // Act
+
         storageInitializer.loadAllData(
                 trainerStorage, traineeStorage, trainingStorage,
                 trainerFile.toString(), traineeFile.toString(), trainingFile.toString()
         );
 
-        // Assert: Verify maps are populated correctly
+        // Verify maps are populated correctly
         assertEquals(1, trainerStorage.size());
         assertTrue(trainerStorage.containsKey(100L));
         assertSame(mockTrainer, trainerStorage.get(100L));
@@ -94,15 +94,13 @@ class StorageInitializerTest {
     @Test
     @DisplayName("Should handle IOException gracefully and leave maps empty when files do not exist")
     void shouldHandleFileNotFoundGracefully() {
-        // Arrange: Non-existing file paths
-        String invalidPath = "non_existing_directory/file.csv";
+
+        String invalidPath = "non_exist/file.csv";
 
         Map<Long, Trainer> trainerStorage = new HashMap<>();
         Map<Long, Trainee> traineeStorage = new HashMap<>();
         Map<Long, Training> trainingStorage = new HashMap<>();
 
-        // Act & Assert
-        // We ensure that no exception escapes the method (it is caught inside)
         assertDoesNotThrow(() -> storageInitializer.loadAllData(
                 trainerStorage, traineeStorage, trainingStorage,
                 invalidPath, invalidPath, invalidPath
