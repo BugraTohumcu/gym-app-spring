@@ -13,8 +13,8 @@ import java.util.Optional;
  * @param <T> the type of the entity, must extend {@link User}
  */
 
-public abstract class UserRepo<T extends User> extends
-        AbstractInMemoryRepository<T, Long>
+public abstract class UserRepo<T extends User>
+        extends AbstractInMemoryRepository<T, Long>
         implements UsernameCapable {
 
     public UserRepo(Map<Long, T> storage) {
