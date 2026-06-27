@@ -14,7 +14,7 @@ public interface CrudRepo<T, ID> {
     /**
      * <p>Saves a given entity.</p>
      * @param entity entity to be saved must not be null
-     * @return the saved entity with system generated password, username and id
+     * @return the saved entity
      * */
     T save(T entity);
 
