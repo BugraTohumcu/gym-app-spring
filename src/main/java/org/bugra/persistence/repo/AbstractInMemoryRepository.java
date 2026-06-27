@@ -7,7 +7,7 @@ public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID
 
     protected final Map<ID, T> storageMap;
 
-    protected AbstractInMemoryRepository(Map<ID, T> storageMap) {
+    public AbstractInMemoryRepository(Map<ID, T> storageMap) {
         this.storageMap = storageMap;
     }
 

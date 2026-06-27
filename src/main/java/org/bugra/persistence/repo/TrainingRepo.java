@@ -10,7 +10,7 @@ import java.util.Map;
 @Repository
 public class TrainingRepo extends AbstractInMemoryRepository<Training, Long> {
 
-    protected TrainingRepo(
+    public TrainingRepo(
             @StorageQualifier(StorageType.TRAINING) Map<Long, Training> storageMap) {
         super(storageMap);
     }
