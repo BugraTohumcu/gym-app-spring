@@ -1,27 +1,28 @@
 package org.bugra.persistence.repo;
 
-import org.bugra.annotation.StorageQualifier;
-import org.bugra.enums.StorageType;
-import org.bugra.model.Trainee;
-import org.springframework.stereotype.Repository;
+import org.bugra.model.User;
 
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * In-memory repository class for {@link Trainee}
- * Inherits CRUD behaviour from {@link AbstractInMemoryRepository}, implements {@link CrudRepo} nad {@link UserBasedRepository}
- * */
+ * <p>Abstract in-memory repository for {@link User} based entities.</p>
+ * <p>Provides common CRUD operations for {@link org.bugra.model.Trainer} and {@link org.bugra.model.Trainee}.</p>
+ * Extends {@link AbstractInMemoryRepository} and implements {@link UsernameCapable}.
+ *
+ * @param <T> the type of the entity, must extend {@link User}
+ */
 
-@Repository
-public class UserRepo extends AbstractInMemoryRepository<Trainee, Long> implements UserBasedRepository {
+public abstract class UserRepo<T extends User> extends
+        AbstractInMemoryRepository<T, Long>
+        implements UsernameCapable {
 
-    public UserRepo(@StorageQualifier(StorageType.TRAINEE) Map<Long, Trainee> traineeStorage) {
-        super(traineeStorage);
+    public UserRepo(Map<Long, T> storage) {
+        super(storage);
     }
 
     @Override
-    public Trainee save(Trainee entity) {
+    public T save(T entity) {
         if(entity == null) {
             throw new IllegalArgumentException("Entity can not be null");
         }
@@ -36,7 +37,7 @@ public class UserRepo extends AbstractInMemoryRepository<Trainee, Long> implemen
     }
 
     @Override
-    public Optional<Trainee> updateById(Trainee entity) {
+    public Optional<T> updateById(T entity) {
         if(!existsById(entity.getId())) {
             return Optional.empty();
         }
