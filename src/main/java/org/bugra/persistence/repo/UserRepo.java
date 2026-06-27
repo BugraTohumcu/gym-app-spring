@@ -3,7 +3,6 @@ package org.bugra.persistence.repo;
 import org.bugra.model.User;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * <p>Abstract in-memory repository for {@link User} based entities.</p>
@@ -22,29 +21,8 @@ public abstract class UserRepo<T extends User>
     }
 
     @Override
-    public T save(T entity) {
-        if(entity == null) {
-            throw new IllegalArgumentException("Entity can not be null");
-        }
-
-        if(entity.getId() == null){
-            throw new IllegalArgumentException("Entity id should be auto generated");
-        }
-
-        // save entity into in-memory database
-        storageMap.put(entity.getId(), entity);
-        return entity;
-    }
-
-    @Override
-    public Optional<T> updateById(T entity) {
-        if(!existsById(entity.getId())) {
-            return Optional.empty();
-        }
-
-        // Update existing entity
-        storageMap.put(entity.getId(), entity);
-        return Optional.of(entity);
+    protected Long getEntityId(T entity) {
+        return entity.getId();
     }
 
     @Override
