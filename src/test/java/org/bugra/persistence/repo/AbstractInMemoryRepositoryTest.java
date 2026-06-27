@@ -100,4 +100,30 @@ class AbstractInMemoryRepositoryTest {
         assertTrue(result);
         assertNull(fakeStorage.get(1L));
     }
+
+    @Test
+    @DisplayName("Should return true if id is exist")
+    void exitsById_ShouldReturnTrueIfIdExists(){
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+        fakeStorage.put(1L, trainee);
+
+        boolean result = fakeRepository.existsById(1L);
+        assertTrue(result);
+    }
+
+
+    @Test
+    @DisplayName("Should return false if id does not exist")
+    void exitsById_ShouldReturnFalseIfIdNotExists(){
+        boolean result = fakeRepository.existsById(1L);
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Should return false if id is null")
+    void exitsById_ShouldReturnTrueIfIdNull(){
+        boolean result = fakeRepository.existsById(null);
+        assertFalse(result);
+    }
 }
