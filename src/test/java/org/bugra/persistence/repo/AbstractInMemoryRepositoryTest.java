@@ -27,6 +27,11 @@ class AbstractInMemoryRepositoryTest {
         }
 
         @Override
+        protected Long getEntityId(Trainee entity) {
+            return entity.getId();
+        }
+
+        @Override
         public Trainee save(Trainee entity) {
             return null;
         }
