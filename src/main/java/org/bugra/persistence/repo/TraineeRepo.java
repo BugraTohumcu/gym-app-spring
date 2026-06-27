@@ -14,7 +14,7 @@ import java.util.Optional;
  * */
 
 @Repository
-public class TraineeRepo extends AbstractInMemoryRepository<Trainee, Long> implements CrudRepo<Trainee, Long>, UserBasedRepository {
+public class TraineeRepo extends AbstractInMemoryRepository<Trainee, Long> implements UserBasedRepository {
 
     public TraineeRepo(@StorageQualifier(StorageType.TRAINEE) Map<Long, Trainee> traineeStorage) {
         super(traineeStorage);
