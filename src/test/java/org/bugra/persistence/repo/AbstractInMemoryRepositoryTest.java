@@ -2,6 +2,7 @@ package org.bugra.persistence.repo;
 
 import org.bugra.model.Trainee;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 
@@ -9,8 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AbstractInMemoryRepositoryTest {
 
@@ -48,6 +48,7 @@ class AbstractInMemoryRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return the correct entity if entity is exits")
     void findById_shouldReturnEntityWhenExists(){
         Trainee trainee = new Trainee();
         trainee.setId(1L);
@@ -60,15 +61,43 @@ class AbstractInMemoryRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return null if entity does not exits")
     void findById_shouldReturnNullWhenNotExists(){
         Optional<Trainee> result = fakeRepository.findById(1L);
         assertTrue(result.isEmpty());
     }
 
     @Test
+    @DisplayName("Should return optional empty if id is null")
     void findById_shouldReturnEmptyWhenIdIsNull(){
         Optional<Trainee> result = fakeRepository.findById(null);
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    @DisplayName("Should return false if provided id is null")
+    void deleteById_shouldReturnFalseWhenIdNull(){
+        boolean result = fakeRepository.deleteById(null);
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Should return false if entity does not exits")
+    void deleteById_shouldReturnFalseWhenNotExist(){
+        boolean result = fakeRepository.deleteById(1L);
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Should return true if entity is deleted")
+    void deleteById_shouldReturnTrueIfDeleted(){
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+        fakeStorage.put(1L, trainee);
+
+        boolean result = fakeRepository.deleteById(1L);
+
+        assertTrue(result);
+        assertNull(fakeStorage.get(1L));
+    }
 }
