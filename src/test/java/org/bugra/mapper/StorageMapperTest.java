@@ -3,6 +3,7 @@ package org.bugra.mapper;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
+import org.bugra.model.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -90,55 +91,101 @@ class StorageMapperTest {
     @Test
     @DisplayName("Should throw ArrayIndexOutOfBoundsException when columns are missing for Trainer")
     void shouldThrowExceptionWhenTrainerColumnsAreMissing() {
-        // Missing specialization field (only 6 columns instead of 7)
         String malformedLine = "1,Alice,Smith,alice.smith,securePassword123,true";
 
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
             storageMapper.parseTrainer(malformedLine);
-        }, "Expected ArrayIndexOutOfBoundsException due to missing columns");
+        });
     }
 
     @Test
     @DisplayName("Should throw ArrayIndexOutOfBoundsException when columns are missing for Trainee")
     void shouldThrowExceptionWhenTraineeColumnsAreMissing() {
-        // Missing address field (only 7 columns instead of 8)
         String malformedLine = "2,Robert,Johnson,robert.johnson,pass1234,false,1995-10-25";
 
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
             storageMapper.parseTrainee(malformedLine);
-        }, "Expected ArrayIndexOutOfBoundsException due to missing columns");
+        });
     }
 
     @Test
     @DisplayName("Should throw NumberFormatException when ID is not a valid long value")
     void shouldThrowNumberFormatExceptionForInvalidId() {
-        // ID is given as "INVALID_ID" instead of a number
         String malformedLine = "INVALID_ID,Alice,Smith,alice.smith,securePassword123,true,Bodybuilding";
 
         assertThrows(NumberFormatException.class, () -> {
             storageMapper.parseTrainer(malformedLine);
-        }, "Expected NumberFormatException due to non-numeric ID");
+        });
     }
 
     @Test
     @DisplayName("Should throw DateTimeParseException when date format is invalid for Trainee")
     void shouldThrowDateTimeParseExceptionForInvalidDateFormat() {
-        // Date is in bad format (DD-MM-YYYY) instead of ISO format (YYYY-MM-DD)
         String malformedLine = "2,Robert,Johnson,robert.johnson,pass1234,false,25-10-1995,London/UK";
 
         assertThrows(java.time.format.DateTimeParseException.class, () -> {
             storageMapper.parseTrainee(malformedLine);
-        }, "Expected DateTimeParseException due to incorrect date format");
+        });
     }
 
     @Test
     @DisplayName("Should throw NumberFormatException when training duration is not an integer")
     void shouldThrowNumberFormatExceptionForInvalidDuration() {
-        // Duration is given as "45mins" instead of a pure integer "45"
-        String malformedLine = "10,20,Cardio_Blast_Session,2026-06-26,Fitness,45mins";
+        String malformedLine = "1,10,20,Cardio_Blast_Session,Fitness,2026-06-26,45mins";
 
         assertThrows(NumberFormatException.class, () -> {
             storageMapper.parseTraining(malformedLine);
-        }, "Expected NumberFormatException due to alphabetic characters in duration");
+        });
+    }
+
+    @Test
+    @DisplayName("Should format Trainer correctly to CSV string")
+    void shouldFormatTrainerCorrectly() {
+        Trainer t = new Trainer();
+        t.setId(1L);
+        t.setFirstName("Alice");
+        t.setLastName("Smith");
+        t.setUsername("alice.smith");
+        t.setPassword("pass123");
+        t.setActive(true);
+        t.setSpecialization("Yoga");
+
+        String formatted = storageMapper.formatTrainer(t);
+        assertEquals("1,Alice,Smith,alice.smith,pass123,true,Yoga", formatted);
+    }
+
+    @Test
+    @DisplayName("Should format Trainee correctly to CSV string")
+    void shouldFormatTraineeCorrectly() {
+        Trainee t = new Trainee();
+        t.setId(2L);
+        t.setFirstName("Bob");
+        t.setLastName("Brown");
+        t.setUsername("bob.brown");
+        t.setPassword("pass456");
+        t.setActive(true);
+        t.setDateOfBirth(LocalDate.of(2000, 1, 1));
+        t.setAddress("Street 1");
+
+        String formatted = storageMapper.formatTrainee(t);
+        assertEquals("2,Bob,Brown,bob.brown,pass456,true,2000-01-01,Street 1", formatted);
+    }
+
+    @Test
+    @DisplayName("Should format Training correctly to CSV string")
+    void shouldFormatTrainingCorrectly() {
+        Training t = new Training();
+        t.setId(3L);
+        t.setTraineeId(10L);
+        t.setTrainerId(20L);
+        t.setTrainingName("HIIT");
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("Cardio");
+        t.setTrainingType(type);
+        t.setTrainingDate(LocalDate.of(2026, 1, 1));
+        t.setTrainingDuration(30);
+
+        String formatted = storageMapper.formatTraining(t);
+        assertEquals("3,10,20,HIIT,Cardio,2026-01-01,30", formatted);
     }
 }

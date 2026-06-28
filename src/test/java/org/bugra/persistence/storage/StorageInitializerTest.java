@@ -121,4 +121,31 @@ class StorageInitializerTest {
         // Verify that mapper was never called since files could not be opened
         verifyNoInteractions(storageMapper);
     }
+
+    @Test
+    @DisplayName("Should successfully save all data to files when destroy is called")
+    void shouldSaveAllDataSuccessfully() throws IOException {
+        Path trainerFile = tempDir.resolve("trainers_out.csv");
+
+        Map<Long, Trainer> trainerStorage = new HashMap<>();
+        Trainer t1 = new Trainer();
+        t1.setId(1L);
+        t1.setFirstName("John");
+        trainerStorage.put(1L, t1);
+
+        storageInitializer = new StorageInitializer(storageMapper, trainerStorage, new HashMap<>(), new HashMap<>());
+        ReflectionTestUtils.setField(storageInitializer, "trainerPath", trainerFile.toString());
+        ReflectionTestUtils.setField(storageInitializer, "traineePath", tempDir.resolve("trainees_out.csv").toString());
+        ReflectionTestUtils.setField(storageInitializer, "trainingPath", tempDir.resolve("trainings_out.csv").toString());
+
+        when(storageMapper.formatTrainer(t1)).thenReturn("1,John,Smith,john.smith,pass123,true,Yoga");
+
+        storageInitializer.destroy();
+
+        assertTrue(Files.exists(trainerFile));
+        String content = Files.readString(trainerFile).trim();
+        assertEquals("1,John,Smith,john.smith,pass123,true,Yoga", content);
+
+        verify(storageMapper, times(1)).formatTrainer(t1);
+    }
 }

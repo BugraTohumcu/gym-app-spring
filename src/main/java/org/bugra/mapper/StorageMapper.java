@@ -4,6 +4,10 @@ import org.bugra.model.*;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
+/**
+ * <p>This class responsible for paring from csv to object such as
+ * {@link Trainee} {@link Trainer} {@link Training} and also format object to csv </p>
+ * */
 @Component
 public class StorageMapper {
 
@@ -32,7 +36,6 @@ public class StorageMapper {
         Training training = new Training();
 
         training.setId(Long.parseLong(parts[0]));
-
         training.setTraineeId(Long.parseLong(parts[1]));
         training.setTrainerId(Long.parseLong(parts[2]));
         training.setTrainingName(parts[3]);
@@ -54,6 +57,43 @@ public class StorageMapper {
         user.setUsername(parts[3]);
         user.setPassword(parts[4]);
         user.setActive(Boolean.parseBoolean(parts[5]));
+    }
+
+    public String formatTrainer(Trainer t) {
+        return String.join(",",
+                String.valueOf(t.getId()),
+                t.getFirstName(),
+                t.getLastName(),
+                t.getUsername(),
+                t.getPassword(),
+                String.valueOf(t.isActive()),
+                t.getSpecialization()
+        );
+    }
+
+    public String formatTrainee(Trainee t) {
+        return String.join(",",
+                String.valueOf(t.getId()),
+                t.getFirstName(),
+                t.getLastName(),
+                t.getUsername(),
+                t.getPassword(),
+                String.valueOf(t.isActive()),
+                t.getDateOfBirth().toString(),
+                t.getAddress()
+        );
+    }
+
+    public String formatTraining(Training t) {
+        return String.join(",",
+                String.valueOf(t.getId()),
+                String.valueOf(t.getTraineeId()),
+                String.valueOf(t.getTrainerId()),
+                t.getTrainingName(),
+                t.getTrainingType().getTrainingTypeName(),
+                t.getTrainingDate().toString(),
+                String.valueOf(t.getTrainingDuration())
+        );
     }
 
 
