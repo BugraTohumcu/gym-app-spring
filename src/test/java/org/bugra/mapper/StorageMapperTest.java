@@ -73,16 +73,17 @@ class StorageMapperTest {
     @Test
     @DisplayName("Training should successfully parse the CSV line with specific workout session details")
     void shouldParseTrainingSuccessfully() {
-        String csvLine = "10,20,Cardio_Blast_Session,2026-06-26,Fitness,45";
+        String csvLine = "1, 10, 20, Cardio_Blast_Session, Fitness, 2026-06-26, 45";
 
         Training training = storageMapper.parseTraining(csvLine);
 
         assertNotNull(training);
+        assertEquals(1L, training.getId());
         assertEquals(10L, training.getTraineeId());
         assertEquals(20L, training.getTrainerId());
         assertEquals("Cardio_Blast_Session", training.getTrainingName());
-        assertEquals(LocalDate.of(2026, 6, 26), training.getTrainingDate());
         assertEquals("Fitness", training.getTrainingType().getTrainingTypeName());
+        assertEquals(LocalDate.of(2026, 6, 26), training.getTrainingDate());
         assertEquals(45, training.getTrainingDuration());
     }
 
