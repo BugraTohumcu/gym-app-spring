@@ -7,17 +7,15 @@ import java.util.function.Function;
 
 public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID>{
 
-    protected final Map<ID, T> storageMap;
+    protected Map<ID, T> storageMap;
     private final Comparator<ID> idComparator;
     private final ID defaultId;
     private final Function<T,ID> idExtractor;
 
     public AbstractInMemoryRepository(
-            Map<ID, T> storageMap,
             Comparator<ID> idComparator,
             ID defaultId,
             Function<T,ID> idExtractor) {
-        this.storageMap = storageMap;
         this.idComparator = idComparator;
         this.defaultId = defaultId;
         this.idExtractor = idExtractor;
@@ -43,6 +41,10 @@ public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID
         return storageMap.keySet().stream()
                 .max(idComparator)
                 .orElse(defaultId);
+    }
+
+    public void setStorageMap(Map<ID, T> storageMap) {
+        this.storageMap = storageMap;
     }
 
     @Override
