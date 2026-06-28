@@ -6,11 +6,15 @@ import org.bugra.persistence.repo.TraineeRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,7 +52,7 @@ class TraineeServiceImpTest {
         mockTrainee.setId(id);
         mockTrainee.setUsername(userName);
 
-        // user exists return mock user
+        // User exists return mock user
         when(traineeRepo.findById(id)).thenReturn(Optional.of(mockTrainee));
 
         Trainee result = traineeService.getTrainee(id);
@@ -106,6 +110,25 @@ class TraineeServiceImpTest {
         verify(traineeRepo, times(1)).existsByUsername("john.doe");
         verify(traineeRepo, times(1)).existsByUsername("john.doe1");
         verify(traineeRepo, times(1)).existsByUsername(expectedUserName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidCredentials")
+    @DisplayName("Should throw IllegalArgumentException when credentials are null or blank")
+    void generateUsername_shouldThrowException_whenCredentialsAreInvalid(String firstName, String lastName) {
+
+        assertThrows(IllegalArgumentException.class,
+                () -> traineeService.generateUsername(firstName, lastName));
+    }
+
+    private static Stream<Arguments> provideInvalidCredentials() {
+        return Stream.of(
+                Arguments.of(null, "Doe"),  // firstName null
+                Arguments.of("John", null),  // lastName null
+                Arguments.of("", "Doe"),    // firstName boş
+                Arguments.of("John", " "),  // lastName blank
+                Arguments.of(null, null)    // both null
+        );
     }
 
     @Test
