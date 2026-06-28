@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.exception.TrainingNotFoundException;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Training;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,12 @@ class TrainingServiceImpTest {
 
     @Mock
     TrainingRepo trainingRepo;
+
+    @Mock
+    TrainerService trainerService;
+
+    @Mock
+    TraineeService traineeService;
 
     @InjectMocks
     TrainingServiceImp trainingService;
@@ -62,6 +69,31 @@ class TrainingServiceImpTest {
         training.setTrainingDuration(0);
 
         assertThrows(IllegalArgumentException.class, () -> trainingService.createTraining(training));
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException when trainer id does not exists")
+    void createTraining_shouldThrowWhenTrainerIdNotExist(){
+
+        Training training = new Training();
+        training.setTraineeId(999L);
+        when(traineeService.getTrainee(999L)).thenReturn(null);
+
+        assertThrows(UserNotFoundException.class, () -> trainingService.createTraining(training));
+        verify(trainingRepo, never()).save(any());
+    }
+
+    @Test
+    void createTraining_ShouldThrowUserNotFoundException_WhenTrainerDoesNotExist() {
+        Training training = new Training();
+        training.setTraineeId(1L);
+        training.setTrainerId(888L);
+
+        when(traineeService.getTrainee(1L)).thenReturn(new org.bugra.model.Trainee());
+        when(trainerService.getTrainer(888L)).thenReturn(null);
+
+        assertThrows(UserNotFoundException.class, () -> trainingService.createTraining(training));
+        verify(trainingRepo, never()).save(any());
     }
 
     @Test
