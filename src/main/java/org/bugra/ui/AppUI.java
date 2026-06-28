@@ -1,10 +1,13 @@
 package org.bugra.ui;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AppUI extends BaseUI {
 
+    private ConfigurableApplicationContext context;
     private final TraineeMenu traineeMenu;
     private final TrainerMenu trainerMenu;
     private final TrainingMenu trainingMenu;
@@ -27,7 +30,12 @@ public class AppUI extends BaseUI {
                 case "1" -> traineeMenu.showMenu();
                 case "2" -> trainerMenu.showMenu();
                 case "3" -> trainingMenu.showMenu();
-                case "0" -> running = false;
+                case "0" -> {
+                    running = false;
+
+                    // Close context first to save data to files
+                    context.close();
+                }
                 default -> printError("Invalid option!");
             }
         }
@@ -48,5 +56,10 @@ public class AppUI extends BaseUI {
         System.out.println("│ 0. Exit");
         System.out.println("└──────────────────────────────────");
         System.out.print("Select: ");
+    }
+
+    @Autowired
+    public void setContext(ConfigurableApplicationContext context) {
+        this.context = context;
     }
 }
