@@ -41,6 +41,7 @@ class TrainerServiceImplTest {
         trainer.setFirstName("Jane");
         trainer.setLastName("Smith");
 
+        when(trainerRepo.getMaxId()).thenReturn(0L);
         when(userCredentialsService.generateRandomPassword()).thenReturn("Secret789");
         when(userCredentialsService.generateUsername(eq("Jane"), eq("Smith"), any()))
                 .thenReturn("jane.smith");

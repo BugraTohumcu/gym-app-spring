@@ -46,6 +46,7 @@ class TraineeServiceImpTest {
         trainee.setFirstName("john");
         trainee.setLastName("doe");
 
+        when(traineeRepo.getMaxId()).thenReturn(0L);
         when(userCredentialsServiceImp.generateRandomPassword()).thenReturn("Secret123");
         when(userCredentialsServiceImp.generateUsername(eq("john"), eq("doe"), any()))
                 .thenReturn("john.doe");
