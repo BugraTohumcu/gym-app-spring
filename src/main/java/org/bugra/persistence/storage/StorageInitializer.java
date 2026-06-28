@@ -49,7 +49,7 @@ public class StorageInitializer {
         logger.info("Storage initialization is started.");
         loadData(trainerStorage, trainerPath, mapper::parseTrainer, Trainer::getId);
         loadData(traineeStorage, traineePath, mapper::parseTrainee, Trainee::getId);
-        loadData(trainingStorage, trainingPath, mapper::parseTraining, Training::getTraineeId);
+        loadData(trainingStorage, trainingPath, mapper::parseTraining, Training::getId);
         logger.info("Storage initialized from files.");
     }
 
