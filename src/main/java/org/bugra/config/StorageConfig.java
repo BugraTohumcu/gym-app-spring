@@ -21,21 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @PropertySource("classpath:application.properties")
 public class StorageConfig {
 
-    // Data paths
-    @Value("${storage.trainees.file}")
-    private String traineesPath;
-
-    @Value("${storage.trainers.file}")
-    private String trainersPath;
-
-    @Value("${storage.trainings.file}")
-    private String trainingsPath;
-
-
-    private final StorageInitializer initializer;
-
-    public StorageConfig(StorageInitializer initializer) { this.initializer = initializer; }
-
     @Bean(name = StorageType.Constants.TRAINER_NAME)
     @StorageQualifier(StorageType.TRAINER)
     public Map<Long, Trainer> trainerStorage() {
@@ -52,14 +37,5 @@ public class StorageConfig {
     @StorageQualifier(StorageType.TRAINING)
     public Map<Long, Training> trainingStorage() {
         return new ConcurrentHashMap<>();
-    }
-
-
-    // Load all data from files
-    @PostConstruct
-    public void init() {
-        initializer.loadAllData(
-                trainerStorage(), traineeStorage(), trainingStorage(),
-                trainersPath, traineesPath, trainingsPath);
     }
 }
