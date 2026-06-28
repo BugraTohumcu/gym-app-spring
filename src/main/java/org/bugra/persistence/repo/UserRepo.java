@@ -16,8 +16,8 @@ public abstract class UserRepo<T extends User>
         extends AbstractInMemoryRepository<T, Long>
         implements UsernameCapable {
 
-    public UserRepo(Map<Long, T> storage) {
-        super(storage, Long::compare, 0L, User::getId);
+    public UserRepo() {
+        super(Long::compare, 0L, User::getId);
     }
 
     @Override

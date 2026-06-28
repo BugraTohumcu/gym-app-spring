@@ -22,8 +22,8 @@ class AbstractInMemoryRepositoryTest {
     private static class TestRepository
         extends AbstractInMemoryRepository<Trainee, Long>{
 
-        protected TestRepository(Map<Long, Trainee> map) {
-            super(map,Long::compare, 0L, Trainee::getId);
+        protected TestRepository() {
+            super(Long::compare, 0L, Trainee::getId);
         }
 
         @Override
@@ -44,7 +44,8 @@ class AbstractInMemoryRepositoryTest {
     @BeforeEach
     void setUp() {
         fakeStorage = new ConcurrentHashMap<>();
-        fakeRepository = new TestRepository(fakeStorage);
+        fakeRepository = new TestRepository();
+        fakeRepository.setStorageMap(fakeStorage);
     }
 
     @Test
