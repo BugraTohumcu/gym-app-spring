@@ -3,6 +3,7 @@ package org.bugra.service;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.util.PasswordGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +27,37 @@ class TraineeServiceImpTest {
     @Mock
     TraineeRepo traineeRepo;
 
+    @Mock
+    UserCredentialsServiceImp userCredentialsServiceImp;
+
     @InjectMocks
     TraineeServiceImp traineeService;
 
     @Test
-    void createTrainee() {
+    @DisplayName("Should throw exception when trainee is null")
+    void createTrainee_shouldThrowExceptionWhenNull() {
+        assertThrows(IllegalArgumentException.class, () -> traineeService.createTrainee(null));
+    }
+    @Test
+    @DisplayName("Should successfully create trainee with generated credentials")
+    void createTrainee_shouldSetCredentialsAndSave() {
+        // Given
+        Trainee trainee = new Trainee();
+        trainee.setFirstName("john");
+        trainee.setLastName("doe");
+
+        when(userCredentialsServiceImp.generateRandomPassword()).thenReturn("Secret123");
+        when(userCredentialsServiceImp.generateUsername(eq("john"), eq("doe"), any()))
+                .thenReturn("john.doe");
+        when(traineeRepo.save(any(Trainee.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        // When
+        Trainee savedTrainee = traineeService.createTrainee(trainee);
+
+        // Then
+        assertEquals("Secret123", savedTrainee.getPassword());
+        assertEquals("john.doe", savedTrainee.getUsername());
+        verify(traineeRepo, times(1)).save(trainee);
     }
 
     @Test
@@ -78,49 +105,6 @@ class TraineeServiceImpTest {
         verify(traineeRepo, times(1)).findById(id);
     }
 
-    @Test
-    @DisplayName("Should generate directly username if there is not similarity int storage")
-    void generateUsername_shouldGenerateUsername() {
-        String firstName = "John";
-        String lastName = "Doe";
-        String expectedUserName = "john.doe";
-
-        String actualUsername = traineeService.generateUsername(firstName,lastName);
-
-        assertEquals(expectedUserName, actualUsername);
-    }
-
-    @Test
-    @DisplayName("Should append and increment counter when the generated username is already taken")
-    void generateUsername_shouldHandleDuplicates() {
-        String firstName = "John";
-        String lastName = "Doe";
-        String expectedUserName = "john.doe2";
-
-        // The existing usernames
-        when(traineeRepo.existsByUsername("john.doe")).thenReturn(true);
-        when(traineeRepo.existsByUsername("john.doe1")).thenReturn(true);
-
-
-        String actualUsername = traineeService.generateUsername(firstName,lastName);
-
-
-        assertEquals(expectedUserName, actualUsername);
-
-        verify(traineeRepo, times(1)).existsByUsername("john.doe");
-        verify(traineeRepo, times(1)).existsByUsername("john.doe1");
-        verify(traineeRepo, times(1)).existsByUsername(expectedUserName);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideInvalidCredentials")
-    @DisplayName("Should throw IllegalArgumentException when credentials are null or blank")
-    void generateUsername_shouldThrowException_whenCredentialsAreInvalid(String firstName, String lastName) {
-
-        assertThrows(IllegalArgumentException.class,
-                () -> traineeService.generateUsername(firstName, lastName));
-    }
-
     private static Stream<Arguments> provideInvalidCredentials() {
         return Stream.of(
                 Arguments.of(null, "Doe"),  // firstName null
@@ -131,7 +115,4 @@ class TraineeServiceImpTest {
         );
     }
 
-    @Test
-    void generateRandomPassword() {
-    }
 }

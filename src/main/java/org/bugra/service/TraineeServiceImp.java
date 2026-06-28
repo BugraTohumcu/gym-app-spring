@@ -5,31 +5,59 @@ import org.bugra.model.Trainee;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TraineeServiceImp implements TraineeService{
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImp.class);
-    private final TraineeRepo traineeRepo;
+    private TraineeRepo traineeRepo;
+    private UserCredentialsService userCredentialsService;
 
-    public TraineeServiceImp(TraineeRepo traineeRepo) {
-        this.traineeRepo = traineeRepo;
-    }
 
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        return null;
+        if (trainee == null) {
+            logger.error("Attempted to create a null trainee");
+            throw new IllegalArgumentException("Trainee cannot be null");
+        }
+
+        // Generate random password
+        String password = userCredentialsService.generateRandomPassword();
+        trainee.setPassword(password);
+
+        // Generate username
+        String finalUsername = userCredentialsService.generateUsername(trainee.getFirstName(),
+                trainee.getLastName(),
+                traineeRepo::existsByUsername);
+        trainee.setUsername(finalUsername);
+
+        Trainee savedTrainee = traineeRepo.save(trainee);
+
+        logger.info("Trainee created successfully with ID: {} and username: {}", savedTrainee.getId(), savedTrainee.getUsername());
+        return savedTrainee;
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        return null;
+        // Null check for object and id
+        if (trainee == null || trainee.getId() == null) {
+            logger.error("Update failed: Trainee or ID is null");
+            throw new IllegalArgumentException("Trainee or Trainee ID cannot be null");
+        }
+
+        logger.info("Trainee updated successfully with ID: {}", trainee.getId());
+        return traineeRepo.updateById(trainee)
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found with id: " + trainee.getId()));
     }
 
     @Override
     public boolean deleteTrainee(long traineeId) {
-        return false;
+        if (!traineeRepo.deleteById(traineeId)) {
+            throw new UserNotFoundException("Trainee not found with id: " + traineeId);
+        }
+        return true;
     }
 
     @Override
@@ -46,36 +74,13 @@ public class TraineeServiceImp implements TraineeService{
         return trainee;
     }
 
-    @Override
-    public String generateUsername(String firstName, String lastName) {
-        // Null and blank check for credentials
-        if (firstName == null || lastName == null ||
-                firstName.isBlank() || lastName.isBlank()) {
-            logger.warn("First name or last name cannot be null or empty");
-            throw new IllegalArgumentException("First name or last name cannot be null or empty");
-        }
-
-        // Create base username
-        String baseName = (firstName.trim() + "." + lastName.trim()).toLowerCase();
-        StringBuilder builder = new StringBuilder(baseName);
-
-        // Check if username is taken
-        // For the simplicity I've used linear search.
-        // Better approach may be second level indexing eg: {"john.doe": 0}
-        int counter = 1;
-        while (traineeRepo.existsByUsername(builder.toString())) {
-            // Reset username
-            builder.setLength(0);
-
-            builder.append(baseName).append(counter);
-            counter++;
-        }
-
-        return builder.toString();
+    @Autowired
+    public void setTraineeRepo(TraineeRepo traineeRepo) {
+        this.traineeRepo = traineeRepo;
     }
 
-    @Override
-    public String generateRandomPassword() {
-        return "";
+    @Autowired
+    public void setUserCredentialsService(UserCredentialsService userCredentialsService){
+        this.userCredentialsService = userCredentialsService;
     }
 }
