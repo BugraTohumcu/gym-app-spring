@@ -10,9 +10,4 @@ public interface UsernameCapable {
      * Checks if a specific username is already taken by any entity in the storage.
      */
     boolean existsByUsername(String username);
-
-    /**
-     * Finds the maximum ID currently present in the storage.
-     */
-    Long getMaxId();
 }
