@@ -29,6 +29,10 @@ public class TrainerServiceImpl implements TrainerService {
                 trainerRepo::existsByUsername
         ));
 
+        trainer.setActive(true);
+        long newId = trainerRepo.getMaxId() + 1;
+        trainer.setId(newId);
+
         Trainer savedTrainer = trainerRepo.save(trainer);
         logger.info("Trainer created successfully with ID: {} and username: {}", savedTrainer.getId(), savedTrainer.getUsername());
         return savedTrainer;

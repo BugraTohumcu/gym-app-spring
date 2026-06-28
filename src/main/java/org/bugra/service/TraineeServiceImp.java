@@ -32,6 +32,10 @@ public class TraineeServiceImp implements TraineeService{
                 trainee.getLastName(),
                 traineeRepo::existsByUsername);
         trainee.setUsername(finalUsername);
+        trainee.setActive(true);
+
+        long newId = traineeRepo.getMaxId() + 1;
+        trainee.setId(newId);
 
         Trainee savedTrainee = traineeRepo.save(trainee);
 
@@ -57,6 +61,7 @@ public class TraineeServiceImp implements TraineeService{
         if (!traineeRepo.deleteById(traineeId)) {
             throw new UserNotFoundException("Trainee not found with id: " + traineeId);
         }
+        logger.error("Trainee with id: {} deleted successfully", traineeId );
         return true;
     }
 
