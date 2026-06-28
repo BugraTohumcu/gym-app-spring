@@ -29,16 +29,20 @@ public class StorageMapper {
     public Training parseTraining(String line) {
         String[] parts = trimParts(line.split(","));
 
+        Training training = new Training();
+
+        training.setId(Long.parseLong(parts[0]));
+
+        training.setTraineeId(Long.parseLong(parts[1]));
+        training.setTrainerId(Long.parseLong(parts[2]));
+        training.setTrainingName(parts[3]);
+
         TrainingType trainingType = new TrainingType();
         trainingType.setTrainingTypeName(parts[4]);
-
-        Training training = new Training();
-        training.setTraineeId(Long.parseLong(parts[0]));
-        training.setTrainerId(Long.parseLong(parts[1]));
-        training.setTrainingName(parts[2]);
         training.setTrainingType(trainingType);
-        training.setTrainingDate(LocalDate.parse(parts[3]));
-        training.setTrainingDuration(Integer.parseInt(parts[5]));
+
+        training.setTrainingDate(LocalDate.parse(parts[5]));
+        training.setTrainingDuration(Integer.parseInt(parts[6]));
 
         return training;
     }
