@@ -19,7 +19,8 @@ class TraineeRepoTest {
     @BeforeEach
     void setup(){
         fakeStorage = new ConcurrentHashMap<>();
-        fakeRepo = new TraineeRepo(fakeStorage);
+        fakeRepo = new TraineeRepo();
+        fakeRepo.setStorageMap(fakeStorage);
     }
 
     @Test
