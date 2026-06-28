@@ -12,11 +12,6 @@ public class TrainingRepo extends AbstractInMemoryRepository<Training, Long> {
 
     public TrainingRepo(
             @StorageQualifier(StorageType.TRAINING) Map<Long, Training> storageMap) {
-        super(storageMap);
-    }
-
-    @Override
-    protected Long getEntityId(Training entity) {
-        return entity.getId();
+        super(storageMap, Long::compare, 0L, Training::getId);
     }
 }
