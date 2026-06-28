@@ -54,19 +54,31 @@ public class StorageInitializer {
     }
 
     // Generic data loading
-     private <V> void loadData(Map<Long, V> dataMap,
-                               String filePath,
-                               Function<String, V> parseData,
-                               Function<V, Long> keyExtractor) {
+    private <V> void loadData(Map<Long, V> dataMap,
+                              String filePath,
+                              Function<String, V> parseData,
+                              Function<V, Long> keyExtractor) {
 
-        try(BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            java.lang.String line;
-            while ((line = reader.readLine()) != null){
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) continue;
+
                 V entity = parseData.apply(line);
-                dataMap.put(keyExtractor.apply(entity), entity);
+
+                if (entity != null) {
+                    Long key = keyExtractor.apply(entity);
+                    if (key != null) {
+                        dataMap.put(key, entity);
+                    } else {
+                        logger.warn("Skipping entity with null ID in file: {}", filePath);
+                    }
+                } else {
+                    logger.warn("Skipping unparseable line in file: {}", filePath);
+                }
             }
         } catch (IOException e) {
-            logger.warn("Data is not found starting empty");
+            logger.warn("Data file not found or unreadable: {}. Starting with empty storage.", filePath);
         }
     }
 
