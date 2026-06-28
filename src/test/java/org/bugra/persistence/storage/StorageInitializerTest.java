@@ -60,7 +60,7 @@ class StorageInitializerTest {
         mockTrainee.setId(200L);
 
         Training mockTraining = new Training();
-        mockTraining.setTraineeId(300L);
+        mockTraining.setId(300L);
 
         when(storageMapper.parseTrainer("trainer-row-1")).thenReturn(mockTrainer);
         when(storageMapper.parseTrainee("trainee-row-1")).thenReturn(mockTrainee);
