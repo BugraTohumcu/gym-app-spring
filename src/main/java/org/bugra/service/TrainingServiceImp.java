@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.exception.TrainingNotFoundException;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Training;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ public class TrainingServiceImp implements TrainingService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImp.class);
     private TrainingRepo trainingRepo;
+    private TraineeService traineeService;
+    private TrainerService trainerService;
 
     @Override
     public Training createTraining(Training training) {
@@ -22,11 +25,32 @@ public class TrainingServiceImp implements TrainingService {
             throw new IllegalArgumentException("Training cannot be null");
         }
 
+        // Check if trainer id exist
+        if(traineeService.getTrainee(training.getTraineeId() ) == null){
+            logger.error("The trainee with id {} not found for training with id {}",
+                    training.getTraineeId(),
+                    training.getId());
+
+            throw new UserNotFoundException("Trainee is not found with id: " + training.getTraineeId());
+        }
+
+        // Check if trainer id exist
+        if(trainerService.getTrainer(training.getTrainerId() ) == null){
+            logger.error("The trainer with id {} not found for training with id {}",
+                    training.getTrainerId(),
+                    training.getId());
+
+            throw new UserNotFoundException("Trainer is not found with id: " + training.getTrainerId());
+        }
+
         // Duration and training date check
         validateTrainingDateAndDuration(
                 training.getTrainingDate(),
                 training.getTrainingDuration()
         );
+
+        long newId = trainingRepo.getMaxId() + 1;
+        training.setId(newId);
 
         Training savedTraining = trainingRepo.save(training);
         logger.info("Training created successfully with ID: {}", savedTraining.getId());
@@ -50,11 +74,13 @@ public class TrainingServiceImp implements TrainingService {
     public void validateTrainingDateAndDuration(LocalDate date, int duration) {
         // Null and invalid time check
         if (date == null || date.isBefore(LocalDate.now())) {
+            logger.error("Training date cannot be null or in the past");
             throw new IllegalArgumentException("Training date cannot be null or in the past");
         }
 
         // Invalid duration check
         if (duration <= 0) {
+            logger.error("Training duration must be positive");
             throw new IllegalArgumentException("Training duration must be positive");
         }
     }
@@ -62,5 +88,15 @@ public class TrainingServiceImp implements TrainingService {
     @Autowired
     public void setTrainingRepo(TrainingRepo trainingRepo) {
         this.trainingRepo = trainingRepo;
+    }
+
+    @Autowired
+    public void setTraineeService(TraineeService traineeService) {
+        this.traineeService = traineeService;
+    }
+
+    @Autowired
+    public void setTrainerService(TrainerService trainerService) {
+        this.trainerService = trainerService;
     }
 }
