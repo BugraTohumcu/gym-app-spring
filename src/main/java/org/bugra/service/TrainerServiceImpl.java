@@ -50,11 +50,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer getTrainer(long trainerId) {
-        return trainerRepo.findById(trainerId)
+        Trainer trainer = trainerRepo.findById(trainerId)
                 .orElseThrow(() -> {
                     logger.warn("Trainer with id: {} not found", trainerId);
                     return new UserNotFoundException("Trainer not found with id: " + trainerId);
                 });
+
+        logger.info("Trainer with id: {} successfully fetched", trainerId); // Bunu ekleyebilirsin
+        return trainer;
     }
 
     @Autowired
