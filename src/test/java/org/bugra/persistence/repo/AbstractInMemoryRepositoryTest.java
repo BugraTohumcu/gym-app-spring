@@ -23,12 +23,7 @@ class AbstractInMemoryRepositoryTest {
         extends AbstractInMemoryRepository<Trainee, Long>{
 
         protected TestRepository(Map<Long, Trainee> map) {
-            super(map);
-        }
-
-        @Override
-        protected Long getEntityId(Trainee entity) {
-            return entity.getId();
+            super(map,Long::compare, 0L, Trainee::getId);
         }
 
         @Override
