@@ -2,6 +2,8 @@ package org.bugra.service;
 
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
+import org.bugra.model.Trainee;
+import org.bugra.model.Trainer;
 import org.bugra.model.Training;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.junit.jupiter.api.DisplayName;
@@ -36,16 +38,22 @@ class TrainingServiceImpTest {
     @DisplayName("Should successfully create training when data is valid")
     void createTraining_shouldSaveSuccessfully() {
         Training training = new Training();
-
-        // Future data
+        training.setTraineeId(1L);
+        training.setTrainerId(1L);
         training.setTrainingDate(LocalDate.now().plusDays(1));
         training.setTrainingDuration(60);
+
+        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
+        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
+
+        when(trainingRepo.getMaxId()).thenReturn(0L);
 
         when(trainingRepo.save(any(Training.class))).thenAnswer(i -> i.getArguments()[0]);
 
         Training saved = trainingService.createTraining(training);
 
         assertNotNull(saved);
+        assertEquals(1L, saved.getId()); // ID oluştuğunu doğrula
         verify(trainingRepo, times(1)).save(training);
     }
 
@@ -53,8 +61,13 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw exception when date is in the past")
     void createTraining_shouldThrowExceptionForPastDate() {
         Training training = new Training();
-        training.setTrainingDate(LocalDate.now().minusDays(1)); // Geçmiş tarih
+        training.setTraineeId(1L);
+        training.setTrainerId(1L);
+        training.setTrainingDate(LocalDate.now().minusDays(1));
         training.setTrainingDuration(60);
+
+        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
+        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
 
         assertThrows(IllegalArgumentException.class, () -> trainingService.createTraining(training));
     }
@@ -62,11 +75,15 @@ class TrainingServiceImpTest {
     @Test
     @DisplayName("Should throw exception when duration is non-positive")
     void createTraining_shouldThrowExceptionForInvalidDuration() {
-        Training training = new Training();
-        training.setTrainingDate(LocalDate.now().plusDays(1));
 
-        // Invalid duration
+        Training training = new Training();
+        training.setTraineeId(1L);
+        training.setTrainerId(1L);
+        training.setTrainingDate(LocalDate.now().plusDays(1));
         training.setTrainingDuration(0);
+
+        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
+        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
 
         assertThrows(IllegalArgumentException.class, () -> trainingService.createTraining(training));
     }
