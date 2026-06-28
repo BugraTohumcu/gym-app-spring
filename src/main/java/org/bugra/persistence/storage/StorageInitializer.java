@@ -1,6 +1,7 @@
 package org.bugra.persistence.storage;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.bugra.annotation.StorageQualifier;
 import org.bugra.enums.StorageType;
 import org.bugra.mapper.StorageMapper;
@@ -10,10 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.*;
 import java.util.function.Function;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;import java.util.Map;
+import java.util.Map;
 
 @Component
 public class StorageInitializer {
@@ -49,8 +49,28 @@ public class StorageInitializer {
         logger.info("Storage initialization is started.");
         loadData(trainerStorage, trainerPath, mapper::parseTrainer, Trainer::getId);
         loadData(traineeStorage, traineePath, mapper::parseTrainee, Trainee::getId);
-        loadData(trainingStorage, trainingPath, mapper::parseTraining, Training::getTraineeId);
+        loadData(trainingStorage, trainingPath, mapper::parseTraining, Training::getId);
         logger.info("Storage initialized from files.");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        logger.info("Saving storage data before shutdown.");
+        saveData(trainerStorage, trainerPath, mapper::formatTrainer);
+        saveData(traineeStorage, traineePath, mapper::formatTrainee);
+        saveData(trainingStorage, trainingPath, mapper::formatTraining);
+        logger.info("Storage saved successfully.");
+    }
+
+    private <V> void saveData(Map<Long, V> dataMap, String filePath, Function<V, String> formatter) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (V entity : dataMap.values()) {
+                writer.write(formatter.apply(entity));
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            logger.error("Error saving data to file: {}", filePath, e);
+        }
     }
 
     // Generic data loading
