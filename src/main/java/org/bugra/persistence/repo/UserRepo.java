@@ -17,12 +17,7 @@ public abstract class UserRepo<T extends User>
         implements UsernameCapable {
 
     public UserRepo(Map<Long, T> storage) {
-        super(storage);
-    }
-
-    @Override
-    protected Long getEntityId(T entity) {
-        return entity.getId();
+        super(storage, Long::compare, 0L, User::getId);
     }
 
     @Override
@@ -32,13 +27,6 @@ public abstract class UserRepo<T extends User>
         }
         return storageMap.values().stream()
                 .anyMatch(trainee -> username.equalsIgnoreCase(trainee.getUsername()));
-    }
-
-    @Override
-    public Long getMaxId() {
-        return storageMap.keySet().stream()
-                .max(Long::compare)
-                .orElse(0L);
     }
 
 }
