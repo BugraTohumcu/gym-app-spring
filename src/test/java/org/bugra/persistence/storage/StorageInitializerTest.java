@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ class StorageInitializerTest {
 
     @BeforeEach
     void setUp() {
-        storageInitializer = new StorageInitializer(storageMapper);
+        storageInitializer = new StorageInitializer(storageMapper, new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 
     @Test
@@ -61,7 +62,6 @@ class StorageInitializerTest {
         Training mockTraining = new Training();
         mockTraining.setTraineeId(300L);
 
-        // Mocking mapper behavior
         when(storageMapper.parseTrainer("trainer-row-1")).thenReturn(mockTrainer);
         when(storageMapper.parseTrainee("trainee-row-1")).thenReturn(mockTrainee);
         when(storageMapper.parseTraining("training-row-1")).thenReturn(mockTraining);
@@ -70,11 +70,12 @@ class StorageInitializerTest {
         Map<Long, Trainee> traineeStorage = new HashMap<>();
         Map<Long, Training> trainingStorage = new HashMap<>();
 
+        storageInitializer = new StorageInitializer(storageMapper, trainerStorage, traineeStorage, trainingStorage);
+        ReflectionTestUtils.setField(storageInitializer, "trainerPath", trainerFile.toString());
+        ReflectionTestUtils.setField(storageInitializer, "traineePath", traineeFile.toString());
+        ReflectionTestUtils.setField(storageInitializer, "trainingPath", trainingFile.toString());
 
-        storageInitializer.loadAllData(
-                trainerStorage, traineeStorage, trainingStorage,
-                trainerFile.toString(), traineeFile.toString(), trainingFile.toString()
-        );
+        storageInitializer.init();
 
         // Verify maps are populated correctly
         assertEquals(1, trainerStorage.size());
@@ -105,10 +106,12 @@ class StorageInitializerTest {
         Map<Long, Trainee> traineeStorage = new HashMap<>();
         Map<Long, Training> trainingStorage = new HashMap<>();
 
-        assertDoesNotThrow(() -> storageInitializer.loadAllData(
-                trainerStorage, traineeStorage, trainingStorage,
-                invalidPath, invalidPath, invalidPath
-        ));
+        storageInitializer = new StorageInitializer(storageMapper, trainerStorage, traineeStorage, trainingStorage);
+        ReflectionTestUtils.setField(storageInitializer, "trainerPath", invalidPath);
+        ReflectionTestUtils.setField(storageInitializer, "traineePath", invalidPath);
+        ReflectionTestUtils.setField(storageInitializer, "trainingPath", invalidPath);
+
+        assertDoesNotThrow(() -> storageInitializer.init());
 
         // Verify that maps remain empty
         assertTrue(trainerStorage.isEmpty());
