@@ -19,6 +19,13 @@ public class AppUI extends BaseUI {
     }
 
     public void run() {
+
+        // Gracefully shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("System is closing...");
+            context.close();
+        }));
+
         boolean running = true;
         printBanner();
 
@@ -32,9 +39,6 @@ public class AppUI extends BaseUI {
                 case "3" -> trainingMenu.showMenu();
                 case "0" -> {
                     running = false;
-
-                    // Close context first to save data to files
-                    context.close();
                 }
                 default -> printError("Invalid option!");
             }
