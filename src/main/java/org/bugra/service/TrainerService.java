@@ -28,4 +28,12 @@ public interface TrainerService {
      * @return the found trainer
      */
     Trainer getTrainer(long trainerId);
+
+
+    /**
+     * Checks if {@link Trainer} does exist with provided id
+     * @param id the unique trainee id
+     * @return true if exists, false otherwise
+     * */
+    boolean existsById(long id);
 }

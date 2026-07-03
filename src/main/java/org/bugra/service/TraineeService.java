@@ -43,4 +43,12 @@ public interface TraineeService {
      * */
     Trainee getTrainee(long traineeId);
 
+
+    /**
+     * Checks if {@link Trainee} does exist with provided id
+     * @param id the unique trainee id
+     * @return true if exists, false otherwise
+     * */
+    boolean existsById(long id);
+
 }
