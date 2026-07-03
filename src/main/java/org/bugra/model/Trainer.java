@@ -1,8 +1,34 @@
 package org.bugra.model;
 
-public class Trainer extends User {
-    private String specialization;
 
-    public String getSpecialization() { return specialization; }
-    public void setSpecialization(String specialization) { this.specialization = specialization; }
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.Set;
+
+@Entity
+@Data
+public class Trainer{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
+
+
+    @ManyToOne
+    private TrainingType specialization;
+
+    @OneToOne(
+            optional = false,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private User user;
+
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private Set<Trainee> trainees;
 }
