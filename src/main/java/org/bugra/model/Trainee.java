@@ -1,14 +1,29 @@
 package org.bugra.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Data;
 
-public class Trainee extends User {
+import java.time.LocalDate;
+import java.util.Set;
+
+@Entity
+@Data
+public class Trainee{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
     private LocalDate dateOfBirth;
     private String address;
 
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    @OneToOne(
+            optional = false,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private User user;
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+
+    @ManyToMany(mappedBy = "trainees")
+    private Set<Trainer> trainers;
 }
