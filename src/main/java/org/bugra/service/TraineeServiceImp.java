@@ -2,6 +2,7 @@ package org.bugra.service;
 
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
+import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,35 +19,39 @@ public class TraineeServiceImp implements TraineeService{
 
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        if (trainee == null) {
-            logger.error("Attempted to create a null trainee");
-            throw new IllegalArgumentException("Trainee cannot be null");
+        if (trainee == null || trainee.getUser() == null) {
+            logger.error("Attempted to create a null trainee or trainee without user credentials");
+            throw new IllegalArgumentException("Trainee and associated User cannot be null");
         }
+
+        User user = trainee.getUser();
 
         // Generate random password
         String password = userCredentialsService.generateRandomPassword();
-        trainee.setPassword(password);
+        user.setPassword(password);
 
         // Generate username
-        String finalUsername = userCredentialsService.generateUsername(trainee.getFirstName(),
-                trainee.getLastName(),
+        String finalUsername = userCredentialsService.generateUsername(
+                user.getFirstName(),
+                user.getLastName(),
                 traineeRepo::existsByUsername);
-        trainee.setUsername(finalUsername);
-        trainee.setActive(true);
 
-        long newId = traineeRepo.getMaxId() + 1;
-        trainee.setId(newId);
+        user.setUsername(finalUsername);
+        user.setActive(true);
 
         Trainee savedTrainee = traineeRepo.save(trainee);
 
-        logger.info("Trainee created successfully with ID: {} and username: {}", savedTrainee.getId(), savedTrainee.getUsername());
+        logger.info("Trainee created successfully with ID: {} and username: {}",
+                savedTrainee.getId(),
+                savedTrainee.getUser().getUsername());
+
         return savedTrainee;
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         // Null check for object and id
-        if (trainee == null || trainee.getId() == null) {
+        if (trainee == null ) {
             logger.error("Update failed: Trainee or ID is null");
             throw new IllegalArgumentException("Trainee or Trainee ID cannot be null");
         }
@@ -75,8 +80,17 @@ public class TraineeServiceImp implements TraineeService{
                     return new UserNotFoundException("Trainee not found with id: " + traineeId);
                 });
 
-        logger.info("User with id: {} and username: {} fetched", traineeId, trainee.getUsername());
+        logger.info("User with id: {} and username: {} fetched",
+                traineeId,
+                trainee.getUser().getUsername());
+
         return trainee;
+    }
+
+
+    @Override
+    public boolean existsById(long id){
+        return traineeRepo.existsById(id);
     }
 
     @Autowired

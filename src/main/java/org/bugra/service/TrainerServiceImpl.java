@@ -2,6 +2,7 @@ package org.bugra.service;
 
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
+import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,26 +22,29 @@ public class TrainerServiceImpl implements TrainerService {
             throw new IllegalArgumentException("Trainer cannot be null");
         }
 
+        User user = trainer.getUser();
+
         // Credentials generation
-        trainer.setPassword(userCredentialsService.generateRandomPassword());
-        trainer.setUsername(userCredentialsService.generateUsername(
-                trainer.getFirstName(),
-                trainer.getLastName(),
+        user.setPassword(userCredentialsService.generateRandomPassword());
+        user.setUsername(userCredentialsService.generateUsername(
+                user.getFirstName(),
+                user.getLastName(),
                 trainerRepo::existsByUsername
         ));
 
-        trainer.setActive(true);
-        long newId = trainerRepo.getMaxId() + 1;
-        trainer.setId(newId);
+        user.setActive(true);
 
         Trainer savedTrainer = trainerRepo.save(trainer);
-        logger.info("Trainer created successfully with ID: {} and username: {}", savedTrainer.getId(), savedTrainer.getUsername());
+        logger.info("Trainer created successfully with ID: {} and username: {}",
+                savedTrainer.getId(),
+                savedTrainer.getUser().getUsername());
+
         return savedTrainer;
     }
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        if (trainer == null || trainer.getId() == null) {
+        if (trainer == null) {
             logger.error("Update failed: Trainer or ID is null");
             throw new IllegalArgumentException("Trainer or Trainer ID cannot be null");
         }
@@ -62,6 +66,12 @@ public class TrainerServiceImpl implements TrainerService {
 
         logger.info("Trainer with id: {} successfully fetched", trainerId); // Bunu ekleyebilirsin
         return trainer;
+    }
+
+
+    @Override
+    public boolean existsById(long id) {
+        return trainerRepo.existsById(id);
     }
 
     @Autowired
