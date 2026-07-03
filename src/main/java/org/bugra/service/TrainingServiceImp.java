@@ -26,21 +26,29 @@ public class TrainingServiceImp implements TrainingService {
         }
 
         // Check if trainer id exist
-        if(traineeService.getTrainee(training.getTraineeId() ) == null){
-            logger.error("The trainee with id {} not found for training with id {}",
-                    training.getTraineeId(),
-                    training.getId());
+        {
+            long traineeId = training.getTrainee().getId();
+            if (traineeService.existsById(traineeId)) {
+                logger.error("The trainee with id {} not found for training with id {}",
+                        traineeId,
+                        training.getId());
 
-            throw new UserNotFoundException("Trainee is not found with id: " + training.getTraineeId());
+                throw new UserNotFoundException("Trainee is not found with id: " +
+                        traineeId);
+            }
         }
 
         // Check if trainer id exist
-        if(trainerService.getTrainer(training.getTrainerId() ) == null){
-            logger.error("The trainer with id {} not found for training with id {}",
-                    training.getTrainerId(),
-                    training.getId());
+        {
+            long trainerId = training.getTrainer().getId();
+            if (trainerService.existsById(trainerId)) {
+                logger.error("The trainer with id {} not found for training with id {}",
+                        trainerId,
+                        training.getId());
 
-            throw new UserNotFoundException("Trainer is not found with id: " + training.getTrainerId());
+                throw new UserNotFoundException("Trainer is not found with id: " +
+                        trainerId);
+            }
         }
 
         // Duration and training date check
@@ -48,9 +56,6 @@ public class TrainingServiceImp implements TrainingService {
                 training.getTrainingDate(),
                 training.getTrainingDuration()
         );
-
-        long newId = trainingRepo.getMaxId() + 1;
-        training.setId(newId);
 
         Training savedTraining = trainingRepo.save(training);
         logger.info("Training created successfully with ID: {}", savedTraining.getId());
