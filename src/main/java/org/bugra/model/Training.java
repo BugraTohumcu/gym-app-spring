@@ -1,34 +1,28 @@
 package org.bugra.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDate;
 
+@Entity
+@Data
 public class Training {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    private Long traineeId;
-    private Long trainerId;
-    private String trainingName;
-    private TrainingType trainingType;
-    private LocalDate trainingDate;
     private int trainingDuration;
+    private String trainingName;
+    private LocalDate trainingDate;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @ManyToOne
+    private TrainingType trainingType;
 
-    public Long getTraineeId() { return traineeId; }
-    public void setTraineeId(Long traineeId) { this.traineeId = traineeId; }
+    @ManyToOne
+    private Trainee trainee;
 
-    public Long getTrainerId() { return trainerId; }
-    public void setTrainerId(Long trainerId) { this.trainerId = trainerId; }
+    @ManyToOne
+    private Trainer trainer;
 
-    public String getTrainingName() { return trainingName; }
-    public void setTrainingName(String trainingName) { this.trainingName = trainingName; }
-
-    public TrainingType getTrainingType() { return trainingType; }
-    public void setTrainingType(TrainingType trainingType) { this.trainingType = trainingType; }
-
-    public LocalDate getTrainingDate() { return trainingDate; }
-    public void setTrainingDate(LocalDate trainingDate) { this.trainingDate = trainingDate; }
-
-    public int getTrainingDuration() { return trainingDuration; }
-    public void setTrainingDuration(int trainingDuration) { this.trainingDuration = trainingDuration; }
 }
