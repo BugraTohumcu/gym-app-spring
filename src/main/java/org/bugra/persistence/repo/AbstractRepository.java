@@ -47,8 +47,13 @@ public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
             throw new IllegalArgumentException("Entity can not be null");
         }
 
-        entityManager.persist(entity);
-        return entity;
+        // if it's not exist save, merge otherwise
+        if(getEntityId(entity) == null){
+            entityManager.persist(entity);
+            return entity;
+        }
+
+        return entityManager.merge(entity);
     }
 
     @Override
@@ -65,7 +70,7 @@ public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
     @Override
     public Optional<T> findById(ID id) {
         if (id == null) {
-            return Optional.empty();
+            throw new IllegalArgumentException("Id cannot be null");
         }
 
         T entity = entityManager.find(entityClass, id);
@@ -79,6 +84,9 @@ public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
 
     @Override
     public boolean deleteById(ID id) {
+        if(id == null){
+            throw new IllegalArgumentException("Id cannot be null");
+        }
         T entity = entityManager.find(entityClass, id);
 
         if(entity != null){

@@ -1,64 +1,66 @@
 package org.bugra.persistence.repo;
 
 import org.bugra.model.Trainee;
+import org.bugra.model.User;
+import org.bugra.persistence.BaseJpaTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AbstractInMemoryRepositoryTest {
+class AbstractInMemoryRepositoryTest extends BaseJpaTest {
 
 
     /**
-     * <p>Test Repository class only used inAbstractInMemoryRepositoryTest.java</p>
-     * <p>Extends {@link AbstractInMemoryRepository}</p>
+     * <p>Test Repository class only used in AbstractRepositoryTest.java</p>
+     * <p>Extends {@link AbstractRepository}</p>
      * */
     private static class TestRepository
-        extends AbstractInMemoryRepository<Trainee, Long>{
+        extends AbstractRepository<Trainee, Long> {
 
         protected TestRepository() {
-            super(Long::compare, 0L, Trainee::getId);
+            super(Trainee.class, Trainee::getId);
         }
 
         @Override
         public Trainee save(Trainee entity) {
-            return null;
+            return super.save(entity);
         }
 
         @Override
         public Optional<Trainee> updateById(Trainee entity) {
-            return Optional.empty();
+            return super.updateById(entity);
         }
     }
 
 
     private TestRepository fakeRepository;
-    private Map<Long, Trainee> fakeStorage;
 
     @BeforeEach
-    void setUp() {
-        fakeStorage = new ConcurrentHashMap<>();
+    void init() {
         fakeRepository = new TestRepository();
-        fakeRepository.setStorageMap(fakeStorage);
+        fakeRepository.setEntityManager(em);
     }
 
     @Test
     @DisplayName("Should return the correct entity if entity is exits")
     void findById_shouldReturnEntityWhenExists(){
         Trainee trainee = new Trainee();
-        trainee.setId(1L);
-        fakeStorage.put(1L, trainee);
+        User user = new User();
+        trainee.setUser(user);
 
-        Optional<Trainee> result = fakeRepository.findById(1L);
+        Trainee savedTrainee = fakeRepository.save(trainee);
+        em.flush();
+        em.clear();
 
+        Optional<Trainee> result = fakeRepository.findById(savedTrainee.getId());
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().getId());
+
+        assertEquals(savedTrainee.getId(), result.get().getId());
     }
 
     @Test
@@ -71,15 +73,15 @@ class AbstractInMemoryRepositoryTest {
     @Test
     @DisplayName("Should return optional empty if id is null")
     void findById_shouldReturnEmptyWhenIdIsNull(){
-        Optional<Trainee> result = fakeRepository.findById(null);
-        assertTrue(result.isEmpty());
+        assertThrows(IllegalArgumentException.class,
+                () -> fakeRepository.findById(null));
     }
 
     @Test
-    @DisplayName("Should return false if provided id is null")
-    void deleteById_shouldReturnFalseWhenIdNull(){
-        boolean result = fakeRepository.deleteById(null);
-        assertFalse(result);
+    @DisplayName("Should throw IllegalArgumentException if provided id is null")
+    void deleteById_shouldThrowWhenIdNull(){
+        assertThrows(IllegalArgumentException.class,
+                () -> fakeRepository.deleteById(null));
     }
 
     @Test
@@ -93,23 +95,26 @@ class AbstractInMemoryRepositoryTest {
     @DisplayName("Should return true if entity is deleted")
     void deleteById_shouldReturnTrueIfDeleted(){
         Trainee trainee = new Trainee();
-        trainee.setId(1L);
-        fakeStorage.put(1L, trainee);
+        trainee.setUser(new User());
+        Trainee savedTrainee = fakeRepository.save(trainee);
+        em.flush();
+        em.clear();
 
-        boolean result = fakeRepository.deleteById(1L);
+        boolean result = fakeRepository.deleteById(savedTrainee.getId());
 
         assertTrue(result);
-        assertNull(fakeStorage.get(1L));
     }
 
     @Test
     @DisplayName("Should return true if id is exist")
     void exitsById_ShouldReturnTrueIfIdExists(){
         Trainee trainee = new Trainee();
-        trainee.setId(1L);
-        fakeStorage.put(1L, trainee);
+        trainee.setUser(new User());
+        Trainee savedTrainee = fakeRepository.save(trainee);
+        em.flush();
+        em.clear();
 
-        boolean result = fakeRepository.existsById(1L);
+        boolean result = fakeRepository.existsById(savedTrainee.getId());
         assertTrue(result);
     }
 
