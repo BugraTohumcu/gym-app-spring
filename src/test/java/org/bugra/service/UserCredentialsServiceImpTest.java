@@ -1,7 +1,7 @@
 package org.bugra.service;
 
+import org.bugra.persistence.repo.UserRepo;
 import org.bugra.util.PasswordGenerator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,14 +11,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class UserCredentialsServiceImpTest {
@@ -26,20 +22,22 @@ class UserCredentialsServiceImpTest {
     @Mock
     PasswordGenerator passwordGenerator;
 
+    @Mock
+    UserRepo userRepo;
+
     @InjectMocks
     UserCredentialsServiceImp credentialsService;
 
-
     @Test
-    @DisplayName("Should generate directly username if there is not similarity int storage")
+    @DisplayName("Should generate directly username if there is not similarity in storage")
     void generateUsername_shouldGenerateUsername() {
         String firstName = "John";
         String lastName = "Doe";
         String expectedUserName = "john.doe";
 
-        String actualUsername = credentialsService.generateUsername(firstName,
-                lastName,
-                s -> false);
+        when(userRepo.findUsernameStartingWith("john.doe")).thenReturn(List.of());
+
+        String actualUsername = credentialsService.generateUsername(firstName, lastName);
 
         assertEquals(expectedUserName, actualUsername);
     }
@@ -47,20 +45,13 @@ class UserCredentialsServiceImpTest {
     @Test
     @DisplayName("Should append and increment counter when the generated username is already taken")
     void generateUsername_shouldHandleDuplicates() {
-        // Given
         String firstName = "John";
         String lastName = "Doe";
         String expectedUserName = "john.doe2";
 
+        when(userRepo.findUsernameStartingWith("john.doe")).thenReturn(List.of("john.doe", "john.doe1"));
 
-        // The existing usernames
-        var takenUsernames = Set.of("john.doe", "john.doe1");
-
-        String actualUsername = credentialsService.generateUsername(
-                firstName,
-                lastName,
-                takenUsernames::contains
-        );
+        String actualUsername = credentialsService.generateUsername(firstName, lastName);
 
         assertEquals(expectedUserName, actualUsername);
     }
@@ -69,10 +60,8 @@ class UserCredentialsServiceImpTest {
     @MethodSource("provideInvalidCredentials")
     @DisplayName("Should throw IllegalArgumentException when credentials are null or blank")
     void generateUsername_shouldThrowException_whenCredentialsAreInvalid(String firstName, String lastName) {
-
-
         assertThrows(IllegalArgumentException.class,
-                () -> credentialsService.generateUsername(firstName, lastName, (s) -> false));
+                () -> credentialsService.generateUsername(firstName, lastName));
     }
 
     private static Stream<Arguments> provideInvalidCredentials() {
@@ -85,11 +74,9 @@ class UserCredentialsServiceImpTest {
         );
     }
 
-
     @Test
     @DisplayName("Should generate random password using the password generator")
     void generateRandomPassword_shouldReturnGeneratedPassword() {
-
         String expectedPassword = "RandomPassword123";
         when(passwordGenerator.generate()).thenReturn(expectedPassword);
 

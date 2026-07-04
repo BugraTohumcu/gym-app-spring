@@ -48,7 +48,7 @@ public class TrainerServiceImpl implements TrainerService {
             throw new IllegalArgumentException("Trainer or Trainer ID cannot be null");
         }
 
-        Trainer updated = trainerRepo.updateById(trainer)
+        Trainer updated = trainerRepo.update(trainer)
                 .orElseThrow(() -> new UserNotFoundException("Trainer not found with id: " + trainer.getId()));
 
         logger.info("Trainer updated successfully with ID: {}", trainer.getId());

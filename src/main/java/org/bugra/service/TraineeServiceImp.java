@@ -57,7 +57,7 @@ public class TraineeServiceImp implements TraineeService{
         }
 
         logger.info("Trainee updated successfully with ID: {}", trainee.getId());
-        return traineeRepo.updateById(trainee)
+        return traineeRepo.update(trainee)
                 .orElseThrow(() -> new UserNotFoundException("Trainee not found with id: " + trainee.getId()));
     }
 

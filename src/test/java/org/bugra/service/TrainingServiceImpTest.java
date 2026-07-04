@@ -37,37 +37,49 @@ class TrainingServiceImpTest {
     @Test
     @DisplayName("Should successfully create training when data is valid")
     void createTraining_shouldSaveSuccessfully() {
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
+
         Training training = new Training();
-        training.setTraineeId(1L);
-        training.setTrainerId(1L);
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
         training.setTrainingDate(LocalDate.now().plusDays(1));
         training.setTrainingDuration(60);
 
-        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
-        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
+        when(traineeService.existsById(1L)).thenReturn(true);
+        when(trainerService.existsById(1L)).thenReturn(true);
 
-        when(trainingRepo.getMaxId()).thenReturn(0L);
-
-        when(trainingRepo.save(any(Training.class))).thenAnswer(i -> i.getArguments()[0]);
+        Training savedTraining = new Training();
+        savedTraining.setId(1L);
+        when(trainingRepo.save(any(Training.class))).thenReturn(savedTraining);
 
         Training saved = trainingService.createTraining(training);
 
         assertNotNull(saved);
-        assertEquals(1L, saved.getId()); // ID oluştuğunu doğrula
-        verify(trainingRepo, times(1)).save(training);
+        assertEquals(1L, saved.getId());
+        verify(trainingRepo, times(1)).save(any(Training.class));
     }
 
     @Test
-    @DisplayName("Should throw exception when date is in the past")
+    @DisplayName("Should throw IllegalArgumentException when date is in the past")
     void createTraining_shouldThrowExceptionForPastDate() {
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
+
         Training training = new Training();
-        training.setTraineeId(1L);
-        training.setTrainerId(1L);
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
         training.setTrainingDate(LocalDate.now().minusDays(1));
         training.setTrainingDuration(60);
 
-        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
-        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
+        when(traineeService.existsById(1L)).thenReturn(true);
+        when(trainerService.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> trainingService.createTraining(training));
     }
@@ -75,39 +87,53 @@ class TrainingServiceImpTest {
     @Test
     @DisplayName("Should throw exception when duration is non-positive")
     void createTraining_shouldThrowExceptionForInvalidDuration() {
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
 
         Training training = new Training();
-        training.setTraineeId(1L);
-        training.setTrainerId(1L);
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
         training.setTrainingDate(LocalDate.now().plusDays(1));
         training.setTrainingDuration(0);
 
-        when(traineeService.getTrainee(1L)).thenReturn(new Trainee());
-        when(trainerService.getTrainer(1L)).thenReturn(new Trainer());
+        when(traineeService.existsById(1L)).thenReturn(true);
+        when(trainerService.existsById(1L)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> trainingService.createTraining(training));
     }
 
     @Test
-    @DisplayName("Should throw UserNotFoundException when trainer id does not exists")
-    void createTraining_shouldThrowWhenTrainerIdNotExist(){
+    @DisplayName("Should throw UserNotFoundException when trainee id does not exists")
+    void createTraining_shouldThrowWhenTraineeIdNotExist(){
+        Trainee trainee = new Trainee();
+        trainee.setId(999L);
 
         Training training = new Training();
-        training.setTraineeId(999L);
-        when(traineeService.getTrainee(999L)).thenReturn(null);
+        training.setTrainee(trainee);
+        when(traineeService.existsById(999L)).thenReturn(false);
 
         assertThrows(UserNotFoundException.class, () -> trainingService.createTraining(training));
         verify(trainingRepo, never()).save(any());
     }
 
     @Test
-    void createTraining_ShouldThrowUserNotFoundException_WhenTrainerDoesNotExist() {
-        Training training = new Training();
-        training.setTraineeId(1L);
-        training.setTrainerId(888L);
+    @DisplayName("Should throw UserNotFoundException when trainer id does not exists")
+    void createTraining_shouldThrowWhenTrainerNotExist() {
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
 
-        when(traineeService.getTrainee(1L)).thenReturn(new org.bugra.model.Trainee());
-        when(trainerService.getTrainer(888L)).thenReturn(null);
+        Trainer trainer = new Trainer();
+        trainer.setId(999L);
+
+        Training training = new Training();
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+
+        when(traineeService.existsById(1L)).thenReturn(true);
+        when(trainerService.existsById(999L)).thenReturn(false);
 
         assertThrows(UserNotFoundException.class, () -> trainingService.createTraining(training));
         verify(trainingRepo, never()).save(any());
