@@ -5,21 +5,25 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID>{
+/**
+ * <p>Generic abstract repository base for all repository classes.</p>
+ * <p>Handles basic CRUD operations</p>
+ * <p>Implements {@link CrudRepo}</p>
+ * */
+public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
 
 
-    private EntityManager entityManager;
+    protected EntityManager entityManager;
 
     // Make class immutable and prevent type erasure
     private final Class<T> entityClass;
     private final Function<T, ID> idExtractor;
 
-    public AbstractInMemoryRepository(
+    public AbstractRepository(
             Class<T> entityClass,
             Function<T, ID> idExtractor) {
         this.entityClass = entityClass;
@@ -37,7 +41,6 @@ public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID
         return idExtractor.apply(entity);
     }
 
-    @Transactional
     @Override
     public T save(T entity) {
         if(entity == null) {
@@ -48,7 +51,6 @@ public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID
         return entity;
     }
 
-    @Transactional
     @Override
     public Optional<T> updateById(T entity) {
         ID id = getEntityId(entity);
