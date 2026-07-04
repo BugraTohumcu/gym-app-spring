@@ -1,9 +1,6 @@
 package org.bugra.service;
 
 import org.bugra.model.User;
-
-import java.util.function.Function;
-
 /**
  *<p>This interfaces declares user credential operations such as password and username creations
  * for {@link User} based entities</p>
@@ -18,7 +15,7 @@ public interface UserCredentialsService {
      * @param lastName  the last name of the trainee, must not be null
      * @return a unique, lowercased string to be used as the profile username
      */
-    String generateUsername(String firstName, String lastName, Function<String, Boolean> existByName);
+    String generateUsername(String firstName, String lastName);
     /**
      * Generates a random alphanumeric password with a fixed length of 10 characters.
      * This password is temporarily assigned to the new profile during creation.

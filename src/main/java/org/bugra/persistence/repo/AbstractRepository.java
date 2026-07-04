@@ -1,0 +1,109 @@
+package org.bugra.persistence.repo;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
+
+import java.util.Optional;
+import java.util.function.Function;
+
+public abstract class AbstractInMemoryRepository<T, ID> implements CrudRepo<T,ID>{
+
+
+    private EntityManager entityManager;
+
+    // Make class immutable and prevent type erasure
+    private final Class<T> entityClass;
+    private final Function<T, ID> idExtractor;
+
+    public AbstractInMemoryRepository(
+            Class<T> entityClass,
+            Function<T, ID> idExtractor) {
+        this.entityClass = entityClass;
+        this.idExtractor = idExtractor;
+    }
+
+    /**
+     * Extracts the unique identifier from the given entity.
+     * Used internally by {@link #save(Object)} and {@link #updateById(Object)}
+     * to determine the storage key.
+     * @param entity the entity to extract the ID from
+     * @return the unique identifier of the entity
+     */
+    public ID getEntityId(T entity){
+        return idExtractor.apply(entity);
+    }
+
+    @Transactional
+    @Override
+    public T save(T entity) {
+        if(entity == null) {
+            throw new IllegalArgumentException("Entity can not be null");
+        }
+
+        entityManager.persist(entity);
+        return entity;
+    }
+
+    @Transactional
+    @Override
+    public Optional<T> updateById(T entity) {
+        ID id = getEntityId(entity);
+
+        if(id == null || entityManager.find(entityClass, id) == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(entityManager.merge(entity));
+    }
+
+    @Override
+    public Optional<T> findById(ID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
+        T entity = entityManager.find(entityClass, id);
+
+        if (entity == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(entity);
+    }
+
+    @Override
+    public boolean deleteById(ID id) {
+        T entity = entityManager.find(entityClass, id);
+
+        if(entity != null){
+            entityManager.remove(entity);
+            return true;
+        }
+
+        return  false;
+    }
+
+    @Override
+    public boolean existsById(ID id) {
+        if (id == null) return false;
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<T> root = cq.from(entityClass);
+
+        cq.select(cb.count(root));
+        cq.where(cb.equal(root.get("id"), id));
+
+        return entityManager.createQuery(cq).getSingleResult() > 0;
+    }
+
+
+    @PersistenceContext
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+}
