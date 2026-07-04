@@ -1,23 +1,25 @@
 package org.bugra.service;
 
+import org.bugra.persistence.repo.UserRepo;
 import org.bugra.util.PasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserCredentialsServiceImp implements UserCredentialsService {
 
+    private UserRepo userRepo;
     private PasswordGenerator passwordGenerator;
     private static final Logger logger = LoggerFactory.getLogger(UserCredentialsServiceImp.class);
 
     @Override
-    public String generateUsername(String firstName,
-                                   String lastName,
-                                   Function<String, Boolean> existByName) {
+    public String generateUsername(String firstName, String lastName) {
         // Null and blank check for credentials
         if (firstName == null || lastName == null ||
                 firstName.isBlank() || lastName.isBlank()) {
@@ -29,15 +31,23 @@ public class UserCredentialsServiceImp implements UserCredentialsService {
         String baseName = (firstName.trim() + "." + lastName.trim()).toLowerCase();
         StringBuilder builder = new StringBuilder(baseName);
 
-        // Check if username is taken
-        // For the simplicity I've used linear search.
-        // Better approach may be second level indexing eg: {"john.doe": 0}
-        int counter = 1;
-        while (existByName.apply(builder.toString())) {
-            // Reset username
-            builder.setLength(0);
+        Set<String> takenNames;
+        {
+            // fetch the list of usernames that uses the basename
+            List<String> existingUsernames = userRepo.findUsernameStartingWith(baseName);
+            takenNames = new HashSet<>(existingUsernames);
+        }
 
-            builder.append(baseName).append(counter);
+        // Return base name if it is unique
+        if(!takenNames.contains(baseName)){
+            return baseName;
+        }
+
+        // Check if username is taken and apply the username creation strategy
+        int counter = 1;
+        while (takenNames.contains(builder.toString())){
+            builder.setLength(baseName.length());
+            builder.append(counter);
             counter++;
         }
 
@@ -52,5 +62,10 @@ public class UserCredentialsServiceImp implements UserCredentialsService {
     @Autowired
     void setPasswordGenerator(PasswordGenerator passwordGenerator){
         this.passwordGenerator = passwordGenerator;
+    }
+
+    @Autowired
+    public void setUserRepo(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 }
