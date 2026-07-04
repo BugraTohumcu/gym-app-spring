@@ -28,7 +28,7 @@ public class TrainingServiceImp implements TrainingService {
         // Check if trainer id exist
         {
             long traineeId = training.getTrainee().getId();
-            if (traineeService.existsById(traineeId)) {
+            if (!traineeService.existsById(traineeId)) {
                 logger.error("The trainee with id {} not found for training with id {}",
                         traineeId,
                         training.getId());
@@ -41,7 +41,7 @@ public class TrainingServiceImp implements TrainingService {
         // Check if trainer id exist
         {
             long trainerId = training.getTrainer().getId();
-            if (trainerService.existsById(trainerId)) {
+            if (!trainerService.existsById(trainerId)) {
                 logger.error("The trainer with id {} not found for training with id {}",
                         trainerId,
                         training.getId());
