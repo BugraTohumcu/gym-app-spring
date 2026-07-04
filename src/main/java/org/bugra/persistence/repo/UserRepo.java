@@ -1,23 +1,23 @@
 package org.bugra.persistence.repo;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.bugra.model.User;
-
-import java.util.Map;
+import org.springframework.stereotype.Repository;
 
 /**
- * <p>Abstract in-memory repository for {@link User} based entities.</p>
- * <p>Provides common CRUD operations for {@link org.bugra.model.Trainer} and {@link org.bugra.model.Trainee}.</p>
- * Extends {@link AbstractInMemoryRepository} and implements {@link UsernameCapable}.
- *
- * @param <T> the type of the entity, must extend {@link User}
+ * <p>Abstract repository for {@link User} entities.</p>
+ * Extends {@link AbstractRepository} and implements {@link UsernameCapable}.
  */
 
-public abstract class UserRepo<T extends User>
-        extends AbstractInMemoryRepository<T, Long>
+@Repository
+public class UserRepo
+        extends AbstractRepository<User, Long>
         implements UsernameCapable {
 
     public UserRepo() {
-        super(Long::compare, 0L, User::getId);
+        super(User.class, User::getId);
     }
 
     @Override
@@ -25,8 +25,19 @@ public abstract class UserRepo<T extends User>
         if (username == null) {
             return false;
         }
-        return storageMap.values().stream()
-                .anyMatch(trainee -> username.equalsIgnoreCase(trainee.getUsername()));
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
+        Root<User> root = criteriaQuery.from(User.class);
+
+
+        // Select the number of users in the result
+        criteriaQuery.select(cb.count(root));
+
+        // Select the users with the provided username
+        criteriaQuery.where(cb.equal(root.get("username"), username));
+
+        return entityManager.createQuery(criteriaQuery).getSingleResult() > 0;
     }
 
 }
