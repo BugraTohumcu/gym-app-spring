@@ -6,6 +6,8 @@ import jakarta.persistence.criteria.Root;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * <p>Abstract repository for {@link User} entities.</p>
  * Extends {@link AbstractRepository} and implements {@link UsernameCapable}.
@@ -38,6 +40,23 @@ public class UserRepo
         criteriaQuery.where(cb.equal(root.get("username"), username));
 
         return entityManager.createQuery(criteriaQuery).getSingleResult() > 0;
+    }
+
+    @Override
+    public List<String> findUsernameStartingWith(String baseName) {
+        if(baseName == null){
+            throw new IllegalArgumentException("Base name can not be null");
+        }
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<String> cq = cb.createQuery(String.class);
+        Root<User> root = cq.from(User.class);
+
+        cq.select(root.get("username"));
+        cq.where(cb.like(root.get("username"), baseName + "%"));
+
+
+        return entityManager.createQuery(cq).getResultList();
     }
 
 }
