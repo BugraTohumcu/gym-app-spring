@@ -32,7 +32,7 @@ public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
 
     /**
      * Extracts the unique identifier from the given entity.
-     * Used internally by {@link #save(Object)} and {@link #updateById(Object)}
+     * Used internally by {@link #save(Object)} and {@link #update(Object)}
      * to determine the storage key.
      * @param entity the entity to extract the ID from
      * @return the unique identifier of the entity
@@ -57,7 +57,7 @@ public abstract class AbstractRepository<T, ID> implements CrudRepo<T,ID>{
     }
 
     @Override
-    public Optional<T> updateById(T entity) {
+    public Optional<T> update(T entity) {
         ID id = getEntityId(entity);
 
         if(id == null || entityManager.find(entityClass, id) == null) {
