@@ -32,7 +32,7 @@ public interface CrudRepo<T, ID> {
      * @return the updated and persisted entity
      * @throws IllegalArgumentException if the trainee profile does not exist in the storage
      */
-    Optional<T> updateById(T entity);
+    Optional<T> update(T entity);
 
 
     /**
