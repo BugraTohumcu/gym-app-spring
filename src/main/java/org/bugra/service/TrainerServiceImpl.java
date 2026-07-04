@@ -28,8 +28,7 @@ public class TrainerServiceImpl implements TrainerService {
         user.setPassword(userCredentialsService.generateRandomPassword());
         user.setUsername(userCredentialsService.generateUsername(
                 user.getFirstName(),
-                user.getLastName(),
-                trainerRepo::existsByUsername
+                user.getLastName()
         ));
 
         user.setActive(true);

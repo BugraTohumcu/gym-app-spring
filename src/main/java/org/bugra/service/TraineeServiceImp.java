@@ -33,8 +33,8 @@ public class TraineeServiceImp implements TraineeService{
         // Generate username
         String finalUsername = userCredentialsService.generateUsername(
                 user.getFirstName(),
-                user.getLastName(),
-                traineeRepo::existsByUsername);
+                user.getLastName()
+        );
 
         user.setUsername(finalUsername);
         user.setActive(true);
