@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AbstractInMemoryRepositoryTest extends BaseJpaTest {
+class AbstractJPARepositoryTest extends BaseJpaTest {
 
 
     /**
@@ -32,8 +32,8 @@ class AbstractInMemoryRepositoryTest extends BaseJpaTest {
         }
 
         @Override
-        public Optional<Trainee> updateById(Trainee entity) {
-            return super.updateById(entity);
+        public Optional<Trainee> update(Trainee entity) {
+            return super.update(entity);
         }
     }
 
