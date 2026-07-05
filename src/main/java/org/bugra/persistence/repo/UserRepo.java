@@ -3,6 +3,7 @@ package org.bugra.persistence.repo;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
@@ -57,6 +58,27 @@ public class UserRepo
 
 
         return entityManager.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        if(username == null) {
+            throw new IllegalArgumentException("Username can not be null");
+        }
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq =cb.createQuery(User.class);
+
+        Root<User> root = cq.from(User.class);
+
+        cq.select(root);
+        cq.where(cb.equal(root.get("username"), username));
+
+        return entityManager
+                .createQuery(cq)
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(UserNotFoundException::new);
     }
 
 }
