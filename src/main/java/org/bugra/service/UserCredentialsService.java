@@ -23,18 +23,4 @@ public interface UserCredentialsService {
      * @return a random 10-character string representing the initial password
      */
     String generateRandomPassword();
-
-    /**
-     * Retrieves a user with a provided username
-     * <p>Calls {@link UserRepo#findByUsername(String)}</p>
-     * @param username a unique, lowercased string to be used as the profile username
-     * @return Retrieved {@link User} from database
-     * */
-    User findByUsername(String username);
-
-    /**
-     * Updates active status of a user by given username
-     * @param username a unique username
-     * */
-    void toggleActiveStatus(String username);
 }
