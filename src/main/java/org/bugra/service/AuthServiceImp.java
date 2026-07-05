@@ -1,10 +1,12 @@
 package org.bugra.service;
 
 
+import org.bugra.dto.ChangePassword;
 import org.bugra.dto.LoginUser;
 import org.bugra.dto.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
+import org.bugra.persistence.repo.UserRepo;
 import org.bugra.util.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,20 +16,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImp implements AuthService {
 
-    private static Logger logger = LoggerFactory.getLogger(AuthServiceImp.class);
-    private UserCredentialsService userService;
+    private final static Logger logger = LoggerFactory.getLogger(AuthServiceImp.class);
+    private UserRepo userRepo;
 
 
     @Autowired
-    public void setUserService(UserCredentialsService userService) {
-        this.userService = userService;
+    public void setUserRepo(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     @Override
     public UserResponse login(LoginUser loginUser) {
-        logger.info("User with username {} is trying to login" , loginUser.username());
-        User fetchedUser = userService.findByUsername(loginUser.username());
+        logger.info("User with username: {} is trying to login" , loginUser.username());
+        User fetchedUser = userRepo.findByUsername(loginUser.username());
 
+        // Password check
         if(!fetchedUser.getPassword().equals(loginUser.password())){
             logger.warn("The provided password for user with username {} is invalid", loginUser.username());
             throw new InvalidPasswordException();
@@ -35,10 +38,33 @@ public class AuthServiceImp implements AuthService {
 
         UserSession.setCurrentUser(fetchedUser);
 
+        logger.info("User with username: {} is successfully logged in" , loginUser.username());
         return new UserResponse(
                 fetchedUser.getUsername(),
                 fetchedUser.getRole(),
                 fetchedUser.getFirstName() + " " + fetchedUser.getLastName()
         );
+    }
+
+    @Override
+    public boolean changePassword(ChangePassword changePassword) {
+        User currentUser = UserSession.getCurrentUser();
+        logger.info("The user with username: {} is changing password",
+                currentUser.getUsername()
+                );
+
+        // Password check
+        if(!currentUser.getPassword().equals(changePassword.currentPassword())){
+            logger.warn("The provided password for user with username: {} is invalid",
+                    currentUser.getUsername());
+            throw new InvalidPasswordException();
+        }
+
+        // set new password and update db
+        currentUser.setPassword(changePassword.newPassword());
+        userRepo.update(currentUser);
+
+        logger.info("User with username: {} successfully updated password" , currentUser.getUsername());
+        return true;
     }
 }
