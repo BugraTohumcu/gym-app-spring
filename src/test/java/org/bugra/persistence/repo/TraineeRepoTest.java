@@ -1,6 +1,7 @@
 package org.bugra.persistence.repo;
 
 import org.bugra.enums.UserRole;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.BaseJpaTest;
@@ -20,6 +21,16 @@ class TraineeRepoTest  extends BaseJpaTest {
     void setup(){
         fakeRepo = new TraineeRepo();
         fakeRepo.setEntityManager(em);
+    }
+
+    private Trainee createAndSaveTrainee(String username) {
+        User user = createValidUser(username, UserRole.TRAINEE);
+        em.persist(user);
+
+        Trainee trainee = new Trainee();
+        trainee.setUser(user);
+        em.persist(trainee);
+        return trainee;
     }
 
     @Test
@@ -74,5 +85,33 @@ class TraineeRepoTest  extends BaseJpaTest {
 
         assertTrue(result.isPresent());
         assertEquals("Mike", result.get().getUser().getFirstName());
+    }
+
+    @Test
+    @DisplayName("Should return trainee when trainee exists with given username")
+    void findTraineeByUsername_shouldReturnTraineeWhenExists() {
+        createAndSaveTrainee("john.doe");
+        em.flush();
+        em.clear();
+
+        Trainee result = fakeRepo.findTraineeByUsername("john.doe");
+
+        assertNotNull(result);
+        assertEquals("john.doe", result.getUser().getUsername());
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException when trainee does not exist")
+    void findTraineeByUsername_shouldThrowExceptionWhenNotFound() {
+        em.flush();
+        em.clear();
+
+        assertThrows(UserNotFoundException.class, () -> fakeRepo.findTraineeByUsername("non.existent"));
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when username is null")
+    void findTraineeByUsername_shouldThrowExceptionWhenUsernameIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> fakeRepo.findTraineeByUsername(null));
     }
 }
