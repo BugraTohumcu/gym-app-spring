@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Transactional
 @Service
 public class TraineeServiceImp implements TraineeService {
 
@@ -24,6 +26,7 @@ public class TraineeServiceImp implements TraineeService {
     private UserService userService;
 
 
+    @Transactional
     @Override
     public Trainee createTrainee(Trainee trainee) {
         if (trainee == null || trainee.getUser() == null) {
@@ -56,6 +59,7 @@ public class TraineeServiceImp implements TraineeService {
         return savedTrainee;
     }
 
+    @Transactional
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         // Null check for object and id
@@ -69,6 +73,7 @@ public class TraineeServiceImp implements TraineeService {
                 .orElseThrow(() -> new UserNotFoundException("Trainee not found with id: " + trainee.getId()));
     }
 
+    @Transactional
     @Override
     public boolean deleteTraineeById(long traineeId) {
         if (!traineeRepo.deleteById(traineeId)) {
@@ -78,11 +83,13 @@ public class TraineeServiceImp implements TraineeService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean deleteTraineeByUsername(String username) {
         return userService.deleteByUsername(username);
     }
 
+    @Transactional
     @Override
     public Trainee getTrainee(long traineeId) {
 
@@ -100,15 +107,22 @@ public class TraineeServiceImp implements TraineeService {
         return trainee;
     }
 
-
+    @Transactional
     @Override
     public boolean existsById(long id){
         return traineeRepo.existsById(id);
     }
 
+    @Transactional
     @Override
     public Trainee getTraineeByUsername(String username) {
         return traineeRepo.findTraineeByUsername(username);
+    }
+
+    @Transactional
+    @Override
+    public void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames) {
+        traineeRepo.updateTraineeTrainers(traineeUsername, trainerUsernames);
     }
 
     @Autowired
