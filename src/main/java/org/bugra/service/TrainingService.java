@@ -1,8 +1,11 @@
 package org.bugra.service;
 
+import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.model.Training;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import org.bugra.exception.TrainingNotFoundException;
 
 /**
@@ -33,4 +36,18 @@ public interface TrainingService {
      * @throws IllegalArgumentException if provided date or duration invalid
     */
     void validateTrainingDateAndDuration(LocalDate date, int duration);
+
+    /**
+     * Retrieves a filtered list of training sessions associated with a specific trainer.
+     * <p>
+     * This method leverages dynamic criteria querying to fetch records based on the optional
+     * parameters encapsulated within the provided {@link TrainerTrainingFilter} DTO.
+     * </p>
+     *
+     * @param filter the {@link TrainerTrainingFilter} containing the mandatory trainer identity and optional search criteria
+     * @return a {@link List} of {@link Training} entities matching the specified criteria,
+     * or an empty list if no records are found
+     * @throws IllegalArgumentException if the provided filter object is null
+     */
+    List<Training> getTrainerTrainings(TrainerTrainingFilter filter);
 }
