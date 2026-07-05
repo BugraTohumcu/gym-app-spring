@@ -22,7 +22,7 @@ public class Training {
     @Column(nullable = false)
     private LocalDate trainingDate;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private TrainingType trainingType;
 
     @ManyToOne
