@@ -1,10 +1,13 @@
 package org.bugra.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
+import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
+import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TrainerService;
 import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
@@ -20,12 +23,26 @@ public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
     private TrainerRepo trainerRepo;
     private UserCredentialsService userCredentialsService;
+    private TrainingTypeRepo trainingTypeRepo;
 
+    @Transactional
     @Override
     public Trainer createTrainer(Trainer trainer) {
         if (trainer == null) {
             throw new IllegalArgumentException("Trainer cannot be null");
         }
+        String trainingTypeName = trainer.getSpecialization().getTrainingTypeName();
+
+        TrainingType type = trainingTypeRepo.findByTrainingTypeName(trainingTypeName)
+                .orElseGet(() -> {
+                    logger.info("New TrainingType found, creating: {}", trainingTypeName);
+                    TrainingType newType = new TrainingType();
+                    newType.setTrainingTypeName(trainingTypeName);
+                    return trainingTypeRepo.save(newType);
+                });
+
+
+        trainer.setSpecialization(type);
 
         User user = trainer.getUser();
 
@@ -47,6 +64,7 @@ public class TrainerServiceImpl implements TrainerService {
         return savedTrainer;
     }
 
+    @Transactional
     @Override
     public Trainer updateTrainer(Trainer trainer) {
         if (trainer == null) {
@@ -61,6 +79,7 @@ public class TrainerServiceImpl implements TrainerService {
         return updated;
     }
 
+    @Transactional
     @Override
     public Trainer getTrainer(long trainerId) {
         Trainer trainer = trainerRepo.findById(trainerId)
@@ -74,16 +93,19 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
 
+    @Transactional
     @Override
     public boolean existsById(long id) {
         return trainerRepo.existsById(id);
     }
 
+    @Transactional
     @Override
     public Trainer getTrainerByUsername(String username) {
         return trainerRepo.findTrainerByUsername(username);
     }
 
+    @Transactional
     @Override
     public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
         if (traineeUsername == null || traineeUsername.isBlank()) {
@@ -95,6 +117,11 @@ public class TrainerServiceImpl implements TrainerService {
     @Autowired
     public void setTrainerRepo(TrainerRepo trainerRepo) {
         this.trainerRepo = trainerRepo;
+    }
+
+    @Autowired
+    public void setTrainingTypeRepo(TrainingTypeRepo trainingTypeRepo) {
+        this.trainingTypeRepo = trainingTypeRepo;
     }
 
     @Autowired
