@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
@@ -80,6 +81,11 @@ public class TrainingServiceImp implements TrainingService {
     @Override
     public List<Training> getTrainerTrainings(TrainerTrainingFilter filter) {
         return trainingRepo.findByTrainerCriteria(filter);
+    }
+
+    @Override
+    public List<Training> getTraineeTrainings(TraineeTrainingFilter filter) {
+        return trainingRepo.findByTraineeCriteria(filter);
     }
 
     @Autowired
