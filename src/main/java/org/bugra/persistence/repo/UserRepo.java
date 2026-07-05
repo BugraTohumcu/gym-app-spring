@@ -1,6 +1,7 @@
 package org.bugra.persistence.repo;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.bugra.exception.UserNotFoundException;
@@ -79,6 +80,22 @@ public class UserRepo
                 .getResultStream()
                 .findFirst()
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public boolean deleteByUsername(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username can not be null");
+        }
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<User> cd = cb.createCriteriaDelete(User.class);
+        Root<User> root = cd.from(User.class);
+
+        cd.where(cb.equal(root.get("username"), username));
+
+        int deletedCount = entityManager.createQuery(cd).executeUpdate();
+        return deletedCount > 0;
     }
 
 }
