@@ -2,6 +2,8 @@ package org.bugra.service;
 
 import org.bugra.model.Trainer;
 
+import java.util.List;
+
 /**
  * Service interface for managing {@link Trainer} profiles
  * Provides capabilities to create, update, and retrieve trainer information
@@ -38,4 +40,6 @@ public interface TrainerService {
     boolean existsById(long id);
 
     Trainer getTrainerByUsername(String username);
+
+    List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername);
 }
