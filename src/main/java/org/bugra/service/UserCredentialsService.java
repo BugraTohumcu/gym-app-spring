@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.model.User;
+import org.bugra.persistence.repo.UserRepo;
 /**
  *<p>This interfaces declares user credential operations such as password and username creations
  * for {@link User} based entities</p>
@@ -22,4 +23,12 @@ public interface UserCredentialsService {
      * @return a random 10-character string representing the initial password
      */
     String generateRandomPassword();
+
+    /**
+     * Retrieves a user with a provided username
+     * <p>Calls {@link UserRepo#findByUsername(String)}</p>
+     * @param username a unique, lowercased string to be used as the profile username
+     * @return Retrieved {@link User} from database
+     * */
+    User findByUsername(String username);
 }
