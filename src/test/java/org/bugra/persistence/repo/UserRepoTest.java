@@ -118,4 +118,53 @@ class UserRepoTest extends BaseJpaTest {
                 () -> fakeUserRepo.findByUsername("test"));
     }
 
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when provided username is null")
+    void deleteByUsername_shouldThrowWhenUsernameNull(){
+        assertThrows(IllegalArgumentException.class,
+                () -> fakeUserRepo.deleteByUsername(null));
+    }
+
+    @Test
+    @DisplayName("Should return false when username does not exist")
+    void deleteByUsername_shouldReturnFalseWhenNotExists() {
+        boolean result = fakeUserRepo.deleteByUsername("test.user");
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Should return true when user is deleted successfully")
+    void deleteByUsername_shouldReturnTrueWhenDeleted() {
+        User user = createValidUser("john.doe", UserRole.TRAINEE);
+        fakeUserRepo.save(user);
+        em.flush();
+        em.clear();
+
+        boolean result = fakeUserRepo.deleteByUsername("john.doe");
+
+        assertTrue(result);
+        assertThrows(UserNotFoundException.class,
+                () -> fakeUserRepo.findByUsername("john.doe"));
+    }
+
+    @Test
+    @DisplayName("Should delete only the exact username, not similar ones")
+    void deleteByUsername_shouldDeleteOnlyExactMatch() {
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("john.doe1", UserRole.TRAINEE);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        em.flush();
+        em.clear();
+
+        fakeUserRepo.deleteByUsername("john.doe");
+
+        assertThrows(UserNotFoundException.class,
+                () -> fakeUserRepo.findByUsername("john.doe"));
+
+        User remaining = fakeUserRepo.findByUsername("john.doe1");
+        assertEquals("john.doe1", remaining.getUsername());
+    }
+
 }
