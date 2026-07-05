@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
@@ -32,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
         ));
 
         user.setActive(true);
+        user.setRole(UserRole.TRAINER);
 
         Trainer savedTrainer = trainerRepo.save(trainer);
         logger.info("Trainer created successfully with ID: {} and username: {}",

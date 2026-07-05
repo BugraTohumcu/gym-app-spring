@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
@@ -38,6 +39,7 @@ public class TraineeServiceImp implements TraineeService{
 
         user.setUsername(finalUsername);
         user.setActive(true);
+        user.setRole(UserRole.TRAINEE);
 
         Trainee savedTrainee = traineeRepo.save(trainee);
 
