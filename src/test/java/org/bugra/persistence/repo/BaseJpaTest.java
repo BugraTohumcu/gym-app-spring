@@ -3,6 +3,8 @@ package org.bugra.persistence;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.bugra.enums.UserRole;
+import org.bugra.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,5 +30,16 @@ public abstract class BaseJpaTest {
             em.getTransaction().rollback();
         }
         em.close();
+    }
+
+    protected User createValidUser(String username, UserRole role) {
+        User user = new User();
+        user.setFirstName("TestFirst");
+        user.setLastName("TestLast");
+        user.setUsername(username);
+        user.setPassword("StrongPass123!");
+        user.setActive(true);
+        user.setRole(role);
+        return user;
     }
 }

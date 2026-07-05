@@ -1,5 +1,6 @@
 package org.bugra.persistence.repo;
 
+import org.bugra.enums.UserRole;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.BaseJpaTest;
@@ -14,13 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AbstractJPARepositoryTest extends BaseJpaTest {
 
-
-    /**
-     * <p>Test Repository class only used in AbstractRepositoryTest.java</p>
-     * <p>Extends {@link AbstractRepository}</p>
-     * */
     private static class TestRepository
-        extends AbstractRepository<Trainee, Long> {
+            extends AbstractRepository<Trainee, Long> {
 
         protected TestRepository() {
             super(Trainee.class, Trainee::getId);
@@ -50,8 +46,7 @@ class AbstractJPARepositoryTest extends BaseJpaTest {
     @DisplayName("Should return the correct entity if entity is exits")
     void findById_shouldReturnEntityWhenExists(){
         Trainee trainee = new Trainee();
-        User user = new User();
-        trainee.setUser(user);
+        trainee.setUser(createValidUser("john.doe", UserRole.TRAINEE));
 
         Trainee savedTrainee = fakeRepository.save(trainee);
         em.flush();
@@ -95,7 +90,7 @@ class AbstractJPARepositoryTest extends BaseJpaTest {
     @DisplayName("Should return true if entity is deleted")
     void deleteById_shouldReturnTrueIfDeleted(){
         Trainee trainee = new Trainee();
-        trainee.setUser(new User());
+        trainee.setUser(createValidUser("john.doe", UserRole.TRAINEE));
         Trainee savedTrainee = fakeRepository.save(trainee);
         em.flush();
         em.clear();
@@ -109,7 +104,7 @@ class AbstractJPARepositoryTest extends BaseJpaTest {
     @DisplayName("Should return true if id is exist")
     void exitsById_ShouldReturnTrueIfIdExists(){
         Trainee trainee = new Trainee();
-        trainee.setUser(new User());
+        trainee.setUser(createValidUser("john.doe", UserRole.TRAINEE));
         Trainee savedTrainee = fakeRepository.save(trainee);
         em.flush();
         em.clear();

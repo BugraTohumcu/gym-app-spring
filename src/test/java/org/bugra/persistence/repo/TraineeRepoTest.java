@@ -1,5 +1,6 @@
 package org.bugra.persistence.repo;
 
+import org.bugra.enums.UserRole;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.BaseJpaTest;
@@ -32,8 +33,7 @@ class TraineeRepoTest  extends BaseJpaTest {
     @DisplayName("Should return entity when save is successful")
     void save_shouldReturnEntityIfSaveSuccessful() {
         Trainee trainee = new Trainee();
-        trainee.setUser(new User());
-        trainee.getUser().setUsername("test");
+        trainee.setUser(createValidUser("test", UserRole.TRAINEE));
 
         Trainee res = fakeRepo.save(trainee);
 
@@ -54,9 +54,9 @@ class TraineeRepoTest  extends BaseJpaTest {
     @DisplayName("Should return updated entity when update is successful")
     void updateById_shouldReturnUpdatedEntity() {
         Trainee trainee = new Trainee();
-        User user = new User();
-        user.setFirstName("John");
-        trainee.setUser(user);
+        trainee.setUser(createValidUser("john.doe", UserRole.TRAINEE));
+        trainee.getUser().setFirstName("John");
+
         Trainee savedTrainee = fakeRepo.save(trainee);
         em.flush();
         em.clear();
@@ -64,7 +64,7 @@ class TraineeRepoTest  extends BaseJpaTest {
         Trainee updatedTrainee = new Trainee();
         updatedTrainee.setId(savedTrainee.getId());
 
-        User updatedUser = new User();
+        User updatedUser = createValidUser("john.doe", UserRole.TRAINEE);
         updatedUser.setId(savedTrainee.getUser().getId());
         updatedUser.setFirstName("Mike");
 

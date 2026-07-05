@@ -1,5 +1,6 @@
 package org.bugra.persistence.repo;
 
+import org.bugra.enums.UserRole;
 import org.bugra.model.User;
 import org.bugra.persistence.BaseJpaTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRepoTest extends BaseJpaTest {
-
 
     UserRepo fakeUserRepo;
 
@@ -31,12 +31,13 @@ class UserRepoTest extends BaseJpaTest {
     @Test
     @DisplayName("Should return true when username exists")
     void existsByUsername_shouldReturnTrueWhenUsernameExists() {
-        User user = new User();
-        user.setUsername("john.doe1");
+        User user = createValidUser("john.doe1", UserRole.TRAINEE);
 
-        User savedUser = fakeUserRepo.save(user);
+        fakeUserRepo.save(user);
+        em.flush();
+        em.clear();
 
-        boolean result = fakeUserRepo.existsByUsername(savedUser.getUsername());
+        boolean result = fakeUserRepo.existsByUsername(user.getUsername());
         assertTrue(result);
     }
 
@@ -71,23 +72,20 @@ class UserRepoTest extends BaseJpaTest {
     @Test
     @DisplayName("Should return username list when basename does exists")
     void findUsernameStartingWith_shouldReturnListWhenBaseNameExists(){
-        User user1 = new User();
-        user1.setUsername("john.doe");
-
-        User user2 = new User();
-        user2.setUsername("john.doe1");
-
-        User user3 = new User();
-        user3.setUsername("john-doe1");
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("john.doe1", UserRole.TRAINEE);
+        User user3 = createValidUser("john-doe1", UserRole.TRAINEE);
 
         fakeUserRepo.save(user1);
         fakeUserRepo.save(user2);
+        fakeUserRepo.save(user3);
+        em.flush();
+        em.clear();
 
         List<String> result = fakeUserRepo.findUsernameStartingWith("john.doe");
 
         assertTrue(result.contains("john.doe"));
         assertTrue(result.contains("john.doe1"));
+        assertFalse(result.contains("john-doe1"));
     }
-
-
 }
