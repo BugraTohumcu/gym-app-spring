@@ -1,6 +1,7 @@
 package org.bugra.service.impl;
 
 
+import jakarta.transaction.Transactional;
 import org.bugra.dto.ChangePassword;
 import org.bugra.dto.LoginUser;
 import org.bugra.dto.UserResponse;
@@ -26,6 +27,7 @@ public class AuthServiceImp implements AuthService {
         this.userRepo = userRepo;
     }
 
+    @Transactional
     @Override
     public UserResponse login(LoginUser loginUser) {
         logger.info("User with username: {} is trying to login" , loginUser.username());
@@ -47,6 +49,7 @@ public class AuthServiceImp implements AuthService {
         );
     }
 
+    @Transactional
     @Override
     public boolean changePassword(ChangePassword changePassword) {
         User currentUser = UserSession.getCurrentUser();
