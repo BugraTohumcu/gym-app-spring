@@ -302,7 +302,7 @@ class TrainingRepoTest extends BaseJpaTest {
                 "New Session",
                 LocalDate.of(2024, 6, 1),
                 60);
-        
+
         em.flush();
         em.clear();
 
