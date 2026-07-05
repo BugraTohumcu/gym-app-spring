@@ -62,13 +62,13 @@ public interface TraineeService {
 
     Trainee getTraineeByUsername(String username);
 
-//    /**
-//     * Updates and synchronizes the list of trainers assigned to a specific trainee.
-//     *
-//     * @param traineeUsername  the unique username of the target trainee; must not be null or blank
-//     * @param trainerUsernames a {@link List} of unique usernames
-//     * @throws UserNotFoundException    if the trainee or any of the trainers cannot be found in the
-//     * @throws IllegalArgumentException if the {@code traineeUsername} is null/blank, or if {@code trainerUsernames} is null
-//     */
-//    void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames);
+    /**
+     * Updates and synchronizes the list of trainers assigned to a specific trainee.
+     *
+     * @param traineeUsername  the unique username of the target trainee; must not be null or blank
+     * @param trainerUsernames a {@link List} of unique usernames
+     * @throws UserNotFoundException    if the trainee or any of the trainers cannot be found in the
+     * @throws IllegalArgumentException if the {@code traineeUsername} is null/blank, or if {@code trainerUsernames} is null
+     */
+    void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames);
 }
