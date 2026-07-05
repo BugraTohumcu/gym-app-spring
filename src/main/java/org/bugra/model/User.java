@@ -3,6 +3,7 @@ package org.bugra.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.bugra.enums.UserRole;
 
 @Entity
 @Data
@@ -12,9 +13,23 @@ public class User {
     @Id
     @GeneratedValue(strategy =  GenerationType.SEQUENCE)
     private Long id;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private boolean isActive;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
 }
