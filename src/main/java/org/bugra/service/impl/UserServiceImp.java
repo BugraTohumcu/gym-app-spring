@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.UserService;
@@ -18,6 +19,24 @@ public class UserServiceImp implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepo.findByUsername(username);
+    }
+
+    @Override
+    public boolean deleteByUsername(String username) {
+        if (username == null) {
+            logger.warn("Provided username is null");
+            throw new IllegalArgumentException("Username can not be null");
+        }
+
+        logger.info("Deleting user with the username: {}", username);
+
+        if(!userRepo.deleteByUsername(username)){
+            logger.info("User with the username: {} does not exists", username);
+            throw new UserNotFoundException();
+        }
+
+        logger.info("Deleted user with the username: {}", username);
+        return true;
     }
 
     @Override
