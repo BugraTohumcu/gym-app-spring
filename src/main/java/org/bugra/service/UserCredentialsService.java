@@ -31,4 +31,10 @@ public interface UserCredentialsService {
      * @return Retrieved {@link User} from database
      * */
     User findByUsername(String username);
+
+    /**
+     * Updates active status of a user by given username
+     * @param username a unique username
+     * */
+    void toggleActiveStatus(String username);
 }
