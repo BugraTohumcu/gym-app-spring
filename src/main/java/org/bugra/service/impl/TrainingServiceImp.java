@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Training;
@@ -13,14 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class TrainingServiceImp implements TrainingService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImp.class);
     private TrainingRepo trainingRepo;
-    private TraineeService traineeService;
-    private TrainerService trainerService;
 
     @Override
     public Training createTraining(Training training) {
@@ -29,29 +29,13 @@ public class TrainingServiceImp implements TrainingService {
         }
 
         // Check if trainer id exist
-        {
-            long traineeId = training.getTrainee().getId();
-            if (!traineeService.existsById(traineeId)) {
-                logger.error("The trainee with id {} not found for training with id {}",
-                        traineeId,
-                        training.getId());
-
-                throw new UserNotFoundException("Trainee is not found with id: " +
-                        traineeId);
-            }
+        if (training.getTrainee() == null) {
+            throw new IllegalArgumentException("Trainee cannot be null");
         }
 
         // Check if trainer id exist
-        {
-            long trainerId = training.getTrainer().getId();
-            if (!trainerService.existsById(trainerId)) {
-                logger.error("The trainer with id {} not found for training with id {}",
-                        trainerId,
-                        training.getId());
-
-                throw new UserNotFoundException("Trainer is not found with id: " +
-                        trainerId);
-            }
+        if (training.getTrainer() == null) {
+            throw new IllegalArgumentException("Trainer cannot be null");
         }
 
         // Duration and training date check
@@ -81,9 +65,9 @@ public class TrainingServiceImp implements TrainingService {
     @Override
     public void validateTrainingDateAndDuration(LocalDate date, int duration) {
         // Null and invalid time check
-        if (date == null || date.isBefore(LocalDate.now())) {
-            logger.error("Training date cannot be null or in the past");
-            throw new IllegalArgumentException("Training date cannot be null or in the past");
+        if (date == null) {
+            logger.error("Training date cannot be null");
+            throw new IllegalArgumentException("Training date cannot be null");
         }
 
         // Invalid duration check
@@ -93,18 +77,13 @@ public class TrainingServiceImp implements TrainingService {
         }
     }
 
+    @Override
+    public List<Training> getTrainerTrainings(TrainerTrainingFilter filter) {
+        return trainingRepo.findByTrainerCriteria(filter);
+    }
+
     @Autowired
     public void setTrainingRepo(TrainingRepo trainingRepo) {
         this.trainingRepo = trainingRepo;
-    }
-
-    @Autowired
-    public void setTraineeService(TraineeService traineeService) {
-        this.traineeService = traineeService;
-    }
-
-    @Autowired
-    public void setTrainerService(TrainerService trainerService) {
-        this.trainerService = trainerService;
     }
 }
