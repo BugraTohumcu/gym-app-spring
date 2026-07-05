@@ -1,6 +1,7 @@
 package org.bugra.persistence.repo;
 
 import org.bugra.enums.UserRole;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.BaseJpaTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,4 +89,33 @@ class UserRepoTest extends BaseJpaTest {
         assertTrue(result.contains("john.doe1"));
         assertFalse(result.contains("john-doe1"));
     }
+
+
+    @Test
+    @DisplayName("Should return user if username does exists")
+    void findByUsername_shouldReturnUser(){
+        User user = createValidUser("john.doe", UserRole.TRAINEE);
+        fakeUserRepo.save(user);
+        em.flush();
+        em.clear();
+
+        User fetchedUser = fakeUserRepo.findByUsername(user.getUsername());
+
+        assertEquals("john.doe", fetchedUser.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when provided username is null")
+    void findByUsername_shouldThrowWhenUsernameNull(){
+        assertThrows(IllegalArgumentException.class,
+                () -> fakeUserRepo.findByUsername(null));
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException when username does not exists")
+    void findByUsername_shouldThrowWhenUsernameNotExists(){
+        assertThrows(UserNotFoundException.class,
+                () -> fakeUserRepo.findByUsername("test"));
+    }
+
 }
