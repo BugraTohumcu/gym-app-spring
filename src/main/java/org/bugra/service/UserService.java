@@ -19,4 +19,12 @@ public interface UserService {
      * @return Retrieved {@link User} from database
      * */
     User findByUsername(String username);
+
+    /**
+     * Deletes a user with provided username
+     * @param username a unique, lowercased string to be used as the profile username
+     * @throws org.bugra.exception.UserNotFoundException if there isn't any record deleted
+     * @return true if deleted, false otherwise
+     * */
+    boolean deleteByUsername(String username);
 }
