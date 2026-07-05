@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
@@ -16,11 +17,13 @@ public class UserServiceImp implements UserService {
     private UserRepo userRepo;
 
 
+    @Transactional
     @Override
     public User findByUsername(String username) {
         return userRepo.findByUsername(username);
     }
 
+    @Transactional
     @Override
     public boolean deleteByUsername(String username) {
         if (username == null) {
@@ -40,6 +43,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @Transactional
     public void toggleActiveStatus(String username) {
         if (username == null) {
             logger.warn("Provided username is null");
