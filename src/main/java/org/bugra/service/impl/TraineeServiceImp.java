@@ -7,6 +7,7 @@ import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.service.TraineeService;
 import org.bugra.service.UserCredentialsService;
+import org.bugra.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class TraineeServiceImp implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImp.class);
     private TraineeRepo traineeRepo;
     private UserCredentialsService userCredentialsService;
+    private UserService userService;
 
 
     @Override
@@ -76,16 +78,7 @@ public class TraineeServiceImp implements TraineeService {
 
     @Override
     public boolean deleteTraineeByUsername(String username) {
-        if(username == null){
-            throw new IllegalArgumentException("Username can not be null");
-        }
-
-        logger.info("Deleting the trainee with the username: {} ", username);
-        if (!userCredentialsService.deleteByUsername()) {
-            throw new UserNotFoundException("Trainee not found with id: " + traineeId);
-        }
-
-
+        return userService.deleteByUsername(username);
     }
 
     @Override
@@ -119,5 +112,10 @@ public class TraineeServiceImp implements TraineeService {
     @Autowired
     public void setUserCredentialsService(UserCredentialsService userCredentialsService){
         this.userCredentialsService = userCredentialsService;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

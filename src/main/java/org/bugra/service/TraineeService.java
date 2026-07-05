@@ -34,7 +34,14 @@ public interface TraineeService {
      * @return success status of the deletion process
      * @throws UserNotFoundException If user does not exist
      * */
-    boolean deleteTrainee(long traineeId);
+    boolean deleteTraineeById(long traineeId);
+
+    /**
+     * <p>Deletes existing trainee with the given username </p>
+     * @param username the unique username
+     * @return the result of {@link UserService#deleteByUsername(String)}
+     * */
+    boolean deleteTraineeByUsername(String username);
     /**
      * <p>Retrieves trainee via given id</p>
      * @param traineeId the unique id for trainee to retrieve
