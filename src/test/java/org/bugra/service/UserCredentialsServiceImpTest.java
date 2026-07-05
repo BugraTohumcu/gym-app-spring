@@ -1,5 +1,7 @@
 package org.bugra.service;
 
+import org.bugra.exception.UserNotFoundException;
+import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.util.PasswordGenerator;
 import org.junit.jupiter.api.DisplayName;
@@ -84,5 +86,41 @@ class UserCredentialsServiceImpTest {
 
         assertEquals(expectedPassword, actualPassword);
         verify(passwordGenerator, times(1)).generate();
+    }
+
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when username is null")
+    void toggleActiveStatus_shouldThrowWhenUsernameNull(){
+        assertThrows(IllegalArgumentException.class,
+                () -> credentialsService.toggleActiveStatus(null));
+    }
+
+    @Test
+    @DisplayName("Should toggle active status from true to false")
+    void toggleActiveStatus_shouldToggleFromTrueToFalse() {
+        User user = new User();
+        user.setActive(true);
+
+        when(userRepo.findByUsername("test")).thenReturn(user);
+
+        credentialsService.toggleActiveStatus("test");
+
+        assertFalse(user.isActive());
+        verify(userRepo).update(user);
+    }
+
+    @Test
+    @DisplayName("Should toggle active status from false to true")
+    void toggleActiveStatus_shouldToggleFromFalseToTrue() {
+        User user = new User();
+        user.setActive(false);
+
+        when(userRepo.findByUsername("test")).thenReturn(user);
+
+        credentialsService.toggleActiveStatus("test");
+
+        assertTrue(user.isActive());
+        verify(userRepo).update(user);
     }
 }
