@@ -77,6 +77,11 @@ public class TrainerServiceImpl implements TrainerService {
         return trainerRepo.existsById(id);
     }
 
+    @Override
+    public Trainer getTrainerByUsername(String username) {
+        return trainerRepo.findTrainerByUsername(username);
+    }
+
     @Autowired
     public void setTrainerRepo(TrainerRepo trainerRepo) {
         this.trainerRepo = trainerRepo;

@@ -36,4 +36,6 @@ public interface TrainerService {
      * @return true if exists, false otherwise
      * */
     boolean existsById(long id);
+
+    Trainer getTrainerByUsername(String username);
 }
