@@ -65,6 +65,23 @@ public class UserCredentialsServiceImp implements UserCredentialsService {
         return userRepo.findByUsername(username);
     }
 
+    @Override
+    public void toggleActiveStatus(String username) {
+        if (username == null) {
+            logger.warn("Provided username is null");
+            throw new IllegalArgumentException("Username can not be null");
+        }
+
+        logger.info("Toggling active status for user: {}", username);
+        User user = userRepo.findByUsername(username);
+
+        boolean newStatus = !user.isActive();
+        user.setActive(newStatus);
+        userRepo.update(user);
+
+        logger.info("User: {} active status changed to: {}", username, newStatus);
+    }
+
     @Autowired
     void setPasswordGenerator(PasswordGenerator passwordGenerator){
         this.passwordGenerator = passwordGenerator;
