@@ -1,6 +1,5 @@
 package org.bugra.service.impl;
 
-import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.UserCredentialsService;
 import org.bugra.util.PasswordGenerator;
