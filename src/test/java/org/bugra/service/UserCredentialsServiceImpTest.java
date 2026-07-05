@@ -1,8 +1,8 @@
 package org.bugra.service;
 
-import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.service.impl.UserCredentialsServiceImp;
 import org.bugra.util.PasswordGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

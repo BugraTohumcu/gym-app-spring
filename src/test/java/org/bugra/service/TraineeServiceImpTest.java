@@ -4,6 +4,7 @@ import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.service.impl.TraineeServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,11 +106,11 @@ class TraineeServiceImpTest {
 
     @Test
     @DisplayName("Should successfully delete trainee when trainee exists")
-    void deleteTrainee_shouldReturnTrue() {
+    void deleteTrainee_ById_shouldReturnTrue() {
         long id = 1L;
         when(traineeRepo.deleteById(id)).thenReturn(true);
 
-        boolean result = traineeService.deleteTrainee(id);
+        boolean result = traineeService.deleteTraineeById(id);
 
         assertTrue(result);
         verify(traineeRepo, times(1)).deleteById(id);
@@ -117,11 +118,11 @@ class TraineeServiceImpTest {
 
     @Test
     @DisplayName("Should throw UserNotFoundException when deleting non-existing trainee")
-    void deleteTrainee_shouldThrowWhenNotFound() {
+    void deleteTrainee_ById_shouldThrowWhenNotFound() {
         long id = 99L;
         when(traineeRepo.deleteById(id)).thenReturn(false);
 
-        assertThrows(UserNotFoundException.class, () -> traineeService.deleteTrainee(id));
+        assertThrows(UserNotFoundException.class, () -> traineeService.deleteTraineeById(id));
         verify(traineeRepo, times(1)).deleteById(id);
     }
 

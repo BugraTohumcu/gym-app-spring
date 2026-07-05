@@ -1,9 +1,12 @@
-package org.bugra.service;
+package org.bugra.service.impl;
 
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Training;
 import org.bugra.persistence.repo.TrainingRepo;
+import org.bugra.service.TraineeService;
+import org.bugra.service.TrainerService;
+import org.bugra.service.TrainingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

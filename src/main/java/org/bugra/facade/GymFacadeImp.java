@@ -36,7 +36,7 @@ public class GymFacadeImp implements GymFacade {
     public Trainee updateTrainee(Trainee trainee) { return traineeService.updateTrainee(trainee); }
 
     @Override
-    public boolean deleteTrainee(long id) { return traineeService.deleteTrainee(id); }
+    public boolean deleteTrainee(long id) { return traineeService.deleteTraineeById(id); }
 
     // Trainer Methods
     @Override

@@ -1,4 +1,4 @@
-package org.bugra.service;
+package org.bugra.service.impl;
 
 
 import org.bugra.dto.ChangePassword;
@@ -7,6 +7,7 @@ import org.bugra.dto.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.service.AuthService;
 import org.bugra.util.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

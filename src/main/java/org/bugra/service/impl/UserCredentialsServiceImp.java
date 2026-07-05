@@ -1,7 +1,8 @@
-package org.bugra.service;
+package org.bugra.service.impl;
 
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.service.UserCredentialsService;
 import org.bugra.util.PasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

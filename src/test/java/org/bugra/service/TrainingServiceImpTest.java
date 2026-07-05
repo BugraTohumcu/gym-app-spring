@@ -6,6 +6,7 @@ import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
 import org.bugra.persistence.repo.TrainingRepo;
+import org.bugra.service.impl.TrainingServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

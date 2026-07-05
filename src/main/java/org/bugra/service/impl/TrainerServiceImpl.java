@@ -1,10 +1,12 @@
-package org.bugra.service;
+package org.bugra.service.impl;
 
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
+import org.bugra.service.TrainerService;
+import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

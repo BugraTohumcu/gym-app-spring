@@ -1,17 +1,19 @@
-package org.bugra.service;
+package org.bugra.service.impl;
 
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.service.TraineeService;
+import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TraineeServiceImp implements TraineeService{
+public class TraineeServiceImp implements TraineeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImp.class);
     private TraineeRepo traineeRepo;
@@ -64,12 +66,26 @@ public class TraineeServiceImp implements TraineeService{
     }
 
     @Override
-    public boolean deleteTrainee(long traineeId) {
+    public boolean deleteTraineeById(long traineeId) {
         if (!traineeRepo.deleteById(traineeId)) {
             throw new UserNotFoundException("Trainee not found with id: " + traineeId);
         }
-        logger.error("Trainee with id: {} deleted successfully", traineeId );
+        logger.info("Trainee with id: {} deleted successfully", traineeId );
         return true;
+    }
+
+    @Override
+    public boolean deleteTraineeByUsername(String username) {
+        if(username == null){
+            throw new IllegalArgumentException("Username can not be null");
+        }
+
+        logger.info("Deleting the trainee with the username: {} ", username);
+        if (!userCredentialsService.deleteByUsername()) {
+            throw new UserNotFoundException("Trainee not found with id: " + traineeId);
+        }
+
+
     }
 
     @Override

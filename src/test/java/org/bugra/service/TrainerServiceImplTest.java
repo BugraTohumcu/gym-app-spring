@@ -4,6 +4,7 @@ import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
+import org.bugra.service.impl.TrainerServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
