@@ -1,5 +1,7 @@
 package org.bugra.persistence.repo;
 
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -88,14 +90,20 @@ public class UserRepo
             throw new IllegalArgumentException("Username can not be null");
         }
 
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaDelete<User> cd = cb.createCriteriaDelete(User.class);
-        Root<User> root = cd.from(User.class);
+        TypedQuery<User> query = entityManager.createQuery(
+                "SELECT u FROM User u WHERE u.username = :username",
+                User.class);
+        query.setParameter("username", username);
 
-        cd.where(cb.equal(root.get("username"), username));
+        try {
+            User user = query.getSingleResult();
 
-        int deletedCount = entityManager.createQuery(cd).executeUpdate();
-        return deletedCount > 0;
+            entityManager.remove(user);
+
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
     }
 
 }
