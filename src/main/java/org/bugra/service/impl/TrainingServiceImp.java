@@ -1,11 +1,14 @@
 package org.bugra.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Training;
+import org.bugra.model.TrainingType;
 import org.bugra.persistence.repo.TrainingRepo;
+import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TraineeService;
 import org.bugra.service.TrainerService;
 import org.bugra.service.TrainingService;
@@ -18,10 +21,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
 public class TrainingServiceImp implements TrainingService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImp.class);
     private TrainingRepo trainingRepo;
+    private TrainingTypeRepo trainingTypeRepo;
 
     @Override
     public Training createTraining(Training training) {
@@ -29,17 +34,26 @@ public class TrainingServiceImp implements TrainingService {
             throw new IllegalArgumentException("Training cannot be null");
         }
 
-        // Check if trainer id exist
+        String trainingTypeName = training.getTrainingType().getTrainingTypeName();
+
+        TrainingType type = trainingTypeRepo.findByTrainingTypeName(trainingTypeName)
+                .orElseGet(() -> {
+                    logger.info("New TrainingType found, creating: {}", trainingTypeName);
+                    TrainingType newType = new TrainingType();
+                    newType.setTrainingTypeName(trainingTypeName);
+                    return trainingTypeRepo.save(newType);
+                });
+
+
+        training.setTrainingType(type);
+
         if (training.getTrainee() == null) {
             throw new IllegalArgumentException("Trainee cannot be null");
         }
-
-        // Check if trainer id exist
         if (training.getTrainer() == null) {
             throw new IllegalArgumentException("Trainer cannot be null");
         }
 
-        // Duration and training date check
         validateTrainingDateAndDuration(
                 training.getTrainingDate(),
                 training.getTrainingDuration()
@@ -91,5 +105,10 @@ public class TrainingServiceImp implements TrainingService {
     @Autowired
     public void setTrainingRepo(TrainingRepo trainingRepo) {
         this.trainingRepo = trainingRepo;
+    }
+
+    @Autowired
+    public void setTrainingTypeRepo(TrainingTypeRepo trainingTypeRepo) {
+        this.trainingTypeRepo = trainingTypeRepo;
     }
 }
