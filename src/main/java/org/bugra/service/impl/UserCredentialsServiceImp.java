@@ -1,5 +1,6 @@
 package org.bugra.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.UserCredentialsService;
 import org.bugra.util.PasswordGenerator;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class UserCredentialsServiceImp implements UserCredentialsService {
 
     private UserRepo userRepo;
