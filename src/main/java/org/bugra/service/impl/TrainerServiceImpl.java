@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TrainerServiceImpl implements TrainerService {
 
@@ -80,6 +82,14 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer getTrainerByUsername(String username) {
         return trainerRepo.findTrainerByUsername(username);
+    }
+
+    @Override
+    public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
+        if (traineeUsername == null || traineeUsername.isBlank()) {
+            throw new IllegalArgumentException("Trainee username cannot be null or blank");
+        }
+        return trainerRepo.findAllNotAssignedToTrainee(traineeUsername);
     }
 
     @Autowired
