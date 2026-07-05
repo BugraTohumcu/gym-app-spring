@@ -33,4 +33,13 @@ public interface UsernameCapable {
      * */
     User findByUsername(String username);
 
+
+    /**
+     * Deletes a user with provided username
+     * @param username a unique, lowercased string to be used as the profile username
+     * @return true if deleted, false otherwise
+     * @throws IllegalArgumentException if the provided username is null
+     * */
+    boolean deleteByUsername(String username);
+
 }
