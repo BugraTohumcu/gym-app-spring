@@ -21,7 +21,8 @@ public class Trainer{
     @OneToOne(
             optional = false,
             cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
     )
     private User user;
 
