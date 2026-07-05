@@ -12,8 +12,14 @@ public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @Column(nullable = false)
     private int trainingDuration;
+
+    @Column(nullable = false)
     private String trainingName;
+
+    @Column(nullable = false)
     private LocalDate trainingDate;
 
     @ManyToOne
