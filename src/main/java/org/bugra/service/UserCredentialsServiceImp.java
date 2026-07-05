@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.util.PasswordGenerator;
 import org.slf4j.Logger;
@@ -57,6 +58,11 @@ public class UserCredentialsServiceImp implements UserCredentialsService {
     @Override
     public String generateRandomPassword() {
         return passwordGenerator.generate();
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepo.findByUsername(username);
     }
 
     @Autowired
