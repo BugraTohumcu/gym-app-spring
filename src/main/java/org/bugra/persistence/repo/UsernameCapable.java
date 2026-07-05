@@ -1,5 +1,7 @@
 package org.bugra.persistence.repo;
 
+import org.bugra.model.User;
+
 import java.util.List;
 
 /**
@@ -20,4 +22,15 @@ public interface UsernameCapable {
      * @return the {@link List} of all similar usernames
      * */
     List<String> findUsernameStartingWith(String basename);
+
+
+    /**
+     * Retrieves a specific user through the provided username
+     * @param username the unique username
+     * @return the specific {@link User} entity
+     * @throws org.bugra.exception.UserNotFoundException if user does not exists
+     * @throws IllegalArgumentException if the provided username is null
+     * */
+    User findByUsername(String username);
+
 }
