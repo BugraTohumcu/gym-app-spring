@@ -6,7 +6,9 @@ import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.service.TraineeService;
+import org.bugra.service.TrainingService;
 import org.bugra.service.UserCredentialsService;
 import org.bugra.service.UserService;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class TraineeServiceImp implements TraineeService {
     private TraineeRepo traineeRepo;
     private UserCredentialsService userCredentialsService;
     private UserService userService;
+    private TrainingRepo trainingRepo;
 
 
     @Transactional
@@ -86,7 +89,22 @@ public class TraineeServiceImp implements TraineeService {
     @Transactional
     @Override
     public boolean deleteTraineeByUsername(String username) {
-        return userService.deleteByUsername(username);
+        logger.info("The user with the username: {} is deleting the account", username);
+
+        Trainee trainee = traineeRepo.findTraineeByUsername(username);
+
+        // Delete trainee's trainings
+        if(!trainingRepo.deleteByTraineeId(trainee.getId())){
+            logger.warn("Not training deleted for trainee with id: {}", trainee.getId());
+        }
+
+        // Clean trainer list
+        if (trainee.getTrainers() != null) {
+            trainee.getTrainers().forEach(trainer -> trainer.getTrainees().remove(trainee));
+            trainee.getTrainers().clear();
+        }
+
+        return traineeRepo.deleteById(trainee.getId());
     }
 
     @Transactional
@@ -119,12 +137,6 @@ public class TraineeServiceImp implements TraineeService {
         return traineeRepo.findTraineeByUsername(username);
     }
 
-    @Transactional
-    @Override
-    public void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames) {
-        traineeRepo.updateTraineeTrainers(traineeUsername, trainerUsernames);
-    }
-
     @Autowired
     public void setTraineeRepo(TraineeRepo traineeRepo) {
         this.traineeRepo = traineeRepo;
@@ -138,5 +150,10 @@ public class TraineeServiceImp implements TraineeService {
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setTrainingRepo(TrainingRepo trainingRepo) {
+        this.trainingRepo = trainingRepo;
     }
 }

@@ -106,6 +106,19 @@ public class TrainingRepo extends AbstractRepository<Training, Long> {
         return value != null && !value.isBlank();
     }
 
+    public boolean deleteByTraineeId(Long traineeId){
+        if(traineeId == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+
+        int deleted = entityManager.createQuery(
+                        "delete from Training where trainee.id =:id")
+                .setParameter("id",traineeId)
+                .executeUpdate();
+
+        return deleted > 0;
+    }
+
 
     private record TrainingJoins(
             Join<?, User> traineeUser,

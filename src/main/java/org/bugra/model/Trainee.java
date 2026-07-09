@@ -27,6 +27,9 @@ public class Trainee{
     private User user;
 
 
-    @ManyToMany(mappedBy = "trainees", fetch = FetchType.EAGER)
+    @ManyToMany(
+            mappedBy = "trainees",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE})
     private Set<Trainer> trainers;
 }
