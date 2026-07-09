@@ -3,11 +3,15 @@ package org.bugra.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Trainer{
 
     @Id
@@ -26,10 +30,11 @@ public class Trainer{
     )
     private User user;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(
-            joinColumns = @JoinColumn(name = "trainee_id"),
-            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainer_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainee_id")
     )
     private Set<Trainee> trainees;
 }

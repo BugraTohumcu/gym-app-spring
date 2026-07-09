@@ -1,13 +1,15 @@
 package org.bugra.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Trainee{
 
     @Id
@@ -25,6 +27,6 @@ public class Trainee{
     private User user;
 
 
-    @ManyToMany(mappedBy = "trainees")
+    @ManyToMany(mappedBy = "trainees", fetch = FetchType.EAGER)
     private Set<Trainer> trainers;
 }

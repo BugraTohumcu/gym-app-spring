@@ -1,12 +1,14 @@
 package org.bugra.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Training {
 
     @Id
@@ -25,10 +27,10 @@ public class Training {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private TrainingType trainingType;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private Trainee trainee;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private Trainer trainer;
 
 }

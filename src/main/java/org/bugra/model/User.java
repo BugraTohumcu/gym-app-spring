@@ -2,11 +2,13 @@ package org.bugra.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.bugra.enums.UserRole;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
