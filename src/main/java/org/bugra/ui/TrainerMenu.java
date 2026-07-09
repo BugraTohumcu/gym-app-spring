@@ -1,6 +1,7 @@
 package org.bugra.ui;
 
 import org.bugra.dto.ChangePassword;
+import org.bugra.dto.CreateTraining;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.dto.UserResponse;
 import org.bugra.facade.GymFacade;
@@ -141,21 +142,17 @@ public class TrainerMenu extends BaseUI {
         int duration    = readPositiveInt("Duration (mins)");
 
         try {
-            Trainer trainer = gymFacade.getTrainerByUsername(currentUser.username());
-            Trainee trainee = gymFacade.getTrainee(traineeId);
 
-            TrainingType trainingType = new TrainingType();
-            trainingType.setTrainingTypeName(typeName);
+            CreateTraining request = new CreateTraining (
+                    currentUser.username(),  // trainer username
+                    traineeId,
+                    name,
+                    typeName,
+                    date,
+                    duration
+            );
 
-            Training training = new Training();
-            training.setTrainer(trainer);
-            training.setTrainee(trainee);
-            training.setTrainingName(name);
-            training.setTrainingType(trainingType);
-            training.setTrainingDate(date);
-            training.setTrainingDuration(duration);
-
-            Training saved = gymFacade.createTraining(training);
+            Training saved = gymFacade.createTraining(request);
             printSuccess("Training added successfully!");
             printTraining(saved);
         } catch (Exception e) {
