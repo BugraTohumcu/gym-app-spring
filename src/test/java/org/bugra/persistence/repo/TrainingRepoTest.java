@@ -393,4 +393,45 @@ class TrainingRepoTest extends BaseJpaTest {
         assertEquals(1, result.size());
         assertEquals("Jane Session", result.get(0).getTrainingName());
     }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when id is null")
+    void deleteByTraineeId_shouldThrowWhenIdNull(){
+        assertThrows(IllegalArgumentException.class,
+                () -> trainingRepo.deleteByTraineeId(null));
+    }
+
+    @Test
+    @DisplayName("Should return true and delete trainings when trainee has trainings")
+    void deleteByTraineeId_shouldReturnTrueWhenTrainingsDeleted() {
+        TrainingType type = createAndSaveTrainingType("Yoga");
+        Trainee trainee = createAndSaveTrainee("john.doe");
+        Trainer trainer = createAndSaveTrainer("jane.smith", type);
+
+        createAndSaveTraining(trainee, trainer, type,
+                "Morning Yoga",
+                LocalDate.of(2024, 1, 15),
+                60);
+
+        em.flush();
+        em.clear();
+
+        boolean result = trainingRepo.deleteByTraineeId(trainee.getId());
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Should return false when trainee has no trainings to delete")
+    void deleteByTraineeId_shouldReturnFalseWhenNoTrainingsExist() {
+        Trainee trainee = createAndSaveTrainee("john.doe");
+
+        em.flush();
+        em.clear();
+
+        boolean result = trainingRepo.deleteByTraineeId(trainee.getId());
+
+        assertFalse(result);
+    }
+
 }
