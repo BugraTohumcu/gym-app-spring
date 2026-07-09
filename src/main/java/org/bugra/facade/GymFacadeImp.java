@@ -81,10 +81,7 @@ public class GymFacadeImp implements GymFacade {
         return trainerService.getTrainersNotAssignedToTrainee(traineeUsername);
     }
 
-    @Override
-    public void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames) {
-        traineeService.updateTraineeTrainers(traineeUsername, trainerUsernames);
-    }
+
 
     // Trainer Methods
     @Override
@@ -117,8 +114,8 @@ public class GymFacadeImp implements GymFacade {
     }
 
     @Override
-    public Training createTraining(Training training) {
-        return trainingService.createTraining(training);
+    public Training createTraining(CreateTraining createTraining) {
+        return trainingService.createTraining(createTraining);
     }
 
     @Override
