@@ -2,12 +2,15 @@ package org.bugra.service;
 
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
+import org.bugra.exception.ValidationException;
+import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainerServiceImpl;
+import org.bugra.util.ValidationUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,10 +38,26 @@ class TrainerServiceImplTest {
     @InjectMocks
     TrainerServiceImpl trainerService;
 
+
+    private Trainer validTrainer(Long id) {
+        User user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("Swimming");
+
+        Trainer trainer = new Trainer();
+        trainer.setId(id);
+        trainer.setUser(user);
+        trainer.setSpecialization(type);
+        return trainer;
+    }
+
     @Test
-    @DisplayName("Should throw IllegalArgumentException when trainer is null")
+    @DisplayName("Should throw ValidationException when trainer is null")
     void createTrainer_shouldThrowExceptionWhenNull() {
-        assertThrows(IllegalArgumentException.class, () -> trainerService.createTrainer(null));
+        assertThrows(ValidationException.class, () -> trainerService.createTrainer(null));
     }
 
     @Test
@@ -74,8 +93,7 @@ class TrainerServiceImplTest {
     @Test
     @DisplayName("Should successfully update trainer when exists")
     void updateTrainer_shouldUpdateSuccessfully() {
-        Trainer trainer = new Trainer();
-        trainer.setId(1L);
+        Trainer trainer = validTrainer(1L);
         when(trainerRepo.update(trainer)).thenReturn(Optional.of(trainer));
 
         Trainer updated = trainerService.updateTrainer(trainer);
@@ -87,8 +105,7 @@ class TrainerServiceImplTest {
     @Test
     @DisplayName("Should throw UserNotFoundException during update when trainer does not exist")
     void updateTrainer_shouldThrowExceptionWhenNotFound() {
-        Trainer trainer = new Trainer();
-        trainer.setId(99L);
+        Trainer trainer = validTrainer(99L);
         when(trainerRepo.update(trainer)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> trainerService.updateTrainer(trainer));
