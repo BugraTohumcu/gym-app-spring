@@ -1,9 +1,12 @@
 package org.bugra.service;
 
+import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
+import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
+import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainerServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +27,9 @@ class TrainerServiceImplTest {
     TrainerRepo trainerRepo;
 
     @Mock
+    TrainingTypeRepo trainingTypeRepo;
+
+    @Mock
     UserCredentialsService userCredentialsService;
 
     @InjectMocks
@@ -38,23 +44,30 @@ class TrainerServiceImplTest {
     @Test
     @DisplayName("Should successfully create trainer with generated credentials")
     void createTrainer_shouldSetCredentialsAndSave() {
-        // Given
         Trainer trainer = new Trainer();
         trainer.setUser(new User());
         trainer.getUser().setFirstName("Jane");
         trainer.getUser().setLastName("Smith");
+
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("Running");
+        trainer.setSpecialization(type);
+
+        when(trainingTypeRepo.findByTrainingTypeName("Running")).thenReturn(Optional.empty());
+        when(trainingTypeRepo.save(any(TrainingType.class))).thenReturn(type);
 
         when(userCredentialsService.generateRandomPassword()).thenReturn("Secret789");
         when(userCredentialsService.generateUsername("Jane", "Smith"))
                 .thenReturn("jane.smith");
         when(trainerRepo.save(any(Trainer.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // When
         Trainer savedTrainer = trainerService.createTrainer(trainer);
 
-        // Then
         assertEquals("Secret789", savedTrainer.getUser().getPassword());
         assertEquals("jane.smith", savedTrainer.getUser().getUsername());
+        assertTrue(savedTrainer.getUser().isActive());
+        assertEquals(UserRole.TRAINER, savedTrainer.getUser().getRole());
+
         verify(trainerRepo, times(1)).save(trainer);
     }
 
