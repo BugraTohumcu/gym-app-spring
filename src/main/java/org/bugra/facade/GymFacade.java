@@ -29,6 +29,8 @@ public interface GymFacade {
 
     List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername);
 
+    void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames);
+
     Trainer createTrainer(Trainer trainer);
 
     Trainer getTrainer(long id);
