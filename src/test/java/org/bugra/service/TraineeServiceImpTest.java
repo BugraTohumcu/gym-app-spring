@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.exception.UserNotFoundException;
+import org.bugra.exception.ValidationException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
@@ -41,17 +42,31 @@ class TraineeServiceImpTest {
     @InjectMocks
     private TraineeServiceImp traineeService;
 
+
+    private Trainee validTrainee(Long id) {
+        User user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+
+        Trainee trainee = new Trainee();
+        trainee.setId(id);
+        trainee.setUser(user);
+        return trainee;
+    }
+
+
     @Test
     @DisplayName("Should throw exception when trainee is null")
     void createTrainee_shouldThrowExceptionWhenNull() {
-        assertThrows(IllegalArgumentException.class, () -> traineeService.createTrainee(null));
+        assertThrows(ValidationException.class, () -> traineeService.createTrainee(null));
     }
 
     @Test
     @DisplayName("Should throw exception when trainee user is null")
     void createTrainee_shouldThrowExceptionWhenUserIsNull() {
         Trainee trainee = new Trainee();
-        assertThrows(IllegalArgumentException.class, () -> traineeService.createTrainee(trainee));
+        trainee.setUser(null);
+        assertThrows(ValidationException.class, () -> traineeService.createTrainee(trainee));
     }
 
     @Test
@@ -92,9 +107,7 @@ class TraineeServiceImpTest {
     @Test
     @DisplayName("Should successfully update trainee when valid")
     void updateTrainee_shouldReturnUpdatedTrainee() {
-        Trainee trainee = new Trainee();
-        trainee.setId(1L);
-
+        Trainee trainee = validTrainee(1L);
         when(traineeRepo.update(trainee)).thenReturn(Optional.of(trainee));
 
         Trainee result = traineeService.updateTrainee(trainee);
@@ -107,8 +120,7 @@ class TraineeServiceImpTest {
     @Test
     @DisplayName("Should throw UserNotFoundException when updating non-existing trainee")
     void updateTrainee_shouldThrowWhenNotFound() {
-        Trainee trainee = new Trainee();
-        trainee.setId(99L);
+        Trainee trainee = validTrainee(99L);
 
         when(traineeRepo.update(trainee)).thenReturn(Optional.empty());
 
