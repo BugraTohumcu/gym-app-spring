@@ -6,6 +6,8 @@ import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.*;
+import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainingServiceImp;
@@ -35,10 +37,10 @@ class TrainingServiceImpTest {
     TrainingTypeRepo trainingTypeRepo;
 
     @Mock
-    TraineeService traineeService;
+    TraineeRepo traineeRepo;
 
     @Mock
-    TrainerService trainerService;
+    TrainerRepo trainerRepo;
 
     @InjectMocks
     TrainingServiceImp trainingService;
@@ -82,8 +84,8 @@ class TrainingServiceImpTest {
     @DisplayName("Should successfully create training when data is valid")
     void createTraining_shouldSaveSuccessfully() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
 
         Training saved = new Training();
         saved.setId(1L);
@@ -101,8 +103,8 @@ class TrainingServiceImpTest {
     void createTraining_shouldCreateNewTrainingTypeWhenNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.empty());
         when(trainingTypeRepo.save(any(TrainingType.class))).thenReturn(mockType);
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
 
         Training saved = new Training();
         saved.setId(1L);
@@ -118,7 +120,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when trainee not found")
     void createTraining_shouldThrowWhenTraineeNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenThrow(new UserNotFoundException("Trainee not found"));
+        when(traineeRepo.findById(1L)).thenThrow(new UserNotFoundException("Trainee not found"));
 
         assertThrows(UserNotFoundException.class,
                 () -> trainingService.createTraining(validRequest()));
@@ -129,8 +131,8 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when trainer not found")
     void createTraining_shouldThrowWhenTrainerNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith"))
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith"))
                 .thenThrow(new UserNotFoundException("Trainer not found"));
 
         assertThrows(UserNotFoundException.class,
@@ -142,8 +144,8 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw IllegalArgumentException when date is null")
     void createTraining_shouldThrowWhenDateIsNull() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
 
         CreateTraining request = new CreateTraining(
                 "jane.smith", 1L, "Morning Yoga", "Yoga", null, 60);
@@ -157,8 +159,8 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw IllegalArgumentException when duration is zero")
     void createTraining_shouldThrowWhenDurationZero() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
 
         CreateTraining request = new CreateTraining(
                 "jane.smith", 1L, "Morning Yoga", "Yoga",
@@ -173,8 +175,8 @@ class TrainingServiceImpTest {
     @DisplayName("Should add trainee to trainer's list and trainer to trainee's list")
     void createTraining_shouldUpdateBidirectionalRelationship() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeService.getTrainee(1L)).thenReturn(mockTrainee);
-        when(trainerService.getTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
         when(trainingRepo.save(any(Training.class))).thenReturn(new Training());
 
         trainingService.createTraining(validRequest());
