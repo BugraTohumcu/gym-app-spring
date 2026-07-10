@@ -5,6 +5,7 @@ import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.service.impl.TraineeServiceImp;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,6 +31,9 @@ class TraineeServiceImpTest {
 
     @Mock
     private TrainingRepo trainingRepo;
+
+    @Mock
+    private TrainerRepo trainerRepo;
 
     @Mock
     private UserCredentialsService userCredentialsService;
@@ -242,5 +247,81 @@ class TraineeServiceImpTest {
         assertThrows(UserNotFoundException.class, () -> traineeService.deleteTraineeByUsername(username));
         verify(traineeRepo, times(1)).findTraineeByUsername(username);
         verifyNoInteractions(trainingRepo);
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException when trainee username does not exist")
+    void updateTraineeTrainers_shouldThrowWhenTraineeNotFound() {
+        // Arrange
+        String traineeUsername = "nonexistent.trainee";
+        List<String> trainerUsernames = List.of("jane.smith", "bob.brown");
+
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(null);
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class,
+                () -> traineeService.updateTraineeTrainers(traineeUsername, trainerUsernames));
+
+        verify(traineeRepo, times(1)).findTraineeByUsername(traineeUsername);
+        verifyNoInteractions(trainerRepo);
+        verify(traineeRepo, never()).update(any());
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException with missing usernames when some trainers are not found")
+    void updateTraineeTrainers_shouldThrowWhenSomeTrainersNotFound() {
+        String traineeUsername = "john.doe";
+        List<String> requestedTrainers = List.of("jane.smith", "ghost.trainer");
+
+        Trainee mockTrainee = new Trainee();
+
+        Trainer foundTrainer = new Trainer();
+        User user = new User();
+        user.setUsername("jane.smith");
+        foundTrainer.setUser(user);
+        List<Trainer> dbResult = List.of(foundTrainer);
+
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(mockTrainee);
+        when(trainerRepo.findAllByUsernames(requestedTrainers)).thenReturn(dbResult);
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+                () -> traineeService.updateTraineeTrainers(traineeUsername, requestedTrainers));
+
+        assertTrue(exception.getMessage().contains("ghost.trainer"));
+
+        verify(traineeRepo, times(1)).findTraineeByUsername(traineeUsername);
+        verify(trainerRepo, times(1)).findAllByUsernames(requestedTrainers);
+        verify(traineeRepo, never()).update(any());
+    }
+
+    @Test
+    @DisplayName("Should successfully clear old trainers and set new ones when all data is valid")
+    void updateTraineeTrainers_shouldSuccessfullyUpdateTrainersList() {
+        String traineeUsername = "john.doe";
+        List<String> newTrainersInput = List.of("jane.smith", "bob.brown");
+
+        Trainee mockTrainee = new Trainee();
+        Set<Trainer> currentTrainers = new java.util.HashSet<>();
+        Trainer oldTrainer = new Trainer();
+        currentTrainers.add(oldTrainer);
+        mockTrainee.setTrainers(currentTrainers);
+
+        Trainer trainer1 = new Trainer();
+        Trainer trainer2 = new Trainer();
+        List<Trainer> foundTrainersFromDb = List.of(trainer1, trainer2);
+
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(mockTrainee);
+        when(trainerRepo.findAllByUsernames(newTrainersInput)).thenReturn(foundTrainersFromDb);
+        when(traineeRepo.update(mockTrainee)).thenReturn(java.util.Optional.of(mockTrainee));
+
+        assertDoesNotThrow(() -> traineeService.updateTraineeTrainers(traineeUsername, newTrainersInput));
+
+        assertEquals(2, mockTrainee.getTrainers().size(), "Trainee's trainers count should be 2");
+        assertTrue(mockTrainee.getTrainers().containsAll(foundTrainersFromDb), "Should contain all new trainers");
+        assertFalse(mockTrainee.getTrainers().contains(oldTrainer), "Should be successfully removed");
+
+        verify(traineeRepo, times(1)).findTraineeByUsername(traineeUsername);
+        verify(trainerRepo, times(1)).findAllByUsernames(newTrainersInput);
+        verify(traineeRepo, times(1)).update(mockTrainee);
     }
 }
