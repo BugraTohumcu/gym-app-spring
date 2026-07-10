@@ -28,8 +28,13 @@ public class Trainee{
 
 
     @ManyToMany(
-            mappedBy = "trainees",
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE})
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE}
+    )
+    @JoinTable(
+            name = "trainee_trainer",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
     private Set<Trainer> trainers;
 }
