@@ -5,12 +5,14 @@ import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.UserNotFoundException;
+import org.bugra.exception.ValidationException;
 import org.bugra.model.*;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainingServiceImp;
+import org.bugra.util.ValidationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,32 +143,24 @@ class TrainingServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when date is null")
+    @DisplayName("Should throw ValidationException when date is null")
     void createTraining_shouldThrowWhenDateIsNull() {
-        when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
-        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
-
         CreateTraining request = new CreateTraining(
                 "jane.smith", 1L, "Morning Yoga", "Yoga", null, 60);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ValidationException.class,
                 () -> trainingService.createTraining(request));
         verify(trainingRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when duration is zero")
+    @DisplayName("Should throw ValidationException when duration is zero")
     void createTraining_shouldThrowWhenDurationZero() {
-        when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
-        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
-
         CreateTraining request = new CreateTraining(
                 "jane.smith", 1L, "Morning Yoga", "Yoga",
                 LocalDate.now().plusDays(1), 0);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ValidationException.class,
                 () -> trainingService.createTraining(request));
         verify(trainingRepo, never()).save(any());
     }
@@ -205,37 +199,6 @@ class TrainingServiceImpTest {
 
         assertThrows(TrainingNotFoundException.class,
                 () -> trainingService.getTraining(1L));
-    }
-
-    @Test
-    @DisplayName("Should pass for valid date and duration")
-    void validateTrainingDateAndDuration_shouldPassForValidInput() {
-        assertDoesNotThrow(() ->
-                trainingService.validateTrainingDateAndDuration(
-                        LocalDate.now().plusDays(1), 60));
-    }
-
-    @Test
-    @DisplayName("Should throw for null date")
-    void validateTrainingDateAndDuration_shouldThrowForNullDate() {
-        assertThrows(IllegalArgumentException.class, () ->
-                trainingService.validateTrainingDateAndDuration(null, 60));
-    }
-
-    @Test
-    @DisplayName("Should throw for zero duration")
-    void validateTrainingDateAndDuration_shouldThrowForZeroDuration() {
-        assertThrows(IllegalArgumentException.class, () ->
-                trainingService.validateTrainingDateAndDuration(
-                        LocalDate.now().plusDays(1), 0));
-    }
-
-    @Test
-    @DisplayName("Should throw for negative duration")
-    void validateTrainingDateAndDuration_shouldThrowForNegativeDuration() {
-        assertThrows(IllegalArgumentException.class, () ->
-                trainingService.validateTrainingDateAndDuration(
-                        LocalDate.now().plusDays(1), -1));
     }
 
     @Test
