@@ -14,15 +14,13 @@ import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
-import org.bugra.service.TraineeService;
-import org.bugra.service.TrainerService;
 import org.bugra.service.TrainingService;
+import org.bugra.util.TrainingValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +37,9 @@ public class TrainingServiceImp implements TrainingService {
 
     @Override
     public Training createTraining(CreateTraining createTraining) {
+        TrainingValidator.validate(createTraining);
 
+        // create the specialization if it does not exist
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(createTraining.trainingTypeName())
                 .orElseGet(() -> {
                     TrainingType newType = new TrainingType();
@@ -58,11 +58,7 @@ public class TrainingServiceImp implements TrainingService {
         // Already checks if the user exists
         Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername());
 
-        validateTrainingDateAndDuration(
-                createTraining.trainingDate(),
-                createTraining.trainingDuration());
-
-
+        // Update trainee_trainer table
         managedTrainer.getTrainees().add(managedTrainee.get());
         managedTrainee.get().getTrainers().add(managedTrainer);
 
@@ -90,21 +86,6 @@ public class TrainingServiceImp implements TrainingService {
         logger.info("Training with id: {} and name: '{}' successfully fetched",
                 trainingId, training.getTrainingName());
         return training;
-    }
-
-    @Override
-    public void validateTrainingDateAndDuration(LocalDate date, int duration) {
-        // Null and invalid time check
-        if (date == null) {
-            logger.error("Training date cannot be null");
-            throw new IllegalArgumentException("Training date cannot be null");
-        }
-
-        // Invalid duration check
-        if (duration <= 0) {
-            logger.error("Training duration must be positive");
-            throw new IllegalArgumentException("Training duration must be positive");
-        }
     }
 
     @Override
