@@ -10,6 +10,7 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TrainerService;
 import org.bugra.service.UserCredentialsService;
+import org.bugra.util.TrainerValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     @Override
     public Trainer createTrainer(Trainer trainer) {
-        if (trainer == null) {
-            throw new IllegalArgumentException("Trainer cannot be null");
-        }
+        TrainerValidator.validate(trainer);
+
         String trainingTypeName = trainer.getSpecialization().getTrainingTypeName();
 
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(trainingTypeName)
@@ -67,10 +67,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        if (trainer == null) {
-            logger.error("Update failed: Trainer or ID is null");
-            throw new IllegalArgumentException("Trainer or Trainer ID cannot be null");
-        }
+        TrainerValidator.validate(trainer);
 
         Trainer updated = trainerRepo.update(trainer)
                 .orElseThrow(() -> new UserNotFoundException("Trainer not found with id: " + trainer.getId()));
