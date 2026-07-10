@@ -11,6 +11,7 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.service.TraineeService;
 import org.bugra.service.UserCredentialsService;
+import org.bugra.util.TraineeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,7 @@ public class TraineeServiceImp implements TraineeService {
     @Transactional
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        if (trainee == null || trainee.getUser() == null) {
-            logger.error("Attempted to create a null trainee or trainee without user credentials");
-            throw new IllegalArgumentException("Trainee and associated User cannot be null");
-        }
+        TraineeValidator.validate(trainee);
 
         User user = trainee.getUser();
 
@@ -67,11 +65,7 @@ public class TraineeServiceImp implements TraineeService {
     @Transactional
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        // Null check for object and id
-        if (trainee == null ) {
-            logger.error("Update failed: Trainee or ID is null");
-            throw new IllegalArgumentException("Trainee or Trainee ID cannot be null");
-        }
+        TraineeValidator.validate(trainee);
 
         logger.info("Trainee updated successfully with ID: {}", trainee.getId());
         return traineeRepo.update(trainee)
