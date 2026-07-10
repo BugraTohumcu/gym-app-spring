@@ -56,13 +56,13 @@ class TraineeServiceImpTest {
 
 
     @Test
-    @DisplayName("Should throw exception when trainee is null")
+    @DisplayName("Should throw ValidationException when trainee is null")
     void createTrainee_shouldThrowExceptionWhenNull() {
         assertThrows(ValidationException.class, () -> traineeService.createTrainee(null));
     }
 
     @Test
-    @DisplayName("Should throw exception when trainee user is null")
+    @DisplayName("Should throw ValidationException when trainee user is null")
     void createTrainee_shouldThrowExceptionWhenUserIsNull() {
         Trainee trainee = new Trainee();
         trainee.setUser(null);
