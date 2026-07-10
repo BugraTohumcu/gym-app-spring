@@ -4,19 +4,21 @@ import jakarta.transaction.Transactional;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
+import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
+import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.service.TraineeService;
-import org.bugra.service.TrainingService;
 import org.bugra.service.UserCredentialsService;
-import org.bugra.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -25,8 +27,8 @@ public class TraineeServiceImp implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImp.class);
     private TraineeRepo traineeRepo;
     private UserCredentialsService userCredentialsService;
-    private UserService userService;
     private TrainingRepo trainingRepo;
+    private TrainerRepo trainerRepo;
 
 
     @Transactional
@@ -137,6 +139,39 @@ public class TraineeServiceImp implements TraineeService {
         return traineeRepo.findTraineeByUsername(username);
     }
 
+    @Transactional
+    @Override
+    public void updateTraineeTrainers(String traineeUsername, List<String> newTrainerUsernames) {
+        logger.info("Updating trainers list for trainee: {}", traineeUsername);
+
+        // Trainee check
+        Trainee trainee = traineeRepo.findTraineeByUsername(traineeUsername);
+        if (trainee == null) {
+            throw new UserNotFoundException("Trainee not found with username: " + traineeUsername);
+        }
+
+        List<Trainer> foundTrainers = trainerRepo.findAllByUsernames(newTrainerUsernames);
+
+        // Update trainers
+        if (foundTrainers.size() != newTrainerUsernames.size()) {
+            Set<String> foundUsernames = foundTrainers.stream()
+                    .map(t -> t.getUser().getUsername())
+                    .collect(Collectors.toSet());
+
+            List<String> missingUsernames = newTrainerUsernames.stream()
+                    .filter(username -> !foundUsernames.contains(username))
+                    .toList();
+
+            logger.warn("Validation failed. Non-existent trainers: {}", missingUsernames);
+            throw new UserNotFoundException("Following trainers not found: " + missingUsernames);
+        }
+
+        trainee.getTrainers().clear();
+        trainee.getTrainers().addAll(foundTrainers);
+
+        traineeRepo.update(trainee);
+    }
+
     @Autowired
     public void setTraineeRepo(TraineeRepo traineeRepo) {
         this.traineeRepo = traineeRepo;
@@ -148,12 +183,12 @@ public class TraineeServiceImp implements TraineeService {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setTrainingRepo(TrainingRepo trainingRepo) {
+        this.trainingRepo = trainingRepo;
     }
 
     @Autowired
-    public void setTrainingRepo(TrainingRepo trainingRepo) {
-        this.trainingRepo = trainingRepo;
+    public void setTrainerRepo(TrainerRepo trainerRepo) {
+        this.trainerRepo = trainerRepo;
     }
 }
