@@ -7,6 +7,8 @@ import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -53,6 +55,22 @@ public class TrainerRepo extends AbstractRepository<Trainer, Long> {
         subquery.where(cb.equal(userJoin.get("username"), traineeUsername));
 
         cq.where(cb.not(root.get("id").in(subquery)));
+
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public List<Trainer> findAllByUsernames(List<String> usernames){
+        if(usernames == null || usernames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Trainer> cq = cb.createQuery(Trainer.class);
+        Root<Trainer> root = cq.from(Trainer.class);
+
+        Join<Trainer, User> userJoin = root.join("user");
+
+        cq.where(userJoin.get("username").in(usernames));
 
         return entityManager.createQuery(cq).getResultList();
     }
