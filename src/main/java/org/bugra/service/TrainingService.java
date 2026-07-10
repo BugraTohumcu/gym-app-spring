@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.dto.CreateTraining;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.model.Training;
@@ -16,11 +17,11 @@ public interface TrainingService {
 
     /**
      * <p>Creates a new training profile</p>
-     * @param training the training entity to create
+     * @param createTraining the training request dto to create a training
      * @return the created training
      * @throws IllegalArgumentException if {@link Training} is null
      */
-    Training createTraining(Training training);
+    Training createTraining(CreateTraining createTraining);
 
     /**
      * <p>Retrieves a training profile by its unique identifier</p>
