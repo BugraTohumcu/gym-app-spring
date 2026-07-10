@@ -5,7 +5,6 @@ import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.model.Training;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.bugra.exception.TrainingNotFoundException;
@@ -26,18 +25,10 @@ public interface TrainingService {
     /**
      * <p>Retrieves a training profile by its unique identifier</p>
      * @param trainingId the ID of the training
-     * @throws TrainingNotFoundException if training does not exists
+     * @throws TrainingNotFoundException if training does not exist
      * @return the found training
      */
     Training getTraining(long trainingId);
-
-    /**
-     *<p>Validate the training date and training duration time</p>
-     * @param date the provided training date
-     * @param duration the provided training duration;
-     * @throws IllegalArgumentException if provided date or duration invalid
-    */
-    void validateTrainingDateAndDuration(LocalDate date, int duration);
 
     /**
      * Retrieves a filtered list of training sessions associated with a specific trainer.
