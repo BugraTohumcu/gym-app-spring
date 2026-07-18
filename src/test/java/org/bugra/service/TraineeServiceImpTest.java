@@ -1,7 +1,8 @@
 package org.bugra.service;
 
+import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.UserNotFoundException;
-import org.bugra.exception.ValidationException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -55,32 +57,22 @@ class TraineeServiceImpTest {
     }
 
 
-    @Test
-    @DisplayName("Should throw ValidationException when trainee is null")
-    void createTrainee_shouldThrowExceptionWhenNull() {
-        assertThrows(ValidationException.class, () -> traineeService.createTrainee(null));
-    }
-
-    @Test
-    @DisplayName("Should throw ValidationException when trainee user is null")
-    void createTrainee_shouldThrowExceptionWhenUserIsNull() {
-        Trainee trainee = new Trainee();
-        trainee.setUser(null);
-        assertThrows(ValidationException.class, () -> traineeService.createTrainee(trainee));
+    private RegisterTrainee createValidRegisterTrainee(){
+        return new RegisterTrainee(
+                "John",
+                "Doe",
+                LocalDate.of(2004, 7,7),
+                "USA"
+        );
     }
 
     @Test
     @DisplayName("Should successfully create trainee with generated credentials")
     void createTrainee_shouldSetCredentialsAndSave() {
-        User user = new User();
-        user.setFirstName("john");
-        user.setLastName("doe");
-
-        Trainee trainee = new Trainee();
-        trainee.setUser(user);
+        RegisterTrainee registerTrainee = createValidRegisterTrainee();
 
         when(userCredentialsService.generateRandomPassword()).thenReturn("Secret123");
-        when(userCredentialsService.generateUsername("john", "doe")).thenReturn("john.doe");
+        when(userCredentialsService.generateUsername("John", "Doe")).thenReturn("john.doe");
 
         when(traineeRepo.save(any(Trainee.class))).thenAnswer(invocation -> {
             Trainee source = invocation.getArgument(0);
@@ -88,20 +80,16 @@ class TraineeServiceImpTest {
             return source;
         });
 
-        Trainee savedTrainee = traineeService.createTrainee(trainee);
+        UserResponse savedTrainee = traineeService.createTrainee(registerTrainee);
 
         assertNotNull(savedTrainee);
-        assertEquals(42L, savedTrainee.getId());
 
-        User savedUser = savedTrainee.getUser();
-        assertNotNull(savedUser);
-        assertEquals("Secret123", savedUser.getPassword());
-        assertEquals("john.doe", savedUser.getUsername());
-        assertTrue(savedUser.isActive());
+        assertEquals("Secret123", savedTrainee.password());
+        assertEquals("john.doe", savedTrainee.username());
 
         verify(userCredentialsService, times(1)).generateRandomPassword();
-        verify(userCredentialsService, times(1)).generateUsername("john", "doe");
-        verify(traineeRepo, times(1)).save(trainee);
+        verify(userCredentialsService, times(1)).generateUsername("John", "Doe");
+        verify(traineeRepo, times(1)).save(any());
     }
 
     @Test

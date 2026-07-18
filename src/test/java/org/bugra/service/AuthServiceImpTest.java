@@ -69,7 +69,7 @@ class AuthServiceImpTest {
         UserResponse response = authService.login(loginUser);
 
         assertEquals(loginUser.username(), response.username());
-        assertEquals(correctUser.getRole(), response.userRole());
+        assertEquals(correctUser.getPassword(), response.password());
     }
 
     @Test
