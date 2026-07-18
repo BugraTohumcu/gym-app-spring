@@ -44,7 +44,7 @@ public class AuthServiceImp implements AuthService {
         logger.info("User with username: {} is successfully logged in" , loginUser.username());
         return new UserResponse(
                 fetchedUser.getUsername(),
-                fetchedUser.getRole()
+                fetchedUser.getPassword()
         );
     }
 
