@@ -1,4 +1,4 @@
-package org.bugra.dto;
+package org.bugra.dto.request;
 
 public record ChangePassword(
         String currentPassword,
