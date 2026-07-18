@@ -68,12 +68,11 @@ class TrainerServiceImplTest {
         trainer.getUser().setFirstName("Jane");
         trainer.getUser().setLastName("Smith");
 
-        TrainingType type = new TrainingType();
-        type.setTrainingTypeName("Running");
-        trainer.setSpecialization(type);
+        TrainingType trainingType = new TrainingType();
+        trainingType.setTrainingTypeName("Running");
+        trainer.setSpecialization(trainingType);
 
-        when(trainingTypeRepo.findByTrainingTypeName("Running")).thenReturn(Optional.empty());
-        when(trainingTypeRepo.save(any(TrainingType.class))).thenReturn(type);
+        when(trainingTypeRepo.findByTrainingTypeName(anyString())).thenReturn(Optional.of(trainingType));
 
         when(userCredentialsService.generateRandomPassword()).thenReturn("Secret789");
         when(userCredentialsService.generateUsername("Jane", "Smith"))

@@ -5,6 +5,7 @@ import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
+import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
@@ -41,11 +42,7 @@ public class TrainingServiceImp implements TrainingService {
 
         // create the specialization if it does not exist
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(createTraining.trainingTypeName())
-                .orElseGet(() -> {
-                    TrainingType newType = new TrainingType();
-                    newType.setTrainingTypeName(createTraining.trainingTypeName());
-                    return trainingTypeRepo.save(newType);
-                });
+                .orElseThrow(TrainingTypeNotFoundException::new);
 
         Optional<Trainee> managedTrainee = traineeRepo.findById(createTraining.traineeId());
 

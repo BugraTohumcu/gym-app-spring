@@ -4,6 +4,7 @@ import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
+import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.exception.ValidationException;
 import org.bugra.model.*;
@@ -100,21 +101,10 @@ class TrainingServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should create new TrainingType when it does not exist")
-    void createTraining_shouldCreateNewTrainingTypeWhenNotFound() {
-        when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.empty());
-        when(trainingTypeRepo.save(any(TrainingType.class))).thenReturn(mockType);
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
-        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
-
-        Training saved = new Training();
-        saved.setId(1L);
-        when(trainingRepo.save(any(Training.class))).thenReturn(saved);
-
-        Training result = trainingService.createTraining(validRequest());
-
-        assertNotNull(result);
-        verify(trainingTypeRepo, times(1)).save(any(TrainingType.class));
+    @DisplayName("Should throw TrainingTypeNotFoundException when it does not exist")
+    void createTraining_shouldThrowWhenNotFound() {
+        assertThrows(TrainingTypeNotFoundException.class,
+                () -> trainingService.createTraining(validRequest()));
     }
 
     @Test
