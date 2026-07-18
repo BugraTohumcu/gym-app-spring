@@ -1,7 +1,7 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
-import org.bugra.dto.CreateTraining;
+import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;

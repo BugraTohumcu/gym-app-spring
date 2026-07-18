@@ -2,9 +2,9 @@ package org.bugra.service.impl;
 
 
 import jakarta.transaction.Transactional;
-import org.bugra.dto.ChangePassword;
-import org.bugra.dto.LoginUser;
-import org.bugra.dto.UserResponse;
+import org.bugra.dto.request.ChangePassword;
+import org.bugra.dto.request.LoginUser;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
@@ -44,8 +44,7 @@ public class AuthServiceImp implements AuthService {
         logger.info("User with username: {} is successfully logged in" , loginUser.username());
         return new UserResponse(
                 fetchedUser.getUsername(),
-                fetchedUser.getRole(),
-                fetchedUser.getFirstName() + " " + fetchedUser.getLastName()
+                fetchedUser.getRole()
         );
     }
 

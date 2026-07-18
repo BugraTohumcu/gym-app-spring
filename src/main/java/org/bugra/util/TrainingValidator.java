@@ -1,6 +1,6 @@
 package org.bugra.util;
 
-import org.bugra.dto.CreateTraining;
+import org.bugra.dto.request.CreateTraining;
 
 import java.time.LocalDate;
 

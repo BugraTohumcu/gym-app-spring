@@ -1,8 +1,8 @@
 package org.bugra.service;
 
-import org.bugra.dto.ChangePassword;
-import org.bugra.dto.LoginUser;
-import org.bugra.dto.UserResponse;
+import org.bugra.dto.request.ChangePassword;
+import org.bugra.dto.request.LoginUser;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.util.UserSession;
 import org.bugra.exception.InvalidPasswordException;
 

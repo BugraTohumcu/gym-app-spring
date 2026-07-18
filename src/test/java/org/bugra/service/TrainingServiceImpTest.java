@@ -1,6 +1,6 @@
 package org.bugra.service;
 
-import org.bugra.dto.CreateTraining;
+import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
@@ -12,7 +12,6 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainingServiceImp;
-import org.bugra.util.ValidationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
