@@ -18,9 +18,7 @@ public class TransactionFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException
     {
         try{
-
             String transactionId = UUID.randomUUID().toString();
-
             MDC.put("transactionId", transactionId);
             filterChain.doFilter(request,response);
         }finally {
