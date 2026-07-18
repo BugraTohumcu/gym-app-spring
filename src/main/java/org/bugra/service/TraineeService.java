@@ -1,6 +1,8 @@
 package org.bugra.service;
 
 
+import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.model.Trainee;
 import org.bugra.exception.UserNotFoundException;
 
@@ -22,7 +24,7 @@ public interface TraineeService {
      * @param trainee New trainee to save with null username and password fields
      * @return Saved trainee
      * */
-    Trainee createTrainee(Trainee trainee);
+    UserResponse createTrainee(RegisterTrainee trainee);
     /**
      * <p>Updates existing profile with given details</p>
      * @param trainee new trainee for update
