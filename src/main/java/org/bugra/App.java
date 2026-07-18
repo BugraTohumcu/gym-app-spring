@@ -1,23 +1,31 @@
 package org.bugra;
 
-import org.bugra.config.StorageConfig;
-import org.bugra.ui.AppUI;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class App{
-    private final static Logger logger = LoggerFactory.getLogger(App.class);
+import java.io.File;
 
-    public static void main(String[] args) {
+public class App {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    public static void main(String[] args) throws LifecycleException {
 
-        logger.info("Program is about to start...");
-        ApplicationContext context = new AnnotationConfigApplicationContext(StorageConfig.class);
+        Tomcat tomcat = new Tomcat();
+        tomcat.setPort(8080);
+        tomcat.setHostname("localhost");
+        tomcat.getConnector();
 
-        AppUI ui = context.getBean(AppUI.class);
+        File webappDir = new File("src/main/webapp");
+        if (!webappDir.exists()) {
+            webappDir.mkdirs();
+        }
 
-        ui.run();
+        tomcat.addWebapp("", webappDir.getAbsolutePath());
 
+
+        tomcat.start();
+        logger.warn("The server is running at: http://localhost:8080/");
+        tomcat.getServer().await();
     }
 }
