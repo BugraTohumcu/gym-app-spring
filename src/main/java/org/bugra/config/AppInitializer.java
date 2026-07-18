@@ -1,6 +1,7 @@
 package org.bugra.config;
 
 import jakarta.servlet.*;
+import org.bugra.filter.RestLoggingFilter;
 import org.bugra.filter.TransactionFilter;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -20,11 +21,18 @@ public class AppInitializer implements WebApplicationInitializer {
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
 
-        // add transaction id filter
+        // add transaction id filter to beginning
         FilterRegistration.Dynamic transactionIdFilter =
                 servletContext.addFilter("transactionIdFilter", new TransactionFilter());
 
         transactionIdFilter.addMappingForUrlPatterns(
                 EnumSet.of(DispatcherType.REQUEST), false, "/*");
+
+        // add rest logging filter to end
+        FilterRegistration.Dynamic restLoggingFilter =
+                servletContext.addFilter("restLoggingFilter", new RestLoggingFilter());
+
+        restLoggingFilter.addMappingForUrlPatterns(
+                EnumSet.of(DispatcherType.REQUEST),true, "/*");
     }
 }
