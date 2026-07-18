@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 @Configuration
-@ComponentScan(basePackages = "org.bugra")
 @EnableTransactionManagement
 public class StorageConfig {
 
