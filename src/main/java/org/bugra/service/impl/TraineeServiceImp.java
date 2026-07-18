@@ -1,6 +1,8 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
@@ -34,10 +36,11 @@ public class TraineeServiceImp implements TraineeService {
 
     @Transactional
     @Override
-    public Trainee createTrainee(Trainee trainee) {
-        TraineeValidator.validate(trainee);
+    public UserResponse createTrainee(RegisterTrainee registerTrainee) {
 
-        User user = trainee.getUser();
+        User user = new User();
+        user.setFirstName(registerTrainee.firstName());
+        user.setLastName(registerTrainee.lastName());
 
         // Generate random password
         String password = userCredentialsService.generateRandomPassword();
@@ -45,13 +48,20 @@ public class TraineeServiceImp implements TraineeService {
 
         // Generate username
         String finalUsername = userCredentialsService.generateUsername(
-                user.getFirstName(),
-                user.getLastName()
+                registerTrainee.firstName(),
+                registerTrainee.lastName()
         );
 
         user.setUsername(finalUsername);
         user.setActive(true);
         user.setRole(UserRole.TRAINEE);
+
+        // Build trainee
+        Trainee trainee = new Trainee();
+        trainee.setUser(user);
+        trainee.setAddress(registerTrainee.address());
+        trainee.setDateOfBirth(registerTrainee.dateOfBirth());
+
 
         Trainee savedTrainee = traineeRepo.save(trainee);
 
@@ -59,7 +69,10 @@ public class TraineeServiceImp implements TraineeService {
                 savedTrainee.getId(),
                 savedTrainee.getUser().getUsername());
 
-        return savedTrainee;
+        return new UserResponse(
+                savedTrainee.getUser().getUsername(),
+                savedTrainee.getUser().getPassword()
+        );
     }
 
     @Transactional
