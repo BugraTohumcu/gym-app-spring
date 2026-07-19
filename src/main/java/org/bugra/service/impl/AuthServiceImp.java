@@ -70,4 +70,10 @@ public class AuthServiceImp implements AuthService {
         logger.info("User with username: {} successfully updated password" , currentUser.getUsername());
         return true;
     }
+
+    @Override
+    public boolean isAuthenticated(String username, String password) {
+        User user = userRepo.findByUsername(username);
+        return user != null && user.getPassword().equals(password);
+    }
 }
