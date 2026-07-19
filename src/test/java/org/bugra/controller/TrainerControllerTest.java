@@ -2,8 +2,11 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
+import org.bugra.exception.UserNotFoundException;
+import org.bugra.mapper.TrainerResponseMapper;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
@@ -24,7 +27,9 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +41,9 @@ class TrainerControllerTest {
 
     @Mock
     private TrainerService trainerService;
+
+    @Mock
+    private TrainerResponseMapper trainerResponseMapper;
 
     @InjectMocks
     private TrainerController trainerController;
@@ -89,5 +97,35 @@ class TrainerControllerTest {
                         .content(objectMapper.writeValueAsString(registerTrainer)))
                 .andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    @DisplayName("GET /trainer/{username} - Success")
+    void getTrainerProfile_shouldReturn200() throws Exception {
+
+        Trainer trainer = new Trainer();
+        TrainerProfileResponse response = TrainerProfileResponse.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .isActive(true)
+                .trainees(java.util.List.of())
+                .build();
+
+        when(trainerService.getTrainerByUsername(anyString())).thenReturn(trainer);
+        when(trainerResponseMapper.mapToTrainerProfileResponse(trainer)).thenReturn(response);
+
+        mockMvc.perform(get("/trainer/jane.smith"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET /trainer/{username} - Fail: User not found")
+    void getTrainerProfile_shouldReturn404AndThrow() throws Exception {
+
+        when(trainerService.getTrainerByUsername(anyString())).thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(get("/trainer/jane.smith"))
+                .andExpect(status().isNotFound());
+    }
+
 
 }
