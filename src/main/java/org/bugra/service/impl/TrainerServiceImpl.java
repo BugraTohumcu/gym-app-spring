@@ -1,7 +1,6 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
-import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.TrainingTypeNotFoundException;
@@ -41,7 +40,9 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = new Trainer();
         trainer.setSpecialization(type);
 
-        User user = trainer.getUser();
+        User user = new User();
+        user.setFirstName(registerTrainer.firstName());
+        user.setLastName(registerTrainer.lastName());
 
         // Credentials generation
         user.setPassword(userCredentialsService.generateRandomPassword());
@@ -53,6 +54,7 @@ public class TrainerServiceImpl implements TrainerService {
         user.setActive(true);
         user.setRole(UserRole.TRAINER);
 
+        trainer.setUser(user);
         Trainer savedTrainer = trainerRepo.save(trainer);
         logger.info("Trainer created successfully with ID: {} and username: {}",
                 savedTrainer.getId(),
@@ -82,7 +84,7 @@ public class TrainerServiceImpl implements TrainerService {
                     return new UserNotFoundException("Trainer not found with id: " + trainerId);
                 });
 
-        logger.info("Trainer with id: {} successfully fetched", trainerId); // Bunu ekleyebilirsin
+        logger.info("Trainer with id: {} successfully fetched", trainerId);
         return trainer;
     }
 
