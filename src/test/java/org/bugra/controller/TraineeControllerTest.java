@@ -160,4 +160,23 @@ class TraineeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address").value(request.address()));
     }
+
+    @Test
+    @DisplayName("DELETE /trainee/{username} - Success")
+    void deleteTrainee_shouldDeleteProfile() throws Exception {
+        when(traineeService.deleteTraineeByUsername(any())).thenReturn(true);
+
+        mockMvc.perform(delete("/trainee/john.doe"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("DELETE /trainee/{username} - Fail")
+    void deleteTrainee_shouldThrowWhenUserNotExist() throws Exception {
+        when(traineeService.deleteTraineeByUsername(any())).thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(delete("/trainee/john.doe"))
+                .andExpect(status().isNotFound());
+    }
+
 }
