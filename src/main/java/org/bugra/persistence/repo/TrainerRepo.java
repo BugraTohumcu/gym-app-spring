@@ -7,7 +7,6 @@ import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,11 +27,13 @@ public class TrainerRepo extends AbstractRepository<Trainer, Long> {
 
         Root<Trainer> root = cq.from(Trainer.class);
         Join<Trainer, User> userJoin = root.join("user");
+        root.fetch("trainees",JoinType.LEFT);
 
         cq.where(cb.equal(userJoin.get("username"), username));
 
         return entityManager.createQuery(cq)
-                .getResultStream()
+                .getResultList()
+                .stream()
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Trainee not found with username: " + username));
     }
