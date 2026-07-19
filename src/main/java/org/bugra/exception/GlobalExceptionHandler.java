@@ -57,6 +57,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, cleanMessage);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex){
+        logger.warn("Username error: {}", ex.getMessage());
+        return buildResponse(HttpStatus.NOT_FOUND,ex.getMessage());
+    }
+
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message) {
         ErrorResponse errorResponse = new ErrorResponse(
                 status.value(),
