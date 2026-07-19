@@ -1,7 +1,10 @@
 package org.bugra.dto.response;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record TrainerProfileResponse(
         String firstName,
         String lastName,
