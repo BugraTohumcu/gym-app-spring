@@ -2,6 +2,7 @@ package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
@@ -12,7 +13,6 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TrainerService;
 import org.bugra.service.UserCredentialsService;
-import org.bugra.util.TrainerValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +65,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Transactional
     @Override
-    public Trainer updateTrainer(Trainer trainer) {
-        TrainerValidator.validate(trainer);
+    public Trainer updateTrainer(UpdateTrainer updateTrainer) {
+
+        Trainer trainer = trainerRepo.findTrainerByUsername(updateTrainer.username());
+
+        trainer.getUser().setUsername(updateTrainer.username());
+        trainer.getUser().setFirstName(updateTrainer.firstName());
+        trainer.getUser().setLastName(updateTrainer.lastName());
+        trainer.getSpecialization().setTrainingTypeName(updateTrainer.specialization());
 
         Trainer updated = trainerRepo.update(trainer)
                 .orElseThrow(() -> new UserNotFoundException("Trainer not found with id: " + trainer.getId()));
