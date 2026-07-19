@@ -8,6 +8,7 @@ public class TraineeResponseMapper {
 
     public  static TraineeProfileResponse mapToTraineeProfileResponse(Trainee trainee){
         return TraineeProfileResponse.builder()
+                .username(trainee.getUser().getUsername())
                 .firstName(trainee.getUser().getFirstName())
                 .lastName(trainee.getUser().getLastName())
                 .dateOfBirth(trainee.getDateOfBirth())
