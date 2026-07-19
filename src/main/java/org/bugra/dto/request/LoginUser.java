@@ -11,5 +11,5 @@ public record LoginUser(
         String username,
 
         @NotBlank(message = ValidationMessages.PASSWORD_REQUIRED)
-        @Size(min = 3, max = 20, message = "Password must be between 3 and 20 characters")
+        @Size(min = 2, max = 20, message = "Password must be between 3 and 20 characters")
         String password) { }
