@@ -3,7 +3,9 @@ package org.bugra.controller;
 
 import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
+import org.bugra.mapper.TrainerResponseMapper;
 import org.bugra.model.Trainer;
 import org.bugra.service.TrainerService;
 import org.slf4j.Logger;
@@ -19,15 +21,26 @@ public class TrainerController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
     private TrainerService trainerService;
+    private TrainerResponseMapper trainerResponseMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerTrainee(
+    public ResponseEntity<UserResponse> registerTrainer(
             @Valid @RequestBody RegisterTrainer registerTrainee
     )
     {
-        logger.info("New trainee is creating with name: {} {}",registerTrainee.firstName(), registerTrainee.lastName());
+        logger.info("New trainer is creating with name: {} {}", registerTrainee.firstName(), registerTrainee.lastName());
         Trainer trainer = trainerService.createTrainer(registerTrainee);
         UserResponse response = new UserResponse(trainer.getUser().getUsername(), trainer.getUser().getPassword());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<TrainerProfileResponse> getTrainerProfile(
+            @PathVariable(value = "username") String username
+    ){
+        logger.info("The trainer profile with username {} is fetching", username);
+        Trainer trainer = trainerService.getTrainerByUsername(username);
+        TrainerProfileResponse response = trainerResponseMapper.mapToTrainerProfileResponse(trainer);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -35,5 +48,10 @@ public class TrainerController {
     @Autowired
     public void setTrainerService(TrainerService trainerService) {
         this.trainerService = trainerService;
+    }
+
+    @Autowired
+    public void setTrainerResponseMapper(TrainerResponseMapper trainerResponseMapper) {
+        this.trainerResponseMapper = trainerResponseMapper;
     }
 }
