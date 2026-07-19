@@ -9,7 +9,6 @@ import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.AuthService;
-import org.bugra.util.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +37,6 @@ public class AuthServiceImp implements AuthService {
             logger.warn("The provided password for user with username {} is invalid", loginUser.username());
             throw new InvalidPasswordException();
         }
-
-        UserSession.setCurrentUser(fetchedUser);
 
         logger.info("User with username: {} is successfully logged in" , loginUser.username());
         return new UserResponse(
