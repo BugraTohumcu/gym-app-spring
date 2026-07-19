@@ -74,6 +74,6 @@ public class AuthServiceImp implements AuthService {
     @Override
     public boolean isAuthenticated(String username, String password) {
         User user = userRepo.findByUsername(username);
-        return user != null && user.getPassword().equals(password);
+        return user.getPassword().equals(password);
     }
 }
