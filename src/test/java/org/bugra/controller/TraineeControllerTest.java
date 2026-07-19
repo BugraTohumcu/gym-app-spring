@@ -10,8 +10,11 @@ import org.bugra.exception.GlobalExceptionHandler;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
+import org.bugra.model.Trainer;
+import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.service.TraineeService;
+import org.bugra.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,6 +43,9 @@ class TraineeControllerTest {
 
     @Mock
     private TraineeService traineeService;
+
+    @Mock
+    private TrainerService trainerService;
 
     @Mock
     private TraineeResponseMapper traineeResponseMapper;
@@ -177,6 +184,29 @@ class TraineeControllerTest {
 
         mockMvc.perform(delete("/trainee/john.doe"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /trainee/not-assigned - Success with data")
+    void getAvailableTrainers_shouldReturn200WithData() throws Exception {
+
+        User user = new User();
+        user.setUsername("jane.smith");
+        user.setFirstName("Jane");
+        user.setLastName("Smith");
+
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("Swimming");
+
+        Trainer trainer = new Trainer();
+        trainer.setUser(user);
+        trainer.setSpecialization(type);
+
+        when(trainerService.getTrainersNotAssignedToTrainee(anyString()))
+                .thenReturn(List.of(trainer));
+
+        mockMvc.perform(get("/trainee/not-assigned?").param("username", "john.doe"))
+                .andExpect(status().isOk());
     }
 
 }
