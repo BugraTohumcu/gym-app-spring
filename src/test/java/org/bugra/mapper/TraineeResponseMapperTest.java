@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class TraineeResponseMapperTest {
 
 
+    TraineeResponseMapper traineeResponseMapper;
+
     private Trainee validTrainee(Long id) {
         User user = new User();
         user.setFirstName("John");
@@ -42,7 +44,7 @@ class TraineeResponseMapperTest {
 
         trainee.setTrainers(Set.of(trainer));
 
-        TraineeProfileResponse response = TraineeResponseMapper.mapToTraineeProfileResponse(trainee);
+        TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
 
         assertNotNull(response);
         assertEquals("John", response.firstName());
@@ -61,7 +63,7 @@ class TraineeResponseMapperTest {
         Trainee trainee = validTrainee(1L);
         trainee.setTrainers(Set.of());
 
-        TraineeProfileResponse response = TraineeResponseMapper.mapToTraineeProfileResponse(trainee);
+        TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
 
         assertTrue(response.trainers().isEmpty());
     }
