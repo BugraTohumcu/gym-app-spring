@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.model.Trainer;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface TrainerService {
      * @param trainer the trainer entity to update
      * @return the updated trainer
      */
-    Trainer updateTrainer(Trainer trainer);
+    Trainer updateTrainer(UpdateTrainer trainer);
 
     /**
      * Retrieves a trainer profile by its unique identifier
