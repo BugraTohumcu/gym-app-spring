@@ -1,9 +1,6 @@
 package org.bugra.persistence.repo;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.User;
@@ -28,6 +25,8 @@ public class TraineeRepo extends AbstractRepository<Trainee, Long> {
 
         Root<Trainee> root = cq.from(Trainee.class);
         Join<Trainee, User> userJoin = root.join("user");
+
+        root.fetch("trainers", JoinType.LEFT);
 
         cq.where(cb.equal(userJoin.get("username"), username));
 
