@@ -2,6 +2,7 @@ package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
@@ -77,12 +78,20 @@ public class TraineeServiceImp implements TraineeService {
 
     @Transactional
     @Override
-    public Trainee updateTrainee(Trainee trainee) {
-        TraineeValidator.validate(trainee);
+    public Trainee updateTrainee(UpdateTrainee updateTrainee) {
+        Trainee existingTrainee = traineeRepo.findTraineeByUsername(updateTrainee.username());
 
-        logger.info("Trainee updated successfully with ID: {}", trainee.getId());
-        return traineeRepo.update(trainee)
-                .orElseThrow(() -> new UserNotFoundException("Trainee not found with id: " + trainee.getId()));
+        existingTrainee.setAddress(updateTrainee.address());
+        existingTrainee.setDateOfBirth(updateTrainee.dateOfBirth());
+
+        User user = existingTrainee.getUser();
+        user.setFirstName(updateTrainee.firstName());
+        user.setLastName(updateTrainee.lastName());
+        user.setActive(updateTrainee.isActive());
+
+        logger.info("Trainee updated successfully with id: {}", existingTrainee.getId());
+        return traineeRepo.update(existingTrainee)
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found with id: " + existingTrainee.getId()));
     }
 
     @Transactional

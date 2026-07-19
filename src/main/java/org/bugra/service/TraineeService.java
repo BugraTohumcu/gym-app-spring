@@ -2,6 +2,7 @@ package org.bugra.service;
 
 
 import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.model.Trainee;
 import org.bugra.exception.UserNotFoundException;
@@ -31,7 +32,7 @@ public interface TraineeService {
      * @return the updated trainee
      * @throws UserNotFoundException If user does not exist
      * */
-    Trainee updateTrainee(Trainee trainee);
+    Trainee updateTrainee(UpdateTrainee trainee);
     /**
      * <p>Deletes existing trainee with given trainee id</p>
      * @param traineeId the unique id for trainee to retrieve
