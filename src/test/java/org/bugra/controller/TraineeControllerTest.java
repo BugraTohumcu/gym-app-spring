@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
+import org.bugra.dto.request.UpdateTrainersList;
 import org.bugra.dto.response.TraineeProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
@@ -28,9 +29,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -207,6 +208,108 @@ class TraineeControllerTest {
 
         mockMvc.perform(get("/trainee/not-assigned?").param("username", "john.doe"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PUT /trainee/trainers - Success")
+    void updateTrainers_shouldReturn200() throws Exception {
+
+        UpdateTrainersList updateTrainersList = new UpdateTrainersList(
+                "jane.smith",
+                List.of("jef.deff")
+        );
+
+        User trainerUser = new User();
+        trainerUser.setUsername("jef.deff");
+        trainerUser.setFirstName("Jef");
+        trainerUser.setLastName("Deff");
+
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("Swimming");
+
+        Trainer trainer = new Trainer();
+        trainer.setUser(trainerUser);
+        trainer.setSpecialization(type);
+
+        Trainee trainee = new Trainee();
+        trainee.setTrainers(Set.of(trainer));
+
+        TraineeProfileResponse.TrainerSummary summary =
+                new TraineeProfileResponse.TrainerSummary("jef.deff", "Jef", "Deff", "Swimming");
+
+        when(traineeService.updateTraineeTrainers(anyString(), anyList())).thenReturn(trainee);
+        when(traineeResponseMapper.mapToTrainerSummary(anyList())).thenReturn(List.of(summary));
+
+        mockMvc.perform(put("/trainee/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PUT /trainee/trainers - Fail: Trainee not found")
+    void updateTrainers_shouldReturn404WhenTraineeNotFound() throws Exception {
+
+        UpdateTrainersList updateTrainersList = new UpdateTrainersList(
+                "jane.smith",
+                List.of("jef.deff")
+        );
+
+        when(traineeService.updateTraineeTrainers(anyString(), anyList()))
+                .thenThrow(new UserNotFoundException("Trainee not found"));
+
+        mockMvc.perform(put("/trainee/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT /trainee/trainers - Fail: One or more trainers not found")
+    void updateTrainers_shouldReturn404WhenTrainerNotFound() throws Exception {
+
+        UpdateTrainersList updateTrainersList = new UpdateTrainersList(
+                "jane.smith",
+                List.of("non.existent")
+        );
+
+        when(traineeService.updateTraineeTrainers(anyString(), anyList()))
+                .thenThrow(new UserNotFoundException("Following trainers not found: [non.existent]"));
+
+        mockMvc.perform(put("/trainee/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT /trainee/trainers - Fail: Username blank")
+    void updateTrainers_shouldReturn422WhenUsernameBlank() throws Exception {
+
+        UpdateTrainersList updateTrainersList = new UpdateTrainersList(
+                "",
+                List.of("jef.deff")
+        );
+
+        mockMvc.perform(put("/trainee/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("PUT /trainee/trainers - Fail: Trainer list empty")
+    void updateTrainers_shouldReturn422WhenTrainerListEmpty() throws Exception {
+
+        UpdateTrainersList updateTrainersList = new UpdateTrainersList(
+                "jane.smith",
+                List.of()
+        );
+
+        mockMvc.perform(put("/trainee/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isUnprocessableEntity());
     }
 
 }
