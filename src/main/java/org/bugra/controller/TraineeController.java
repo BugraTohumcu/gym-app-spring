@@ -8,7 +8,9 @@ import org.bugra.dto.response.TraineeProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
+import org.bugra.model.Trainer;
 import org.bugra.service.TraineeService;
+import org.bugra.service.TrainerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +18,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/trainee")
 public class TraineeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeController.class);
     private TraineeService traineeService;
+    private TrainerService trainerService;
     private TraineeResponseMapper traineeResponseMapper;
 
     @PostMapping("/register")
@@ -67,9 +72,26 @@ public class TraineeController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/not-assigned")
+    public ResponseEntity<List<TraineeProfileResponse.TrainerSummary>> getAvailableTrainers(
+            @RequestParam(value = "username") String username
+    ){
+        logger.info("Fetching trainers not assigned to trainee with username {}", username);
+        List<Trainer> trainers = trainerService.getTrainersNotAssignedToTrainee(username);
+
+        List<TraineeProfileResponse.TrainerSummary> response = traineeResponseMapper.mapToTrainerSummary(trainers);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @Autowired
     public void setTraineeService(TraineeService traineeService) {
         this.traineeService = traineeService;
+    }
+
+    @Autowired
+    public void setTrainerService(TrainerService trainerService) {
+        this.trainerService = trainerService;
     }
 
     @Autowired
