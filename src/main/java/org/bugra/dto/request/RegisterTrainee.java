@@ -24,7 +24,7 @@ public record RegisterTrainee(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         LocalDate dateOfBirth,
 
-        @Size(max = 100, message = ValidationMessages.ADDRESS_SIZE)
+        @Size(min = 5, max = 100, message = ValidationMessages.ADDRESS_SIZE)
         String address
 ) {
 }
