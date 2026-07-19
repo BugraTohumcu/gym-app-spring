@@ -1,6 +1,8 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
@@ -29,15 +31,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Transactional
     @Override
-    public Trainer createTrainer(Trainer trainer) {
-        TrainerValidator.validate(trainer);
+    public Trainer createTrainer(RegisterTrainer registerTrainer) {
 
-        String trainingTypeName = trainer.getSpecialization().getTrainingTypeName();
+        String trainingTypeName = registerTrainer.specialization();
 
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(trainingTypeName)
                 .orElseThrow(TrainingTypeNotFoundException::new);
 
-
+        Trainer trainer = new Trainer();
         trainer.setSpecialization(type);
 
         User user = trainer.getUser();
