@@ -2,12 +2,11 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
-import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.mapper.TrainerResponseMapper;
-import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
 import org.bugra.service.TrainerService;
@@ -29,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -127,5 +125,53 @@ class TrainerControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("PUT /trainer - Success")
+    void updateTrainerProfile_shouldReturn200() throws Exception {
+
+        UpdateTrainer updateTrainer = new UpdateTrainer(
+                "jane.smith",
+                "Jane",
+                "Smith",
+                "Swimming",
+                true
+        );
+
+        Trainer trainer = new Trainer();
+        TrainerProfileResponse response = TrainerProfileResponse.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .isActive(true)
+                .trainees(java.util.List.of())
+                .build();
+
+        when(trainerService.updateTrainer(any())).thenReturn(trainer);
+        when(trainerResponseMapper.mapToTrainerProfileResponse(trainer)).thenReturn(response);
+
+        mockMvc.perform(put("/trainer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainer)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PUT /trainer - Fail: User not found")
+    void updateTrainerProfile_shouldReturn404AndThrow() throws Exception {
+
+        UpdateTrainer updateTrainer = new UpdateTrainer(
+                "jane.smith",
+                "Jane",
+                "Smith",
+                "Swimming",
+                true
+        );
+
+        when(trainerService.updateTrainer(any())).thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(put("/trainer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateTrainer)))
+                .andExpect(status().isNotFound());
+    }
 
 }
