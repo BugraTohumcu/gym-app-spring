@@ -51,11 +51,11 @@ public class AuthServiceImp implements AuthService {
     @Transactional
     @Override
     public boolean changePassword(ChangePassword changePassword) {
-        User currentUser = UserSession.getCurrentUser();
         logger.info("The user with username: {} is changing password",
-                currentUser.getUsername()
+                changePassword.username()
                 );
 
+        User currentUser = userRepo.findByUsername(changePassword.username());
         // Password check
         if(!currentUser.getPassword().equals(changePassword.currentPassword())){
             logger.warn("The provided password for user with username: {} is invalid",
