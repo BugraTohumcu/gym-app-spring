@@ -3,6 +3,7 @@ package org.bugra.controller;
 
 import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.TraineeProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
@@ -21,6 +22,7 @@ public class TraineeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeController.class);
     private TraineeService traineeService;
+    private TraineeResponseMapper traineeResponseMapper;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerTrainee(
@@ -36,12 +38,26 @@ public class TraineeController {
             @PathVariable(value = "username") String username
     ){
         Trainee trainee = traineeService.getTraineeByUsername(username);
-        TraineeProfileResponse response = TraineeResponseMapper.mapToTraineeProfileResponse(trainee);
+        TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<TraineeProfileResponse> updateTraineeProfile(
+            @Valid @RequestBody UpdateTrainee updateTrainee
+            ){
+        Trainee trainee = traineeService.updateTrainee(updateTrainee);
+        TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Autowired
     public void setTraineeService(TraineeService traineeService) {
         this.traineeService = traineeService;
+    }
+
+    @Autowired
+    public void setTraineeResponseMapper(TraineeResponseMapper traineeResponseMapper) {
+        this.traineeResponseMapper = traineeResponseMapper;
     }
 }
