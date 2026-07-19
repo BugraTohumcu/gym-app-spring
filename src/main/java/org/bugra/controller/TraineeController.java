@@ -4,7 +4,9 @@ package org.bugra.controller;
 import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
+import org.bugra.dto.request.UpdateTrainersList;
 import org.bugra.dto.response.TraineeProfileResponse;
+import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
@@ -19,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/trainee")
@@ -81,6 +84,17 @@ public class TraineeController {
 
         List<TraineeProfileResponse.TrainerSummary> response = traineeResponseMapper.mapToTrainerSummary(trainers);
 
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/trainers")
+    public ResponseEntity<List<TraineeProfileResponse.TrainerSummary>> updateTrainers(
+            @Valid @RequestBody UpdateTrainersList updateTrainersList
+            ){
+
+        Trainee trainee = traineeService.updateTraineeTrainers(updateTrainersList.username(), updateTrainersList.trainerUsernames());
+        Set<Trainer> trainers = trainee.getTrainers();
+        List<TraineeProfileResponse.TrainerSummary> response = traineeResponseMapper.mapToTrainerSummary(trainers.stream().toList());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
