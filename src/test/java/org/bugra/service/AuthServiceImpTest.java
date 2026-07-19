@@ -82,6 +82,7 @@ class AuthServiceImpTest {
 
         // Provide invalid password
         changePassword = new ChangePassword(
+                "john.doe",
                 "12345",
                 "54321"
         );
@@ -100,6 +101,7 @@ class AuthServiceImpTest {
 
         // Provide invalid password
         changePassword = new ChangePassword(
+                "john.doe",
                 "123",
                 "54321"
         );
