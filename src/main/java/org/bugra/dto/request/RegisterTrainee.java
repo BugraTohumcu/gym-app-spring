@@ -5,25 +5,26 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import org.bugra.shared.ValidationMessages;
 
 import java.time.LocalDate;
 
 @Builder
 public record RegisterTrainee(
 
-        @NotBlank(message = "First name is required")
-        @Size(min = 2, max = 50, message = "First name should be between 2 - 50 chars")
+        @NotBlank(message = ValidationMessages.FIRST_NAME_REQUIRED)
+        @Size(min = 2, max = 50, message = ValidationMessages.FIRST_NAME_SIZE)
         String firstName,
 
-        @NotBlank(message = "Last name is required")
-        @Size(min = 2, max = 50, message = "Last name should be between 2 - 50 chars")
+        @NotBlank(message = ValidationMessages.LAST_NAME_REQUIRED)
+        @Size(min = 2, max = 50, message = ValidationMessages.LAST_NAME_SIZE)
         String lastName,
 
-        @Past(message = "Date of birth should be in past date")
+        @Past(message = ValidationMessages.DOB_PAST)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         LocalDate dateOfBirth,
 
-        @Size(max = 100, message ="Address length can not pass 100 chars" )
+        @Size(max = 100, message = ValidationMessages.ADDRESS_SIZE)
         String address
 ) {
 }
