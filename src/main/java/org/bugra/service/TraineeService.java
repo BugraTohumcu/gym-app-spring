@@ -70,8 +70,9 @@ public interface TraineeService {
      *
      * @param traineeUsername  the unique username of the target trainee; must not be null or blank
      * @param trainerUsernames a {@link List} of unique usernames
+     * @return update trainee
      * @throws UserNotFoundException    if the trainee or any of the trainers cannot be found in the
      * @throws IllegalArgumentException if the {@code traineeUsername} is null/blank, or if {@code trainerUsernames} is null
      */
-    void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames);
+    Trainee updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames);
 }

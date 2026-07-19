@@ -152,7 +152,7 @@ public class TraineeServiceImp implements TraineeService {
 
     @Transactional
     @Override
-    public void updateTraineeTrainers(String traineeUsername, List<String> newTrainerUsernames) {
+    public Trainee updateTraineeTrainers(String traineeUsername, List<String> newTrainerUsernames) {
         logger.info("Updating trainers list for trainee: {}", traineeUsername);
 
         // Trainee check
@@ -180,7 +180,8 @@ public class TraineeServiceImp implements TraineeService {
         trainee.getTrainers().clear();
         trainee.getTrainers().addAll(foundTrainers);
 
-        traineeRepo.update(trainee);
+        return traineeRepo.update(trainee)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Autowired
