@@ -11,7 +11,7 @@ public record UpdateTrainersList(
         @Size(min = 3, max = 50, message = ValidationMessages.USERNAME_SIZE)
         String username,
 
-        @NotBlank(message = ValidationMessages.TRAINER_LIST_SIZE)
+        @Size(message = ValidationMessages.TRAINER_LIST_SIZE)
         List<String> trainerUsernames
 ) {
 }
