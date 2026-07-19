@@ -6,7 +6,6 @@ import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.request.UpdateTrainersList;
 import org.bugra.dto.response.TraineeProfileResponse;
-import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
