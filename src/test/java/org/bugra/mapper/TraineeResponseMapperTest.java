@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TraineeResponseMapperTest {
 
 
-    TraineeResponseMapper traineeResponseMapper;
+    TraineeResponseMapper traineeResponseMapper = new TraineeResponseMapper();
 
     private Trainee validTrainee(Long id) {
         User user = new User();
