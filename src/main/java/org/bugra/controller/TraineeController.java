@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.TraineeProfileResponse;
-import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
 import org.bugra.service.TraineeService;
@@ -25,11 +24,13 @@ public class TraineeController {
     private TraineeResponseMapper traineeResponseMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerTrainee(
+    public ResponseEntity<TraineeProfileResponse> registerTrainee(
             @Valid @RequestBody RegisterTrainee registerTrainee
     )
     {
-            UserResponse response = traineeService.createTrainee(registerTrainee);
+            logger.info("New trainee is creating with name: {} {}",registerTrainee.firstName(), registerTrainee.lastName());
+            Trainee trainee = traineeService.createTrainee(registerTrainee);
+            TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
             return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -37,6 +38,7 @@ public class TraineeController {
     public ResponseEntity<TraineeProfileResponse> getTraineeProfile(
             @PathVariable(value = "username") String username
     ){
+        logger.info("The trainee profile with username {} is fetching", username);
         Trainee trainee = traineeService.getTraineeByUsername(username);
         TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -46,6 +48,8 @@ public class TraineeController {
     public ResponseEntity<TraineeProfileResponse> updateTraineeProfile(
             @Valid @RequestBody UpdateTrainee updateTrainee
             ){
+
+        logger.info("The trainee with username {} is updating profile", updateTrainee.username());
         Trainee trainee = traineeService.updateTrainee(updateTrainee);
         TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
         return new ResponseEntity<>(response, HttpStatus.OK);
