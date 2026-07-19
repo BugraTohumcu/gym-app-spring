@@ -76,7 +76,7 @@ class AuthControllerTest {
                 "123"
         );
 
-        when(authService.login(any())).thenThrow(new UserNotFoundException());
+        when(authService.login(any())).thenThrow(UserNotFoundException.class);
 
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +97,24 @@ class AuthControllerTest {
 
         mockMvc.perform(put("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .contentType(objectMapper.writeValueAsString(changePassword)))
+                        .content(objectMapper.writeValueAsString(changePassword)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PUT /login - Fail")
+    void changePassword_shouldReturn404() throws Exception {
+        ChangePassword changePassword = new ChangePassword(
+                "john.doe",
+                "123",
+                "1234"
+        );
+
+        when(authService.changePassword(any())).thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(put("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changePassword)))
+                .andExpect(status().isNotFound());
     }
 }
