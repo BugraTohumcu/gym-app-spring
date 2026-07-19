@@ -79,7 +79,8 @@ public class UserRepo
 
         return entityManager
                 .createQuery(cq)
-                .getResultStream()
+                .getResultList()
+                .stream()
                 .findFirst()
                 .orElseThrow(UserNotFoundException::new);
     }
