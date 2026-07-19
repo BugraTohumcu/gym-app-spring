@@ -3,6 +3,7 @@ package org.bugra.controller;
 
 import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TrainerResponseMapper;
@@ -40,6 +41,17 @@ public class TrainerController {
     ){
         logger.info("The trainer profile with username {} is fetching", username);
         Trainer trainer = trainerService.getTrainerByUsername(username);
+        TrainerProfileResponse response = trainerResponseMapper.mapToTrainerProfileResponse(trainer);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<TrainerProfileResponse> updateTrainerProfile(
+            @Valid @RequestBody UpdateTrainer updateTrainer
+    ){
+
+        logger.info("The trainer with username {} is updating profile", updateTrainer.username());
+        Trainer trainer = trainerService.updateTrainer(updateTrainer);
         TrainerProfileResponse response = trainerResponseMapper.mapToTrainerProfileResponse(trainer);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
