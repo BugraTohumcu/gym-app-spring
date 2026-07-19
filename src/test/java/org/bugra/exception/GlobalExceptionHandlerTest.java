@@ -99,4 +99,16 @@ class GlobalExceptionHandlerTest {
 
         assertEquals("An unexpected error occurred", response.getBody().message());
     }
+
+    @Test
+    @DisplayName("Should return 404 status code and username not found message")
+    void handleUserNotFound_shouldReturn404WithNotFoundMessage() {
+        String errorMessage = "Trainee not found with username: necmi.kunduz7";
+        UserNotFoundException exception = new UserNotFoundException(errorMessage);
+
+        ResponseEntity<ErrorResponse> response = handler.handleUserNotFound(exception);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(errorMessage, response.getBody().message());
+    }
 }
