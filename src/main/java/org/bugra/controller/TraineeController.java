@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.TraineeProfileResponse;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
 import org.bugra.model.Trainee;
 import org.bugra.service.TraineeService;
@@ -24,13 +25,13 @@ public class TraineeController {
     private TraineeResponseMapper traineeResponseMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<TraineeProfileResponse> registerTrainee(
+    public ResponseEntity<UserResponse> registerTrainee(
             @Valid @RequestBody RegisterTrainee registerTrainee
     )
     {
             logger.info("New trainee is creating with name: {} {}",registerTrainee.firstName(), registerTrainee.lastName());
             Trainee trainee = traineeService.createTrainee(registerTrainee);
-            TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
+            UserResponse response = new UserResponse(trainee.getUser().getUsername(), trainee.getUser().getPassword());
             return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
