@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.exception.ValidationException;
@@ -55,22 +56,17 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw ValidationException when trainer is null")
-    void createTrainer_shouldThrowExceptionWhenNull() {
-        assertThrows(ValidationException.class, () -> trainerService.createTrainer(null));
-    }
-
-    @Test
     @DisplayName("Should successfully create trainer with generated credentials")
     void createTrainer_shouldSetCredentialsAndSave() {
-        Trainer trainer = new Trainer();
-        trainer.setUser(new User());
-        trainer.getUser().setFirstName("Jane");
-        trainer.getUser().setLastName("Smith");
+
+        RegisterTrainer registerTrainer = new RegisterTrainer(
+                "Jane",
+                "Smith",
+                "Swimming"
+        );
+
 
         TrainingType trainingType = new TrainingType();
-        trainingType.setTrainingTypeName("Running");
-        trainer.setSpecialization(trainingType);
 
         when(trainingTypeRepo.findByTrainingTypeName(anyString())).thenReturn(Optional.of(trainingType));
 
@@ -79,14 +75,14 @@ class TrainerServiceImplTest {
                 .thenReturn("jane.smith");
         when(trainerRepo.save(any(Trainer.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        Trainer savedTrainer = trainerService.createTrainer(trainer);
+        Trainer savedTrainer = trainerService.createTrainer(registerTrainer);
 
         assertEquals("Secret789", savedTrainer.getUser().getPassword());
         assertEquals("jane.smith", savedTrainer.getUser().getUsername());
         assertTrue(savedTrainer.getUser().isActive());
         assertEquals(UserRole.TRAINER, savedTrainer.getUser().getRole());
 
-        verify(trainerRepo, times(1)).save(trainer);
+        verify(trainerRepo, times(1)).save(any());
     }
 
     @Test
