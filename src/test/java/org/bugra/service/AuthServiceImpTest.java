@@ -77,6 +77,8 @@ class AuthServiceImpTest {
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
 
+        when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
+
         // Provide invalid password
         changePassword = new ChangePassword(
                 "john.doe",
@@ -95,6 +97,7 @@ class AuthServiceImpTest {
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
 
+        when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
         // Provide invalid password
         changePassword = new ChangePassword(
                 "john.doe",
