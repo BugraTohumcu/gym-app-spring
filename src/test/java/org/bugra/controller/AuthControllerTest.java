@@ -2,6 +2,7 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -80,5 +82,22 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginUser)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT /login - Success")
+    void changePassword_shouldReturn200() throws Exception {
+        ChangePassword changePassword = new ChangePassword(
+          "john.doe",
+          "123",
+          "1234"
+        );
+
+        when(authService.changePassword(any())).thenReturn(true);
+
+        mockMvc.perform(put("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(objectMapper.writeValueAsString(changePassword)))
+                .andExpect(status().isOk());
     }
 }

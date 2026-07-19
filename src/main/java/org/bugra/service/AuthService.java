@@ -3,13 +3,12 @@ package org.bugra.service;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
-import org.bugra.util.UserSession;
 import org.bugra.exception.InvalidPasswordException;
 
 public interface AuthService {
 
     /**
-     * Validates provided username and password and sets current {@link UserSession}
+     * Validates provided username and password}
      * @param loginUser wrapper that holds username and password information
      * @return {@link UserResponse}
      * @throws InvalidPasswordException if provided password does not match

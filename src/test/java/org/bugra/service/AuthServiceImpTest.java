@@ -8,7 +8,6 @@ import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.impl.AuthServiceImp;
-import org.bugra.util.UserSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,7 +76,6 @@ class AuthServiceImpTest {
         User currentUser = new User();
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
-        UserSession.setCurrentUser(currentUser);
 
         // Provide invalid password
         changePassword = new ChangePassword(
@@ -97,7 +94,6 @@ class AuthServiceImpTest {
         User currentUser = new User();
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
-        UserSession.setCurrentUser(currentUser);
 
         // Provide invalid password
         changePassword = new ChangePassword(
