@@ -1,6 +1,7 @@
 package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
@@ -66,6 +67,17 @@ class TraineeServiceImpTest {
         );
     }
 
+    private UpdateTrainee createValidUpdateTrainee(){
+        return new UpdateTrainee(
+                "john.doe",
+                "John",
+                "Doe",
+                LocalDate.of(2004, 7,7),
+                "USA",
+                true
+        );
+    }
+
     @Test
     @DisplayName("Should successfully create trainee with generated credentials")
     void createTrainee_shouldSetCredentialsAndSave() {
@@ -96,9 +108,10 @@ class TraineeServiceImpTest {
     @DisplayName("Should successfully update trainee when valid")
     void updateTrainee_shouldReturnUpdatedTrainee() {
         Trainee trainee = validTrainee(1L);
+        when(traineeRepo.findTraineeByUsername(any())).thenReturn(trainee);
         when(traineeRepo.update(trainee)).thenReturn(Optional.of(trainee));
 
-        Trainee result = traineeService.updateTrainee(trainee);
+        Trainee result = traineeService.updateTrainee(createValidUpdateTrainee());
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
@@ -109,10 +122,10 @@ class TraineeServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when updating non-existing trainee")
     void updateTrainee_shouldThrowWhenNotFound() {
         Trainee trainee = validTrainee(99L);
-
+        when(traineeRepo.findTraineeByUsername(any())).thenReturn(trainee);
         when(traineeRepo.update(trainee)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainee(trainee));
+        assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainee(createValidUpdateTrainee()));
         verify(traineeRepo, times(1)).update(trainee);
     }
 
