@@ -1,17 +1,15 @@
 package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
-import org.bugra.exception.ValidationException;
-import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.impl.TrainerServiceImpl;
-import org.bugra.util.ValidationUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +53,16 @@ class TrainerServiceImplTest {
         return trainer;
     }
 
+    private UpdateTrainer createValidUpdateTrainer(){
+        return new UpdateTrainer(
+                "john.doe",
+                "John",
+                "Doe",
+                "Swimming",
+                true
+        );
+    }
+
     @Test
     @DisplayName("Should successfully create trainer with generated credentials")
     void createTrainer_shouldSetCredentialsAndSave() {
@@ -88,10 +96,14 @@ class TrainerServiceImplTest {
     @Test
     @DisplayName("Should successfully update trainer when exists")
     void updateTrainer_shouldUpdateSuccessfully() {
+
+        UpdateTrainer updateTrainer = createValidUpdateTrainer();
+
         Trainer trainer = validTrainer(1L);
+        when(trainerRepo.findTrainerByUsername(anyString())).thenReturn(trainer);
         when(trainerRepo.update(trainer)).thenReturn(Optional.of(trainer));
 
-        Trainer updated = trainerService.updateTrainer(trainer);
+        Trainer updated = trainerService.updateTrainer(updateTrainer);
 
         assertNotNull(updated);
         verify(trainerRepo, times(1)).update(trainer);
@@ -100,10 +112,10 @@ class TrainerServiceImplTest {
     @Test
     @DisplayName("Should throw UserNotFoundException during update when trainer does not exist")
     void updateTrainer_shouldThrowExceptionWhenNotFound() {
-        Trainer trainer = validTrainer(99L);
-        when(trainerRepo.update(trainer)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> trainerService.updateTrainer(trainer));
+        when(trainerRepo.findTrainerByUsername(anyString())).thenThrow(UserNotFoundException.class);
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.updateTrainer(createValidUpdateTrainer()));
     }
 
     @Test
