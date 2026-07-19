@@ -3,7 +3,6 @@ package org.bugra.service.impl;
 import jakarta.transaction.Transactional;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
-import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
@@ -14,7 +13,6 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.service.TraineeService;
 import org.bugra.service.UserCredentialsService;
-import org.bugra.util.TraineeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,7 @@ public class TraineeServiceImp implements TraineeService {
 
     @Transactional
     @Override
-    public UserResponse createTrainee(RegisterTrainee registerTrainee) {
+    public Trainee createTrainee(RegisterTrainee registerTrainee) {
 
         User user = new User();
         user.setFirstName(registerTrainee.firstName());
@@ -70,10 +68,7 @@ public class TraineeServiceImp implements TraineeService {
                 savedTrainee.getId(),
                 savedTrainee.getUser().getUsername());
 
-        return new UserResponse(
-                savedTrainee.getUser().getUsername(),
-                savedTrainee.getUser().getPassword()
-        );
+        return trainee;
     }
 
     @Transactional
