@@ -8,6 +8,7 @@ import org.bugra.model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,6 +67,40 @@ class TraineeResponseMapperTest {
         TraineeProfileResponse response = traineeResponseMapper.mapToTraineeProfileResponse(trainee);
 
         assertTrue(response.trainers().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should map list of Trainers to TrainerSummary list correctly")
+    void mapToTrainerSummary_shouldMapCorrectly() {
+        User user = new User();
+        user.setUsername("jane.smith");
+        user.setFirstName("Jane");
+        user.setLastName("Smith");
+
+        TrainingType spec = new TrainingType();
+        spec.setTrainingTypeName("Swimming");
+
+        Trainer trainer = new Trainer();
+        trainer.setUser(user);
+        trainer.setSpecialization(spec);
+
+        List<TraineeProfileResponse.TrainerSummary> result =
+                traineeResponseMapper.mapToTrainerSummary(List.of(trainer));
+
+        assertEquals(1, result.size());
+        assertEquals("jane.smith", result.get(0).username());
+        assertEquals("Jane", result.get(0).firstName());
+        assertEquals("Smith", result.get(0).lastName());
+        assertEquals("Swimming", result.get(0).specialization());
+    }
+
+    @Test
+    @DisplayName("Should return empty list when trainers list is empty")
+    void mapToTrainerSummary_shouldHandleEmptyList() {
+        List<TraineeProfileResponse.TrainerSummary> result =
+                traineeResponseMapper.mapToTrainerSummary(List.of());
+
+        assertTrue(result.isEmpty());
     }
 
 }
