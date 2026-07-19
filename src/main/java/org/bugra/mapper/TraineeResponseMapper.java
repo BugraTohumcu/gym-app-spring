@@ -15,6 +15,7 @@ public class TraineeResponseMapper {
                 .isActive(trainee.getUser().isActive())
                 .trainers(trainee.getTrainers().stream()
                         .map(trainer -> new TraineeProfileResponse.TrainerSummary(
+                                trainer.getUser().getUsername(),
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingTypeName()

@@ -20,6 +20,7 @@ public record TraineeProfileResponse(
         List<TrainerSummary> trainers
 ) {
     public record TrainerSummary(
+            String username,
             String firstName,
             String lastName,
             String specialization
