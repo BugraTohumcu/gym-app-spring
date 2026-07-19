@@ -1,7 +1,6 @@
 package org.bugra.config;
 
 import jakarta.servlet.*;
-import org.bugra.filter.AuthFilter;
 import org.bugra.filter.RestLoggingFilter;
 import org.bugra.filter.TransactionFilter;
 import org.springframework.web.WebApplicationInitializer;
