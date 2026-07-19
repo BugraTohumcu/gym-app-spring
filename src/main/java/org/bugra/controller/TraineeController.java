@@ -56,6 +56,17 @@ public class TraineeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteTrainee(
+            @PathVariable(value = "username") String username
+    ) {
+        logger.info("The trainee with username {} is deleting profile", username);
+        traineeService.deleteTraineeByUsername(username);
+
+        logger.info("The trainee with username {} deleted profile", username);
+        return ResponseEntity.noContent().build();
+    }
+
     @Autowired
     public void setTraineeService(TraineeService traineeService) {
         this.traineeService = traineeService;
