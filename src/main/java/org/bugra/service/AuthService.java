@@ -25,4 +25,13 @@ public interface AuthService {
      * @throws InvalidPasswordException if provided password does not match
      * */
     boolean changePassword(ChangePassword changePassword);
+
+    /**
+     * Checks if the user with given username and password does exists
+     * @param username unique username
+     * @param password user password
+     * @return true if user found, false otherwise
+     * @throws org.bugra.exception.UserNotFoundException if user does not exists
+     * */
+    boolean isAuthenticated(String username, String password);
 }
