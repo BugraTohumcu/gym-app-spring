@@ -110,6 +110,7 @@ public class TraineeController {
             @Valid @ModelAttribute TraineeTrainingFilter traineeTrainingFilter
             )
     {
+        logger.info("Fetching trainings for trainee with username: {}", traineeTrainingFilter.traineeUsername());
         List<Training> trainings = trainingService.getTraineeTrainings(traineeTrainingFilter);
         List<TraineeTrainings> response = trainingResponseMapper.mapToTraineeTrainings(trainings);
         return new ResponseEntity<>(response, HttpStatus.OK);
