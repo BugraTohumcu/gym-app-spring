@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.dto.request.UpdateUserStatus;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.service.impl.UserServiceImp;
@@ -26,8 +27,9 @@ class UserServiceImpTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when username is null")
     void toggleActiveStatus_shouldThrowWhenUsernameNull(){
+        UpdateUserStatus userStatus = new UpdateUserStatus(true);
         assertThrows(IllegalArgumentException.class,
-                () -> userService.toggleActiveStatus(null));
+                () -> userService.toggleActiveStatus(null,userStatus));
     }
 
     @Test
@@ -35,10 +37,10 @@ class UserServiceImpTest {
     void toggleActiveStatus_shouldToggleFromTrueToFalse() {
         User user = new User();
         user.setActive(true);
-
+        UpdateUserStatus userStatus = new UpdateUserStatus(false);
         when(userRepo.findByUsername("test")).thenReturn(user);
 
-        userService.toggleActiveStatus("test");
+        userService.toggleActiveStatus("test", userStatus);
 
         assertFalse(user.isActive());
         verify(userRepo).update(user);
@@ -49,10 +51,10 @@ class UserServiceImpTest {
     void toggleActiveStatus_shouldToggleFromFalseToTrue() {
         User user = new User();
         user.setActive(false);
-
+        UpdateUserStatus userStatus = new UpdateUserStatus(true);
         when(userRepo.findByUsername("test")).thenReturn(user);
 
-        userService.toggleActiveStatus("test");
+        userService.toggleActiveStatus("test",userStatus);
 
         assertTrue(user.isActive());
         verify(userRepo).update(user);
