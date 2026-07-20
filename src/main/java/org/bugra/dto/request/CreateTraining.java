@@ -28,7 +28,6 @@ public record CreateTraining(
         @Future(message = ValidationMessages.TRAINING_DATE_FUTURE)
         LocalDate trainingDate,
 
-        @NotBlank(message = ValidationMessages.TRAINING_DURATION)
         int trainingDuration
 ) {
     @AssertTrue(message = ValidationMessages.TRAINING_DURATION_VALUE)
