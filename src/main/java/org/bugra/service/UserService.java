@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.dto.request.UpdateUserStatus;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 
@@ -9,7 +10,7 @@ public interface UserService {
      * Updates active status of a user by given username
      * @param username a unique username
      * */
-    void toggleActiveStatus(String username);
+    void toggleActiveStatus(String username, UpdateUserStatus userStatus);
 
 
     /**

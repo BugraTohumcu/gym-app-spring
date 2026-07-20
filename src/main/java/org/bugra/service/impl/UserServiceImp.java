@@ -1,6 +1,7 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import org.bugra.dto.request.UpdateUserStatus;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
@@ -44,7 +45,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     @Transactional
-    public void toggleActiveStatus(String username) {
+    public void toggleActiveStatus(String username, UpdateUserStatus userStatus) {
         if (username == null) {
             logger.warn("Provided username is null");
             throw new IllegalArgumentException("Username can not be null");
@@ -53,7 +54,7 @@ public class UserServiceImp implements UserService {
         logger.info("Toggling active status for user: {}", username);
         User user = userRepo.findByUsername(username);
 
-        boolean newStatus = !user.isActive();
+        boolean newStatus = userStatus.status();
         user.setActive(newStatus);
         userRepo.update(user);
 
