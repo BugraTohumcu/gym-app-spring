@@ -1,12 +1,15 @@
 package org.bugra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.TrainerTrainings;
 import org.bugra.exception.GlobalExceptionHandler;
+import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.mapper.TrainerResponseMapper;
 import org.bugra.mapper.TrainingResponseMapper;
@@ -35,8 +38,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TrainerControllerTest {
 
     private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Mock
     private TrainingService trainingService;
@@ -236,6 +238,71 @@ class TrainerControllerTest {
                         .param("toDate", "2026-07-31")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("POST /trainer/trainings/training - Success")
+    void createTraining_shouldReturn200() throws Exception {
+
+        CreateTraining createTraining = new CreateTraining(
+                "ronnie.fit",
+                "jane.smith",
+                "Leg Day",
+                "STRENGTH",
+                LocalDate.now().plusDays(7),
+                60
+        );
+
+        mockMvc.perform(post("/trainer/trainings/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createTraining)))
+                .andExpect(status().isOk());
+
+        verify(trainingService).createTraining(any(CreateTraining.class));
+    }
+
+    @Test
+    @DisplayName("POST /trainer/trainings/training - Fail: Trainee or trainer not found")
+    void createTraining_shouldReturn404WhenUserNotFound() throws Exception {
+
+        CreateTraining createTraining = new CreateTraining(
+                "ronnie.fit",
+                "jane.smith",
+                "Leg Day",
+                "STRENGTH",
+                LocalDate.now().plusDays(7),
+                60
+        );
+
+        doThrow(new UserNotFoundException())
+                .when(trainingService).createTraining(any(CreateTraining.class));
+
+        mockMvc.perform(post("/trainer/trainings/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createTraining)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("POST /trainer/trainings/training - Fail: Training type not found")
+    void createTraining_shouldReturn404WhenTrainingTypeNotFound() throws Exception {
+
+        CreateTraining createTraining = new CreateTraining(
+                "ronnie.fit",
+                "jane.smith",
+                "Leg Day",
+                "NON_EXISTENT_TYPE",
+                LocalDate.now().plusDays(7),
+                60
+        );
+
+        doThrow(new TrainingTypeNotFoundException())
+                .when(trainingService).createTraining(any(CreateTraining.class));
+
+        mockMvc.perform(post("/trainer/trainings/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createTraining)))
+                .andExpect(status().isBadRequest());
     }
 
 }
