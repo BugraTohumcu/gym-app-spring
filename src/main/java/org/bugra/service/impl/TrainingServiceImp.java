@@ -6,7 +6,6 @@ import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.TrainingTypeNotFoundException;
-import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
@@ -16,14 +15,12 @@ import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TrainingService;
-import org.bugra.util.TrainingValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -38,30 +35,23 @@ public class TrainingServiceImp implements TrainingService {
 
     @Override
     public Training createTraining(CreateTraining createTraining) {
-        TrainingValidator.validate(createTraining);
 
         // create the specialization if it does not exist
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(createTraining.trainingTypeName())
                 .orElseThrow(TrainingTypeNotFoundException::new);
 
-        Optional<Trainee> managedTrainee = traineeRepo.findById(createTraining.traineeId());
-
-
-        if(managedTrainee.isEmpty()){
-            logger.error("The trainee with id: {} not found", createTraining.traineeId());
-            throw new UserNotFoundException("Trainee not found during training creation");
-        }
+        Trainee managedTrainee = traineeRepo.findTraineeByUsername(createTraining.traineeUsername());
 
         // Already checks if the user exists
         Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername());
 
         // Update trainee_trainer table
-        managedTrainer.getTrainees().add(managedTrainee.get());
-        managedTrainee.get().getTrainers().add(managedTrainer);
+        managedTrainer.getTrainees().add(managedTrainee);
+        managedTrainee.getTrainers().add(managedTrainer);
 
         Training training = new Training();
         training.setTrainer(managedTrainer);
-        training.setTrainee(managedTrainee.get());
+        training.setTrainee(managedTrainee);
         training.setTrainingName(createTraining.trainingName());
         training.setTrainingType(type);
         training.setTrainingDate(createTraining.trainingDate());
