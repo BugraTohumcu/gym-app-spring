@@ -3,12 +3,15 @@ package org.bugra.controller;
 
 import jakarta.validation.Valid;
 import org.bugra.dto.request.RegisterTrainer;
+import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
+import org.bugra.dto.response.TrainerTrainings;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TrainerResponseMapper;
 import org.bugra.mapper.TrainingResponseMapper;
 import org.bugra.model.Trainer;
+import org.bugra.model.Training;
 import org.bugra.service.TrainerService;
 import org.bugra.service.TrainingService;
 import org.slf4j.Logger;
@@ -17,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/trainer")
@@ -57,6 +62,17 @@ public class TrainerController {
         logger.info("The trainer with username {} is updating profile", updateTrainer.username());
         Trainer trainer = trainerService.updateTrainer(updateTrainer);
         TrainerProfileResponse response = trainerResponseMapper.mapToTrainerProfileResponse(trainer);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/trainings")
+    public ResponseEntity<List<TrainerTrainings>> getTrainerTrainings(
+            @Valid @ModelAttribute TrainerTrainingFilter trainerTrainingFilter
+    )
+    {
+        logger.info("Fetching trainings for trainer with username: {}", trainerTrainingFilter.trainerUsername());
+        List<Training> trainings = trainingService.getTrainerTrainings(trainerTrainingFilter);
+        List<TrainerTrainings> response = trainingResponseMapper.mapToTrainerTrainings(trainings);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
