@@ -2,16 +2,21 @@ package org.bugra.controller;
 
 
 import jakarta.validation.Valid;
+import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.request.UpdateTrainersList;
 import org.bugra.dto.response.TraineeProfileResponse;
+import org.bugra.dto.response.TraineeTrainings;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TraineeResponseMapper;
+import org.bugra.mapper.TrainingResponseMapper;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
+import org.bugra.model.Training;
 import org.bugra.service.TraineeService;
 import org.bugra.service.TrainerService;
+import org.bugra.service.TrainingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,8 @@ public class TraineeController {
     private TraineeService traineeService;
     private TrainerService trainerService;
     private TraineeResponseMapper traineeResponseMapper;
+    private TrainingService trainingService;
+    private TrainingResponseMapper trainingResponseMapper;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerTrainee(
@@ -91,10 +98,32 @@ public class TraineeController {
             @Valid @RequestBody UpdateTrainersList updateTrainersList
             ){
 
+        logger.info("Updating trainee's trainer list for trainee with the username {}", updateTrainersList.username());
         Trainee trainee = traineeService.updateTraineeTrainers(updateTrainersList.username(), updateTrainersList.trainerUsernames());
         Set<Trainer> trainers = trainee.getTrainers();
         List<TraineeProfileResponse.TrainerSummary> response = traineeResponseMapper.mapToTrainerSummary(trainers.stream().toList());
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/trainings")
+    public ResponseEntity<List<TraineeTrainings>> getTraineeTrainings(
+            @Valid @ModelAttribute TraineeTrainingFilter traineeTrainingFilter
+            )
+    {
+        List<Training> trainings = trainingService.getTraineeTrainings(traineeTrainingFilter);
+        List<TraineeTrainings> response = trainingResponseMapper.mapToTraineeTrainings(trainings);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @Autowired
+    public void setTrainingResponseMapper(TrainingResponseMapper trainingResponseMapper) {
+        this.trainingResponseMapper = trainingResponseMapper;
+    }
+
+    @Autowired
+    public void setTrainingService(TrainingService trainingService) {
+        this.trainingService = trainingService;
     }
 
     @Autowired
