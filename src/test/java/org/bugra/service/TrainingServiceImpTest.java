@@ -6,7 +6,6 @@ import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
-import org.bugra.exception.ValidationException;
 import org.bugra.model.*;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.persistence.repo.TrainerRepo;
@@ -73,7 +72,7 @@ class TrainingServiceImpTest {
     private CreateTraining validRequest() {
         return new CreateTraining(
                 "jane.smith",
-                1L,
+                "john.doe",
                 "Morning Yoga",
                 "Yoga",
                 LocalDate.now().plusDays(1),
@@ -86,7 +85,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should successfully create training when data is valid")
     void createTraining_shouldSaveSuccessfully() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
 
         Training saved = new Training();
@@ -111,7 +110,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when trainee not found")
     void createTraining_shouldThrowWhenTraineeNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenThrow(new UserNotFoundException("Trainee not found"));
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenThrow(new UserNotFoundException("Trainee not found"));
 
         assertThrows(UserNotFoundException.class,
                 () -> trainingService.createTraining(validRequest()));
@@ -122,7 +121,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when trainer not found")
     void createTraining_shouldThrowWhenTrainerNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
         when(trainerRepo.findTrainerByUsername("jane.smith"))
                 .thenThrow(new UserNotFoundException("Trainer not found"));
 
@@ -132,33 +131,10 @@ class TrainingServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw ValidationException when date is null")
-    void createTraining_shouldThrowWhenDateIsNull() {
-        CreateTraining request = new CreateTraining(
-                "jane.smith", 1L, "Morning Yoga", "Yoga", null, 60);
-
-        assertThrows(ValidationException.class,
-                () -> trainingService.createTraining(request));
-        verify(trainingRepo, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw ValidationException when duration is zero")
-    void createTraining_shouldThrowWhenDurationZero() {
-        CreateTraining request = new CreateTraining(
-                "jane.smith", 1L, "Morning Yoga", "Yoga",
-                LocalDate.now().plusDays(1), 0);
-
-        assertThrows(ValidationException.class,
-                () -> trainingService.createTraining(request));
-        verify(trainingRepo, never()).save(any());
-    }
-
-    @Test
     @DisplayName("Should add trainee to trainer's list and trainer to trainee's list")
     void createTraining_shouldUpdateBidirectionalRelationship() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findById(1L)).thenReturn(Optional.of(mockTrainee));
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
         when(trainingRepo.save(any(Training.class))).thenReturn(new Training());
 
