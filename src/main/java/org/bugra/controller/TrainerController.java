@@ -2,6 +2,7 @@ package org.bugra.controller;
 
 
 import jakarta.validation.Valid;
+import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.dto.request.UpdateTrainer;
@@ -74,6 +75,16 @@ public class TrainerController {
         List<Training> trainings = trainingService.getTrainerTrainings(trainerTrainingFilter);
         List<TrainerTrainings> response = trainingResponseMapper.mapToTrainerTrainings(trainings);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/trainings/training")
+    public ResponseEntity<Void> createTraining(
+            @Valid @RequestBody CreateTraining createTraining
+            )
+    {
+        logger.info("The trainer: {} is creating new training", createTraining.trainerUsername());
+        trainingService.createTraining(createTraining);
+        return ResponseEntity.ok().build();
     }
 
 
