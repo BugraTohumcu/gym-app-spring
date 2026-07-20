@@ -1,8 +1,8 @@
 package org.bugra.service;
 
 import org.bugra.dto.request.CreateTraining;
-import org.bugra.dto.TraineeTrainingFilter;
-import org.bugra.dto.TrainerTrainingFilter;
+import org.bugra.dto.request.TraineeTrainingFilter;
+import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.model.Training;
 
 import java.util.List;

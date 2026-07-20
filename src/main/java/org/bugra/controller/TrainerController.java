@@ -7,8 +7,10 @@ import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.mapper.TrainerResponseMapper;
+import org.bugra.mapper.TrainingResponseMapper;
 import org.bugra.model.Trainer;
 import org.bugra.service.TrainerService;
+import org.bugra.service.TrainingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class TrainerController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
     private TrainerService trainerService;
+    private TrainingService trainingService;
+    private TrainingResponseMapper trainingResponseMapper;
     private TrainerResponseMapper trainerResponseMapper;
 
     @PostMapping("/register")
@@ -56,6 +60,16 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    @Autowired
+    public void setTrainingResponseMapper(TrainingResponseMapper trainingResponseMapper) {
+        this.trainingResponseMapper = trainingResponseMapper;
+    }
+
+    @Autowired
+    public void setTrainingService(TrainingService trainingService) {
+        this.trainingService = trainingService;
+    }
 
     @Autowired
     public void setTrainerService(TrainerService trainerService) {

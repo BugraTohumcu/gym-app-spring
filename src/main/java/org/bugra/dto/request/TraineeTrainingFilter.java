@@ -1,4 +1,4 @@
-package org.bugra.dto;
+package org.bugra.dto.request;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;

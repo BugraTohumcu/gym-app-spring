@@ -1,7 +1,7 @@
 package org.bugra.persistence.repo;
 
-import org.bugra.dto.TraineeTrainingFilter;
-import org.bugra.dto.TrainerTrainingFilter;
+import org.bugra.dto.request.TraineeTrainingFilter;
+import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.enums.UserRole;
 import org.bugra.model.*;
 import org.bugra.persistence.BaseJpaTest;

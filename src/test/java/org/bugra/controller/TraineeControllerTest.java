@@ -2,7 +2,7 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.bugra.dto.TraineeTrainingFilter;
+import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.request.UpdateTrainersList;

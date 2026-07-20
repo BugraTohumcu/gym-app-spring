@@ -1,8 +1,8 @@
 package org.bugra.persistence.repo;
 
 import jakarta.persistence.criteria.*;
-import org.bugra.dto.TraineeTrainingFilter;
-import org.bugra.dto.TrainerTrainingFilter;
+import org.bugra.dto.request.TraineeTrainingFilter;
+import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.model.Training;
 import org.bugra.model.TrainingType;
 import org.bugra.model.User;
