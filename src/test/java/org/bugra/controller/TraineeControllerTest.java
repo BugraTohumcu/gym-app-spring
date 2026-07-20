@@ -2,20 +2,21 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.bugra.dto.TraineeTrainingFilter;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.request.UpdateTrainersList;
 import org.bugra.dto.response.TraineeProfileResponse;
+import org.bugra.dto.response.TraineeTrainings;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.mapper.TraineeResponseMapper;
-import org.bugra.model.Trainee;
-import org.bugra.model.Trainer;
-import org.bugra.model.TrainingType;
-import org.bugra.model.User;
+import org.bugra.mapper.TrainingResponseMapper;
+import org.bugra.model.*;
 import org.bugra.service.TraineeService;
 import org.bugra.service.TrainerService;
+import org.bugra.service.TrainingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -50,6 +52,12 @@ class TraineeControllerTest {
 
     @Mock
     private TraineeResponseMapper traineeResponseMapper;
+
+    @Mock
+    private TrainingService trainingService;
+
+    @Mock
+    private TrainingResponseMapper trainingResponseMapper;
 
     @InjectMocks
     private TraineeController traineeController;
@@ -309,6 +317,54 @@ class TraineeControllerTest {
         mockMvc.perform(put("/trainee/trainers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateTrainersList)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("GET /trainee/trainings - Should return trainings list with 200 OK")
+    void getTraineeTrainings_shouldReturnTrainingsList() throws Exception {
+        List<Training> mockTrainings = List.of(new Training());
+        TrainingType type = new TrainingType();
+        type.setTrainingTypeName("STRENGTH");
+
+        TraineeTrainings responseDto = TraineeTrainings.builder()
+                .trainingName("Leg Day")
+                .trainingType(type)
+                .date(LocalDate.of(2026, 7, 20))
+                .duration(75)
+                .trainerName("ronnie.fit")
+                .build();
+
+        when(trainingService.getTraineeTrainings(any(TraineeTrainingFilter.class)))
+                .thenReturn(mockTrainings);
+        when(trainingResponseMapper.mapToTraineeTrainings(mockTrainings))
+                .thenReturn(List.of(responseDto));
+
+        mockMvc.perform(get("/trainee/trainings")
+                        .param("traineeUsername", "john.doe")
+                        .param("trainingType", "STRENGTH")
+                        .param("fromDate", "2026-07-01")
+                        .param("toDate", "2026-07-31")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].trainingName").value("Leg Day"))
+                .andExpect(jsonPath("$[0].trainingType.trainingTypeName").value("STRENGTH"))
+                .andExpect(jsonPath("$[0].duration").value(75))
+                .andExpect(jsonPath("$[0].trainerName").value("ronnie.fit"));
+
+        verify(trainingService).getTraineeTrainings(any(TraineeTrainingFilter.class));
+        verify(trainingResponseMapper).mapToTraineeTrainings(mockTrainings);
+    }
+
+    @Test
+    @DisplayName("GET /trainee/trainings - Should return 422 when invalid date interval provided")
+    void getTraineeTrainings_shouldReturn422WhenInvalidTimeProvided() throws Exception {
+
+        mockMvc.perform(get("/trainee/trainings")
+                        .param("traineeUsername", "john.doe")
+                        .param("fromDate", "2027-07-01")
+                        .param("toDate", "2026-07-31")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
     }
 
