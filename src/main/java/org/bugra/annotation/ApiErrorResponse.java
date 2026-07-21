@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 public @interface ApiErrorResponse {
 
     @AliasFor(annotation = ApiResponse.class, attribute = "responseCode")
-    String responseCode() default "404";
+    String responseCode() default "";
 
     @AliasFor(annotation = ApiResponse.class, attribute = "description")
     String value() default "";
