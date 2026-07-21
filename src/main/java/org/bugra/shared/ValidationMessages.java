@@ -24,4 +24,5 @@ public interface ValidationMessages {
     String TRAINING_NAME_SIZE           = "Training name must be between 2-20 chars";
     String TRAINING_TYPE_NAME_SIZE      = "Training type name must be between 2-20 chars";
     String TRAINING_DURATION_VALUE      = "Training duration neither can be zero or negative value";
+    String PASSWORD_SIZE                =  "Password must be between 2 and 20 characters";
 }
