@@ -22,7 +22,7 @@ public record UpdateTrainer(
         @Size(min = 2, max = 50, message = ValidationMessages.SPECIALIZATION_SIZE)
         String specialization,
 
-        @NotNull(message = "Is Active status is required")
+        @NotNull(message = ValidationMessages.STATUS_REQUIRED)
         Boolean isActive
 ) {
 }

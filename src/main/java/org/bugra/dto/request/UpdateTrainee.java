@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 public record UpdateTrainee(
         @NotBlank(message = ValidationMessages.USERNAME_REQUIRED)
-        @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+        @Size(min = 3, max = 50, message = ValidationMessages.USERNAME_SIZE)
         String username,
 
         @NotBlank(message = ValidationMessages.FIRST_NAME_REQUIRED)
@@ -26,6 +26,6 @@ public record UpdateTrainee(
         @Size(max = 100, message = ValidationMessages.ADDRESS_SIZE)
         String address,
 
-        @NotNull(message = "Is Active status is required")
+        @NotNull(message = ValidationMessages.STATUS_REQUIRED)
         Boolean isActive
 ) {}
