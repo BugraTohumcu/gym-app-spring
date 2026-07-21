@@ -1,7 +1,12 @@
 package org.bugra.controller;
 
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.bugra.annotation.ApiNotFound;
+import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.TrainerTrainingFilter;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Trainer Management", description = "Endpoints for managing trainer profiles, registration, and training creation")
 @RestController
 @RequestMapping("/trainer")
 public class TrainerController {
@@ -34,8 +40,12 @@ public class TrainerController {
     private TrainingResponseMapper trainingResponseMapper;
     private TrainerResponseMapper trainerResponseMapper;
 
+    @Operation(summary = "Register a new trainer", description = "Creates a new trainer profile and returns generated credentials.")
+    @ApiResponse(responseCode = "200", description = "Trainer registered successfully")
+    @ApiValidationErrors
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerTrainer(
+            @Parameter(description = "Trainer registration payload", required = true)
             @Valid @RequestBody RegisterTrainer registerTrainee
     )
     {
@@ -45,8 +55,12 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get trainer profile", description = "Fetches the profile details of a trainer by username.")
+    @ApiResponse(responseCode = "200", description = "Trainer profile retrieved successfully")
+    @ApiNotFound("Trainer not found")
     @GetMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> getTrainerProfile(
+            @Parameter(description = "Username of the trainer", required = true)
             @PathVariable(value = "username") String username
     ){
         logger.info("The trainer profile with username {} is fetching", username);
@@ -55,8 +69,13 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update trainer profile", description = "Updates an existing trainer profile.")
+    @ApiResponse(responseCode = "200", description = "Trainer profile updated successfully")
+    @ApiNotFound("Trainer not found")
+    @ApiValidationErrors
     @PutMapping
     public ResponseEntity<TrainerProfileResponse> updateTrainerProfile(
+            @Parameter(description = "Updated trainer profile payload", required = true)
             @Valid @RequestBody UpdateTrainer updateTrainer
     ){
 
@@ -66,8 +85,13 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get trainer trainings", description = "Fetches training sessions for a trainer filtered by various criteria.")
+    @ApiResponse(responseCode = "200", description = "List of trainings retrieved successfully")
+    @ApiNotFound("Trainer user not found")
+    @ApiValidationErrors
     @GetMapping("/trainings")
     public ResponseEntity<List<TrainerTrainings>> getTrainerTrainings(
+            @Parameter(description = "Filter parameters including trainer username, date range, trainee name, and training type")
             @Valid @ModelAttribute TrainerTrainingFilter trainerTrainingFilter
     )
     {
@@ -77,10 +101,15 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Create a new training", description = "Creates a new training session associated with a trainer and trainee.")
+    @ApiResponse(responseCode = "200", description = "Training created successfully")
+    @ApiNotFound("Trainer or trainee user not found")
+    @ApiValidationErrors
     @PostMapping("/trainings/training")
     public ResponseEntity<Void> createTraining(
+            @Parameter(description = "Training creation payload", required = true)
             @Valid @RequestBody CreateTraining createTraining
-            )
+    )
     {
         logger.info("The trainer: {} is creating new training", createTraining.trainerUsername());
         trainingService.createTraining(createTraining);

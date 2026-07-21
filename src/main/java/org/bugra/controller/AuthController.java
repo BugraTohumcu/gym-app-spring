@@ -1,16 +1,14 @@
 package org.bugra.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.bugra.annotation.ApiErrorResponse;
+import org.bugra.annotation.ApiNotFound;
 import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
-import org.bugra.dto.response.ErrorResponse;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +28,8 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Login user", description = "Login user with provided username and password")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Logins user and returns username and password"),
-            @ApiResponse(responseCode = "404", description = "User not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ApiResponse(responseCode = "200", description = "Logins user and returns username and password")
+    @ApiNotFound("User not found")
     @ApiValidationErrors
     public ResponseEntity<UserResponse> login(
             @Valid @RequestBody LoginUser loginUser
@@ -51,11 +46,9 @@ public class AuthController {
 
     @PutMapping("/login")
     @Operation(summary = "Update Password", description = "Update with provided username , current password and new password")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Updates user password"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "401", description = "Invalid Password")
-    })
+    @ApiResponse(responseCode = "200", description = "Updates user password")
+    @ApiErrorResponse(responseCode = "401", description = "Invalid password")
+    @ApiNotFound("User not found")
     @ApiValidationErrors
     public ResponseEntity<Void> changePassword(
             @Valid @RequestBody ChangePassword changePassword
