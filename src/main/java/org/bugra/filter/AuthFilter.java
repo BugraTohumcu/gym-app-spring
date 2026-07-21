@@ -20,7 +20,9 @@ public class AuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.contains("/register") || path.contains("/login")) {
+        if (path.contains("/register") || path.contains("/login") || path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.contains("swagger")) {
             filterChain.doFilter(request, response);
             return;
         }
