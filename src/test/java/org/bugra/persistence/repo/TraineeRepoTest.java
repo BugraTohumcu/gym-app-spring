@@ -18,7 +18,7 @@ class TraineeRepoTest  extends BaseJpaTest {
     TraineeRepo fakeRepo;
 
     @BeforeEach
-    void setup(){
+    void init(){
         fakeRepo = new TraineeRepo();
         fakeRepo.setEntityManager(em);
     }

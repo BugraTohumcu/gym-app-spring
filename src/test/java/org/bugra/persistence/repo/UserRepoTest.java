@@ -17,7 +17,7 @@ class UserRepoTest extends BaseJpaTest {
     UserRepo fakeUserRepo;
 
     @BeforeEach
-    void setup(){
+    void init(){
         fakeUserRepo = new UserRepo();
         fakeUserRepo.setEntityManager(em);
     }
