@@ -1,6 +1,25 @@
 server:
   port: 8080
 
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/gymapp
+    username: postgres
+    password: 12345
+  jpa:
+    hibernate:
+      ddl-auto: update
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      roles: USER, ADMIN
+      show-details: always
+
 logging:
   level:
     root: INFO
