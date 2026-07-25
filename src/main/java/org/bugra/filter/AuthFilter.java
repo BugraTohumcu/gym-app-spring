@@ -22,7 +22,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
         if (path.contains("/register") || path.contains("/login") || path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
-                path.contains("swagger")) {
+                path.contains("swagger") || path.contains("/actuator")) {
             filterChain.doFilter(request, response);
             return;
         }
