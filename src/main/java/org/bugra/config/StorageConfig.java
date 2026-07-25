@@ -15,13 +15,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class StorageConfig {
 
     @Bean
-    public LocalEntityManagerFactoryBean entityManagerFactory() {
-        LocalEntityManagerFactoryBean factoryBean = new LocalEntityManagerFactoryBean();
-        factoryBean.setPersistenceUnitName("org.bugra");
-        return factoryBean;
-    }
-
-    @Bean
     public PlatformTransactionManager platformTransactionManager(EntityManagerFactory entityManagerFactory){
         return new JpaTransactionManager(entityManagerFactory);
     }
