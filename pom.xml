@@ -23,7 +23,6 @@
 
   <dependencies>
 
-    <!-- Web & REST (Tomcat, Spring MVC, Jackson dahildir) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -78,7 +77,6 @@
 
   <build>
     <plugins>
-      <!-- Fat-JAR oluşturmak için şart olan Spring Boot eklentisi -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
