@@ -2,11 +2,14 @@ package org.bugra.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
 import org.bugra.exception.UserNotFoundException;
+import org.bugra.monitor.metric.AuthMetric;
 import org.bugra.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,11 +33,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
+    private MeterRegistry meterRegistry;
+
+    private AuthMetric authMetric;
 
     @Mock
     private AuthService authService;
 
-    @InjectMocks
     private AuthController authController;
 
     private MockMvc mockMvc;
@@ -42,6 +47,11 @@ class AuthControllerTest {
 
     @BeforeEach
     void setup(){
+        meterRegistry = new SimpleMeterRegistry();
+        authMetric = new AuthMetric(meterRegistry);
+
+        authController = new AuthController(authService, authMetric);
+
         this.mockMvc = MockMvcBuilders.standaloneSetup(authController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
