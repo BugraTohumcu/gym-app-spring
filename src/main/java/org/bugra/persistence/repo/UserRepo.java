@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
@@ -115,5 +116,26 @@ public class UserRepo
                 "Select count(u.id) from User u"
         ).getSingleResult();
 
+    }
+
+    /**
+     * <p>Retrieves the number of users currently in database according to the provided status</p>
+     * @param active defines the status of users to filter
+     * */
+    public long findUserCountByStatus(boolean active) {
+        return (long) entityManager.createQuery(
+                "Select count(u.id) from User u where u.isActive = :active")
+                .setParameter("active", active)
+                .getSingleResult();
+    }
+
+    /**
+     * <p>Retrieves the number of users currently in database according to the provided user role</p>
+     * */
+    public long findUserCountByRole(UserRole userRole) {
+        return (long) entityManager.createQuery(
+                        "Select count(u.id) from User u where u.role= :userRole")
+                .setParameter("userRole", userRole)
+                .getSingleResult();
     }
 }
