@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.bugra.annotation.ApiErrorResponse;
 import org.bugra.annotation.ApiNotFound;
@@ -23,7 +24,7 @@ import java.util.Base64;
 
 @RestController
 @Tag(name = "Auth Management", description = "Endpoints for managing logging and password update")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthController {
 
     private AuthService authService;
