@@ -167,4 +167,26 @@ class UserRepoTest extends BaseJpaTest {
         assertEquals("john.doe1", remaining.getUsername());
     }
 
+    @Test
+    @DisplayName("Should return total number of users currently in db")
+    void findUserCount_shouldReturnTwo(){
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("jane.smith", UserRole.TRAINER);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        em.flush();
+        em.clear();
+
+        double result = fakeUserRepo.findUserCount();
+        assertEquals(2, result);
+    }
+
+    @Test
+    @DisplayName("Should return 0 when db is empty")
+    void findUserCount_shouldReturnZero(){
+        double result = fakeUserRepo.findUserCount();
+        assertEquals(0, result);
+    }
+
 }
