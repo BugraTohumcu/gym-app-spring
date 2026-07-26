@@ -4,14 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.bugra.annotation.ApiErrorResponse;
 import org.bugra.annotation.ApiNotFound;
 import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
+import org.bugra.monitor.metric.AuthMetric;
 import org.bugra.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,9 +23,11 @@ import java.util.Base64;
 
 @RestController
 @Tag(name = "Auth Management", description = "Endpoints for managing logging and password update")
+@RequiredArgsConstructor
 public class AuthController {
 
     private AuthService authService;
+    private final AuthMetric authMetric;
 
     @PostMapping("/login")
     @Operation(summary = "Login user", description = "Login user with provided username and password")
@@ -34,7 +37,7 @@ public class AuthController {
     public ResponseEntity<UserResponse> login(
             @Valid @RequestBody LoginUser loginUser
             ){
-
+        authMetric.incrementLoginCounter();
         UserResponse userResponse = authService.login(loginUser);
         String token = Base64.getEncoder().encodeToString(
                 (loginUser.username() + ":" + loginUser.password()).getBytes()
@@ -54,7 +57,8 @@ public class AuthController {
             @Valid @RequestBody ChangePassword changePassword
             )
     {
-       authService.changePassword(changePassword);
+        authMetric.incrementChangePasswordCounter();
+        authService.changePassword(changePassword);
         String token = Base64.getEncoder().encodeToString(
                 (changePassword.username() + ":" + changePassword.newPassword()).getBytes()
         );
@@ -62,11 +66,5 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header("Authorization", token)
                 .build();
-    }
-
-
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
     }
 }
