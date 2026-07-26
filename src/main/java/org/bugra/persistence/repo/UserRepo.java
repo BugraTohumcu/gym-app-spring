@@ -107,4 +107,13 @@ public class UserRepo
         }
     }
 
+    /**
+     * <p>Retrieves the number of users currently in database</p>
+     * */
+    public long findUserCount() {
+        return (long) entityManager.createQuery(
+                "Select count(u.id) from User u"
+        ).getSingleResult();
+
+    }
 }
