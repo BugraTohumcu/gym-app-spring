@@ -169,7 +169,7 @@ class UserRepoTest extends BaseJpaTest {
 
     @Test
     @DisplayName("Should return total number of users currently in db")
-    void findUserCount_shouldReturnTwo(){
+    void findUserCount_shouldReturnTotalUsers(){
         User user1 = createValidUser("john.doe", UserRole.TRAINEE);
         User user2 = createValidUser("jane.smith", UserRole.TRAINER);
 
@@ -178,15 +178,78 @@ class UserRepoTest extends BaseJpaTest {
         em.flush();
         em.clear();
 
-        double result = fakeUserRepo.findUserCount();
+        long result = fakeUserRepo.findUserCount();
         assertEquals(2, result);
     }
 
     @Test
     @DisplayName("Should return 0 when db is empty")
     void findUserCount_shouldReturnZero(){
-        double result = fakeUserRepo.findUserCount();
+        long result = fakeUserRepo.findUserCount();
         assertEquals(0, result);
+    }
+
+    @Test
+    @DisplayName("Should return only number of active users ")
+    void findUserCount_shouldReturnActiveUsersCount(){
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("jane.smith", UserRole.TRAINER);
+        User user3 = createValidUser("bobby.brown", UserRole.TRAINER);
+
+        user3.setActive(false);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        fakeUserRepo.save(user3);
+        long result = fakeUserRepo.findUserCountByStatus(true);
+        assertEquals(2, result);
+    }
+
+    @Test
+    @DisplayName("Should return only number of passive users ")
+    void findUserCount_shouldReturnPassiveUsersCount(){
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("jane.smith", UserRole.TRAINER);
+        User user3 = createValidUser("bobby.brown", UserRole.TRAINER);
+
+        user2.setActive(false);
+        user3.setActive(false);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        fakeUserRepo.save(user3);
+        long result = fakeUserRepo.findUserCountByStatus(false);
+        assertEquals(2, result);
+    }
+
+    @Test
+    @DisplayName("Should return the total number of trainees")
+    void findUserCountByRole_shouldReturnTraineeCount(){
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("jane.smith", UserRole.TRAINEE);
+        User user3 = createValidUser("bobby.brown", UserRole.TRAINER);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        fakeUserRepo.save(user3);
+
+        long result = fakeUserRepo.findUserCountByRole(UserRole.TRAINEE);
+        assertEquals(2,result);
+    }
+
+    @Test
+    @DisplayName("Should return the total number of trainers")
+    void findUserCountByRole_shouldReturnTrainerCount(){
+        User user1 = createValidUser("john.doe", UserRole.TRAINEE);
+        User user2 = createValidUser("jane.smith", UserRole.TRAINER);
+        User user3 = createValidUser("bobby.brown", UserRole.TRAINER);
+
+        fakeUserRepo.save(user1);
+        fakeUserRepo.save(user2);
+        fakeUserRepo.save(user3);
+
+        long result = fakeUserRepo.findUserCountByRole(UserRole.TRAINER);
+        assertEquals(2,result);
     }
 
 }
