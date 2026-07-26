@@ -16,7 +16,7 @@ public class AuthMetric {
                 .description("Total login attempts")
                 .register(meterRegistry);
 
-        this.changePasswordCounter = Counter.builder("auth.change-password.total")
+        this.changePasswordCounter = Counter.builder("gymapp.auth.change-password.total")
                 .tags("environment", "development")
                 .description("Total password change attempts")
                 .register(meterRegistry);
