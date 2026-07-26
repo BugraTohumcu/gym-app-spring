@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: gym-app
+  profiles:
+    active: local
