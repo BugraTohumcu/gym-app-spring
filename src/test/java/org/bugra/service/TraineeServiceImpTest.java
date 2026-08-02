@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -29,6 +30,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeServiceImpTest {
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private TraineeRepo traineeRepo;
@@ -92,6 +96,7 @@ class TraineeServiceImpTest {
             return source;
         });
 
+        when(passwordEncoder.encode(anyString())).thenReturn("Secret123");
         UserResponse savedTrainee = traineeService.createTrainee(registerTrainee);
 
         assertNotNull(savedTrainee);
