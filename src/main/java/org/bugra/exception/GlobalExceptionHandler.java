@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +34,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex) {
         logger.error("Invalid Credentials: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<ErrorResponse> handleInternalAuthServiceException(InternalAuthenticationServiceException ex) {
+        if (ex.getCause() instanceof LockedException) {
+            logger.error("User account locked: {}", ex.getCause().getMessage());
+            return buildResponse(HttpStatus.UNAUTHORIZED, ex.getCause().getMessage());
+        }
+
+        logger.error("Auth failed: {}", ex.getMessage());
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
