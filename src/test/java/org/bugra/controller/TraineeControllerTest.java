@@ -81,13 +81,7 @@ class TraineeControllerTest {
 
         UserResponse userResponse = new UserResponse("john.doe", "123");
 
-        Trainee trainee = new Trainee();
-        User user = new User();
-        user.setUsername("john.doe");
-        user.setPassword("123");
-        trainee.setUser(user);
-
-        when(traineeService.createTrainee(any())).thenReturn(trainee);
+        when(traineeService.createTrainee(any())).thenReturn(userResponse);
 
         mockMvc.perform(post("/trainee/register")
                         .contentType(MediaType.APPLICATION_JSON)
