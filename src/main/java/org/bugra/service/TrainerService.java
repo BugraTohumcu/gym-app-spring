@@ -2,6 +2,7 @@ package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.UpdateTrainer;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.model.Trainer;
 
 import java.util.List;
@@ -15,9 +16,9 @@ public interface TrainerService {
     /**
      * Creates a new trainer profile with auto-generated credentials
      * @param trainer the trainer entity to create
-     * @return the created trainer
+     * @return {@link UserResponse} the created trainer
      */
-    Trainer createTrainer(RegisterTrainer trainer);
+    UserResponse createTrainer(RegisterTrainer trainer);
 
     /**
      * Updates an existing trainer profile

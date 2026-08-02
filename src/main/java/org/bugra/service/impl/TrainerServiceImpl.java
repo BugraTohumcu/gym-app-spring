@@ -1,8 +1,10 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.UpdateTrainer;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
@@ -15,22 +17,24 @@ import org.bugra.service.TrainerService;
 import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
-    private TrainerRepo trainerRepo;
-    private UserCredentialsService userCredentialsService;
-    private TrainingTypeRepo trainingTypeRepo;
+    private final TrainerRepo trainerRepo;
+    private final UserCredentialsService userCredentialsService;
+    private final TrainingTypeRepo trainingTypeRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
-    public Trainer createTrainer(RegisterTrainer registerTrainer) {
+    public UserResponse createTrainer(RegisterTrainer registerTrainer) {
 
         String trainingTypeName = registerTrainer.specialization();
 
@@ -45,7 +49,8 @@ public class TrainerServiceImpl implements TrainerService {
         user.setLastName(registerTrainer.lastName());
 
         // Credentials generation
-        user.setPassword(userCredentialsService.generateRandomPassword());
+        String password = userCredentialsService.generateRandomPassword();
+        user.setPassword(passwordEncoder.encode(password));
         user.setUsername(userCredentialsService.generateUsername(
                 user.getFirstName(),
                 user.getLastName()
@@ -60,7 +65,10 @@ public class TrainerServiceImpl implements TrainerService {
                 savedTrainer.getId(),
                 savedTrainer.getUser().getUsername());
 
-        return savedTrainer;
+        return new UserResponse(
+                savedTrainer.getUser().getUsername(),
+                password
+        );
     }
 
     @Transactional
@@ -114,20 +122,5 @@ public class TrainerServiceImpl implements TrainerService {
             throw new IllegalArgumentException("Trainee username cannot be null or blank");
         }
         return trainerRepo.findAllNotAssignedToTrainee(traineeUsername);
-    }
-
-    @Autowired
-    public void setTrainerRepo(TrainerRepo trainerRepo) {
-        this.trainerRepo = trainerRepo;
-    }
-
-    @Autowired
-    public void setTrainingTypeRepo(TrainingTypeRepo trainingTypeRepo) {
-        this.trainingTypeRepo = trainingTypeRepo;
-    }
-
-    @Autowired
-    public void setUserCredentialsService(UserCredentialsService userCredentialsService) {
-        this.userCredentialsService = userCredentialsService;
     }
 }
