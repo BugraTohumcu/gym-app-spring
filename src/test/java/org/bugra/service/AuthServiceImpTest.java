@@ -3,10 +3,10 @@ package org.bugra.service;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
-import org.bugra.enums.UserRole;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.security.UserPrincipal;
 import org.bugra.service.impl.AuthServiceImp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,9 +15,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +30,9 @@ class AuthServiceImpTest {
 
     @Mock
     UserRepo mockUserRepo;
+
+    @Mock
+    AuthenticationManager authenticationManager;
 
     @InjectMocks
     AuthServiceImp authService;
@@ -42,32 +50,35 @@ class AuthServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw InvalidPasswordException when password is does not match")
+    @DisplayName("Should throw exception when password is invalid")
     void login_shouldThrowWhenPasswordInvalid() {
-        User wrongUser = new User();
-        wrongUser.setUsername("john.doe");
-        wrongUser.setPassword("123");
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        when(mockUserRepo.findByUsername(any())).thenReturn(wrongUser);
-        assertThrows(InvalidPasswordException.class,
+        assertThrows(BadCredentialsException.class,
                 () -> authService.login(loginUser));
     }
 
 
     @Test
-    @DisplayName("Should throw InvalidPasswordException when password does not match")
+    @DisplayName("Should return UserResponse when login is successful")
     void login_shouldReturnUserResponse() {
         User correctUser = new User();
-        correctUser.setRole(UserRole.TRAINEE);
         correctUser.setUsername("john.doe");
         correctUser.setPassword("12345");
 
-        when(mockUserRepo.findByUsername(any())).thenReturn(correctUser);
+        UserPrincipal mockPrincipal = new UserPrincipal(correctUser);
+
+        Authentication mockAuthentication = mock(Authentication.class);
+        when(mockAuthentication.getPrincipal()).thenReturn(mockPrincipal);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(mockAuthentication);
 
         UserResponse response = authService.login(loginUser);
 
+        assertNotNull(response);
         assertEquals(loginUser.username(), response.username());
-        assertEquals(correctUser.getPassword(), response.password());
     }
 
     @Test
