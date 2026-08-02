@@ -2,6 +2,7 @@ package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.UpdateTrainer;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -24,6 +26,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerServiceImplTest {
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Mock
     TrainerRepo trainerRepo;
@@ -77,18 +82,16 @@ class TrainerServiceImplTest {
         TrainingType trainingType = new TrainingType();
 
         when(trainingTypeRepo.findByTrainingTypeName(anyString())).thenReturn(Optional.of(trainingType));
-
         when(userCredentialsService.generateRandomPassword()).thenReturn("Secret789");
+        when(passwordEncoder.encode(anyString())).thenReturn("Secret789");
         when(userCredentialsService.generateUsername("Jane", "Smith"))
                 .thenReturn("jane.smith");
         when(trainerRepo.save(any(Trainer.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        Trainer savedTrainer = trainerService.createTrainer(registerTrainer);
+        UserResponse savedTrainer = trainerService.createTrainer(registerTrainer);
 
-        assertEquals("Secret789", savedTrainer.getUser().getPassword());
-        assertEquals("jane.smith", savedTrainer.getUser().getUsername());
-        assertTrue(savedTrainer.getUser().isActive());
-        assertEquals(UserRole.TRAINER, savedTrainer.getUser().getRole());
+        assertEquals("Secret789", savedTrainer.password());
+        assertEquals("jane.smith", savedTrainer.username());
 
         verify(trainerRepo, times(1)).save(any());
     }
