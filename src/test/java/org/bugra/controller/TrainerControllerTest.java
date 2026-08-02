@@ -8,6 +8,7 @@ import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.TrainerProfileResponse;
 import org.bugra.dto.response.TrainerTrainings;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.GlobalExceptionHandler;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.exception.UserNotFoundException;
@@ -16,7 +17,6 @@ import org.bugra.mapper.TrainingResponseMapper;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
 import org.bugra.model.TrainingType;
-import org.bugra.model.User;
 import org.bugra.service.TrainerService;
 import org.bugra.service.TrainingService;
 import org.junit.jupiter.api.*;
@@ -35,7 +35,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -73,18 +72,18 @@ class TrainerControllerTest {
 
     @Test
     @DisplayName("POST /trainer/register - Success")
-    void registerTrainee_shouldRegisterAndReturn200() throws Exception{
+    void registerTrainer_shouldRegisterAndReturn200() throws Exception{
         RegisterTrainer registerTrainer = new RegisterTrainer(
                 "John",
                 "Doe",
                 "Swimming"
         );
-        Trainer trainer = new Trainer();
-        trainer.setUser(new User());
-        trainer.getUser().setUsername("john.doe");
-        trainer.getUser().setPassword("123");
+        UserResponse userResponse = new UserResponse(
+          "john.doe",
+          "123"
+        );
 
-        when(trainerService.createTrainer(any())).thenReturn(trainer);
+        when(trainerService.createTrainer(any())).thenReturn(userResponse);
 
         mockMvc.perform(post("/trainer/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +102,7 @@ class TrainerControllerTest {
     @ParameterizedTest(name = "{0}")
     @DisplayName("POST /trainer/register - Fail: Validation")
     @MethodSource("invalidRegisterTrainerProvider")
-    void registerTrainee_shouldReturn422WhenFieldIsBlank(
+    void registerTrainer_shouldReturn422WhenFieldIsBlank(
             String testName, String firstName, String lastName, String specialization) throws Exception {
 
         RegisterTrainer registerTrainer = new RegisterTrainer(firstName, lastName, specialization);
