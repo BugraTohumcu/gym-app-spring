@@ -54,8 +54,7 @@ public class TraineeController {
             @Valid @RequestBody RegisterTrainee registerTrainee
     ) {
         logger.info("New trainee is creating with name: {} {}", registerTrainee.firstName(), registerTrainee.lastName());
-        Trainee trainee = traineeService.createTrainee(registerTrainee);
-        UserResponse response = new UserResponse(trainee.getUser().getUsername(), trainee.getUser().getPassword());
+        UserResponse response = traineeService.createTrainee(registerTrainee);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
