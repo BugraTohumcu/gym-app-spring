@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan(basePackages = {"org.bugra"})
-@Import({ StorageConfig.class, WebConfig.class, FilterConfig.class})
+@Import({ StorageConfig.class, WebConfig.class, SecurityConfig.class})
 public class AppConfig {
 
     @Bean
