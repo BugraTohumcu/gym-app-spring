@@ -50,8 +50,7 @@ public class TrainerController {
     )
     {
         logger.info("New trainer is creating with name: {} {}", registerTrainee.firstName(), registerTrainee.lastName());
-        Trainer trainer = trainerService.createTrainer(registerTrainee);
-        UserResponse response = new UserResponse(trainer.getUser().getUsername(), trainer.getUser().getPassword());
+        UserResponse response = trainerService.createTrainer(registerTrainee);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
