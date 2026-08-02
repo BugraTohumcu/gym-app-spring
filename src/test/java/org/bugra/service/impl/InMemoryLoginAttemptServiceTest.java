@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +17,8 @@ class InMemoryLoginAttemptServiceTest {
     private LoginAttemptService loginAttemptService;
 
 
-
+    private final int MAX_ATTEMPT = 3;
+    private final int BLOCK_DURATION = 5;
     @BeforeEach
     void setup(){
         loginAttemptService = new InMemoryLoginAttemptService();
@@ -57,10 +60,14 @@ class InMemoryLoginAttemptServiceTest {
     void isBlocked_shouldReturnTrue() {
         String key = "test";
 
-        ConcurrentHashMap<String, Integer> internalCache =
+        ConcurrentHashMap<String, Integer> attemptCache =
                 (ConcurrentHashMap<String, Integer>) ReflectionTestUtils.getField(loginAttemptService, "attemptCache");
 
-        internalCache.put(key, 3);
+        ConcurrentHashMap<String, LocalDateTime> blockCache =
+                (ConcurrentHashMap<String, LocalDateTime>) ReflectionTestUtils.getField(loginAttemptService, "blockCache");
+
+        attemptCache.put(key, 3);
+        blockCache.put(key, LocalDateTime.now().plusMinutes(5));
 
         assertTrue(loginAttemptService.isBlocked(key));
     }
