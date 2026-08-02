@@ -2,46 +2,51 @@ package org.bugra.service.impl;
 
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.security.UserPrincipal;
 import org.bugra.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
 
     private final static Logger logger = LoggerFactory.getLogger(AuthServiceImp.class);
-    private UserRepo userRepo;
-
-
-    @Autowired
-    public void setUserRepo(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
+    private final UserRepo userRepo;
+    private final AuthenticationManager authManager;
 
     @Transactional
     @Override
     public UserResponse login(LoginUser loginUser) {
         logger.info("User with username: {} is trying to login" , loginUser.username());
-        User fetchedUser = userRepo.findByUsername(loginUser.username());
 
-        // Password check
-        if(!fetchedUser.getPassword().equals(loginUser.password())){
-            logger.warn("The provided password for user with username {} is invalid", loginUser.username());
-            throw new InvalidPasswordException();
-        }
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginUser.username(),
+                        loginUser.password()
+                )
+        );
 
-        logger.info("User with username: {} is successfully logged in" , loginUser.username());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        UserPrincipal user = (UserPrincipal)  auth.getPrincipal();
+
+        logger.info("User with username: {} is successfully logged in" , user.getUsername());
         return new UserResponse(
-                fetchedUser.getUsername(),
-                fetchedUser.getPassword()
+                user.getUsername(),
+                user.getPassword()
         );
     }
 
