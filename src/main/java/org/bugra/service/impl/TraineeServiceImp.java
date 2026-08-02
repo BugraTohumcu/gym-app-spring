@@ -1,6 +1,7 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.UserResponse;
@@ -17,6 +18,7 @@ import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,13 +27,15 @@ import java.util.stream.Collectors;
 
 @Transactional
 @Service
+@RequiredArgsConstructor
 public class TraineeServiceImp implements TraineeService {
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImp.class);
-    private TraineeRepo traineeRepo;
-    private UserCredentialsService userCredentialsService;
-    private TrainingRepo trainingRepo;
-    private TrainerRepo trainerRepo;
+    private final TraineeRepo traineeRepo;
+    private final UserCredentialsService userCredentialsService;
+    private final TrainingRepo trainingRepo;
+    private final TrainerRepo trainerRepo;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -44,7 +48,7 @@ public class TraineeServiceImp implements TraineeService {
 
         // Generate random password
         String password = userCredentialsService.generateRandomPassword();
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
 
         // Generate username
         String finalUsername = userCredentialsService.generateUsername(
@@ -186,25 +190,5 @@ public class TraineeServiceImp implements TraineeService {
 
         return traineeRepo.update(trainee)
                 .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Autowired
-    public void setTraineeRepo(TraineeRepo traineeRepo) {
-        this.traineeRepo = traineeRepo;
-    }
-
-    @Autowired
-    public void setUserCredentialsService(UserCredentialsService userCredentialsService){
-        this.userCredentialsService = userCredentialsService;
-    }
-
-    @Autowired
-    public void setTrainingRepo(TrainingRepo trainingRepo) {
-        this.trainingRepo = trainingRepo;
-    }
-
-    @Autowired
-    public void setTrainerRepo(TrainerRepo trainerRepo) {
-        this.trainerRepo = trainerRepo;
     }
 }
