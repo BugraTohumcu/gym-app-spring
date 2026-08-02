@@ -23,9 +23,9 @@ public interface TraineeService {
      * <p>Creates new trainee profile, calculates unique username and random
      * password and persists the trainee data</p>
      * @param trainee New trainee to save with null username and password fields
-     * @return Saved trainee
+     * @return {@link UserResponse} Saved trainee
      * */
-    Trainee createTrainee(RegisterTrainee trainee);
+    UserResponse createTrainee(RegisterTrainee trainee);
     /**
      * <p>Updates existing profile with given details</p>
      * @param trainee new trainee for update

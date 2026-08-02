@@ -2,6 +2,7 @@ package org.bugra.service;
 
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
@@ -91,12 +92,12 @@ class TraineeServiceImpTest {
             return source;
         });
 
-        Trainee savedTrainee = traineeService.createTrainee(registerTrainee);
+        UserResponse savedTrainee = traineeService.createTrainee(registerTrainee);
 
         assertNotNull(savedTrainee);
 
-        assertEquals("Secret123", savedTrainee.getUser().getPassword());
-        assertEquals("john.doe", savedTrainee.getUser().getUsername());
+        assertEquals("Secret123", savedTrainee.password());
+        assertEquals("john.doe", savedTrainee.username());
 
         verify(userCredentialsService, times(1)).generateRandomPassword();
         verify(userCredentialsService, times(1)).generateUsername("John", "Doe");

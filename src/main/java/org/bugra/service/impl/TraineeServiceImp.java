@@ -3,6 +3,7 @@ package org.bugra.service.impl;
 import jakarta.transaction.Transactional;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.UpdateTrainee;
+import org.bugra.dto.response.UserResponse;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
@@ -35,7 +36,7 @@ public class TraineeServiceImp implements TraineeService {
 
     @Transactional
     @Override
-    public Trainee createTrainee(RegisterTrainee registerTrainee) {
+    public UserResponse createTrainee(RegisterTrainee registerTrainee) {
 
         User user = new User();
         user.setFirstName(registerTrainee.firstName());
@@ -68,7 +69,10 @@ public class TraineeServiceImp implements TraineeService {
                 savedTrainee.getId(),
                 savedTrainee.getUser().getUsername());
 
-        return trainee;
+        return new UserResponse(
+                savedTrainee.getUser().getUsername(),
+                password
+        );
     }
 
     @Transactional
