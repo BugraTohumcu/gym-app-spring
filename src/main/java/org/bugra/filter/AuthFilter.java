@@ -4,15 +4,27 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.bugra.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.bugra.security.JwtTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-import java.util.Base64;
 
+@Component
+@RequiredArgsConstructor
 public class AuthFilter extends OncePerRequestFilter {
 
-    private AuthService authService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -27,31 +39,42 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
+        try{
+            String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && isValidToken(authHeader)) {
+            logger.debug("Header is here "+ authHeader);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+                // extract token
+                String accessToken = authHeader.substring(7);
+                String username = tokenProvider.extractUsername(accessToken);
+
+                // check username is found and if the user is already authenticated
+                if(StringUtils.hasText(username) && SecurityContextHolder.getContext().getAuthentication() == null){
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    // token validation
+                    if(tokenProvider.isValid(accessToken,userDetails)){
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails.getUsername(),
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+                filterChain.doFilter(request,response);
+
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            request.setAttribute("jwt_error", e.getMessage());
             filterChain.doFilter(request, response);
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
-    private boolean isValidToken(String token) {
-        try {
-            String decoded = new String(Base64.getDecoder().decode(token));
-            String[] parts = decoded.split(":");
-
-            if (parts.length != 2) return false;
-
-            return authService.isAuthenticated(parts[0], parts[1]);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
-    }
 }
