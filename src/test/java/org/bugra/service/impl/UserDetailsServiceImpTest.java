@@ -69,7 +69,7 @@ class UserDetailsServiceImpTest {
         assertEquals("john.doe", principal.getUsername());
         assertEquals("secret123", principal.getPassword());
         assertEquals(
-                new SimpleGrantedAuthority(UserRole.TRAINEE.name()),
+                new SimpleGrantedAuthority("ROLE_"+UserRole.TRAINEE.name()),
                 principal.getAuthorities().stream().toList().getFirst()
         );
     }
