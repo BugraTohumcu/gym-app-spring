@@ -1,10 +1,12 @@
 package org.bugra.config;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.bugra.filter.RestLoggingFilter;
 import org.bugra.filter.TransactionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +48,14 @@ public class SecurityConfig {
                         req -> req.requestMatchers(
                                 "/login", "/trainee/register", "/trainer/register", "/swagger/*")
                                 .permitAll().anyRequest().authenticated()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(((request, response, authentication) ->
+                        {
+                            SecurityContextHolder.clearContext();
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        }))
                 )
                 .addFilterBefore(new TransactionFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new RestLoggingFilter(), TransactionFilter.class)
