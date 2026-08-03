@@ -3,6 +3,6 @@ package org.bugra.dto.response;
 
 public record UserResponse(
         String username,
-        String password
-) {
+        String password,
+        String accessToken) {
 }
