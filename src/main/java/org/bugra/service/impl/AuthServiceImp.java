@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +27,7 @@ public class AuthServiceImp implements AuthService {
     private final static Logger logger = LoggerFactory.getLogger(AuthServiceImp.class);
     private final UserRepo userRepo;
     private final AuthenticationManager authManager;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -59,14 +61,14 @@ public class AuthServiceImp implements AuthService {
 
         User currentUser = userRepo.findByUsername(changePassword.username());
         // Password check
-        if(!currentUser.getPassword().equals(changePassword.currentPassword())){
+        if(!passwordEncoder.matches(changePassword.currentPassword(), currentUser.getPassword())){
             logger.warn("The provided password for user with username: {} is invalid",
                     currentUser.getUsername());
             throw new InvalidPasswordException();
         }
 
         // set new password and update db
-        currentUser.setPassword(changePassword.newPassword());
+        currentUser.setPassword(passwordEncoder.encode(changePassword.newPassword()));
         userRepo.update(currentUser);
 
         logger.info("User with username: {} successfully updated password" , currentUser.getUsername());
