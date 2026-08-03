@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final AuthFilter authFilter;
@@ -49,7 +51,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         req -> req.requestMatchers(
-                                "/login", "/trainee/register", "/trainer/register", "/swagger/*")
+                                "/login", "/trainee/register", "/trainer/register",
+                                        "/swagger-ui/**", "v3/api/docs/**")
                                 .permitAll().anyRequest().authenticated()
                 )
                 .logout(logout -> logout
