@@ -9,7 +9,9 @@ import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.security.JwtTokenProvider;
 import org.bugra.security.UserPrincipal;
+import org.bugra.security.dto.TokenPayload;
 import org.bugra.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ public class AuthServiceImp implements AuthService {
     private final UserRepo userRepo;
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
     @Transactional
     @Override
@@ -45,10 +48,13 @@ public class AuthServiceImp implements AuthService {
 
         UserPrincipal user = (UserPrincipal)  auth.getPrincipal();
 
+        String token = tokenProvider.generateAccessToken(new TokenPayload(user.getUsername()));
+
         logger.info("User with username: {} is successfully logged in" , user.getUsername());
         return new UserResponse(
                 user.getUsername(),
-                user.getPassword()
+                user.getPassword(),
+                token
         );
     }
 

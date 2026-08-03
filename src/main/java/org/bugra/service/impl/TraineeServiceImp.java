@@ -13,11 +13,12 @@ import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingRepo;
+import org.bugra.security.JwtTokenProvider;
+import org.bugra.security.dto.TokenPayload;
 import org.bugra.service.TraineeService;
 import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ public class TraineeServiceImp implements TraineeService {
     private final TrainingRepo trainingRepo;
     private final TrainerRepo trainerRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
 
     @Transactional
@@ -68,6 +70,7 @@ public class TraineeServiceImp implements TraineeService {
 
 
         Trainee savedTrainee = traineeRepo.save(trainee);
+        String accessToken = tokenProvider.generateAccessToken(new TokenPayload(user.getUsername()));
 
         logger.info("Trainee created successfully with ID: {} and username: {}",
                 savedTrainee.getId(),
@@ -75,7 +78,8 @@ public class TraineeServiceImp implements TraineeService {
 
         return new UserResponse(
                 savedTrainee.getUser().getUsername(),
-                password
+                password,
+                accessToken
         );
     }
 

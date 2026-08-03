@@ -13,6 +13,8 @@ import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
+import org.bugra.security.JwtTokenProvider;
+import org.bugra.security.dto.TokenPayload;
 import org.bugra.service.TrainerService;
 import org.bugra.service.UserCredentialsService;
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final UserCredentialsService userCredentialsService;
     private final TrainingTypeRepo trainingTypeRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
     @Transactional
     @Override
@@ -65,9 +68,12 @@ public class TrainerServiceImpl implements TrainerService {
                 savedTrainer.getId(),
                 savedTrainer.getUser().getUsername());
 
+        String accessToken = tokenProvider.generateAccessToken(new TokenPayload(user.getUsername()));
+
         return new UserResponse(
                 savedTrainer.getUser().getUsername(),
-                password
+                password,
+                accessToken
         );
     }
 
