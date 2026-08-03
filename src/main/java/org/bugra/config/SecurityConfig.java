@@ -1,12 +1,12 @@
 package org.bugra.config;
 
-
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.bugra.filter.AuthFilter;
 import org.bugra.filter.RestLoggingFilter;
 import org.bugra.filter.TransactionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,7 +25,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AuthFilter authFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService){
@@ -59,6 +62,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(new TransactionFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new RestLoggingFilter(), TransactionFilter.class)
+                .addFilterAfter(authFilter, RestLoggingFilter.class)
                 .build();
     }
 
