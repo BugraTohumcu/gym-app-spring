@@ -19,9 +19,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +32,9 @@ class AuthServiceImpTest {
 
     @Mock
     UserRepo mockUserRepo;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Mock
     AuthenticationManager authenticationManager;
@@ -88,6 +93,7 @@ class AuthServiceImpTest {
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
 
+        when(passwordEncoder.matches(any(),any())).thenReturn(false);
         when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
 
         // Provide invalid password
@@ -108,6 +114,8 @@ class AuthServiceImpTest {
         currentUser.setUsername("john.doe");
         currentUser.setPassword("123");
 
+        when(passwordEncoder.encode(any())).thenReturn("54321");
+        when(passwordEncoder.matches(any(),any())).thenReturn(true);
         when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
         // Provide invalid password
         changePassword = new ChangePassword(
