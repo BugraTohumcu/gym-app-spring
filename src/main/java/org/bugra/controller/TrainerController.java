@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.bugra.annotation.ApiNotFound;
 import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.CreateTraining;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,13 +34,14 @@ import java.util.List;
 @Tag(name = "Trainer Management", description = "Endpoints for managing trainer profiles, registration, and training creation")
 @RestController
 @RequestMapping("/trainer")
+@RequiredArgsConstructor
 public class TrainerController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
-    private TrainerService trainerService;
-    private TrainingService trainingService;
-    private TrainingResponseMapper trainingResponseMapper;
-    private TrainerResponseMapper trainerResponseMapper;
+    private final TrainerService trainerService;
+    private final TrainingService trainingService;
+    private final TrainingResponseMapper trainingResponseMapper;
+    private final TrainerResponseMapper trainerResponseMapper;
 
     @Operation(summary = "Register a new trainer", description = "Creates a new trainer profile and returns generated credentials.")
     @ApiResponse(responseCode = "200", description = "Trainer registered successfully")
@@ -58,6 +61,7 @@ public class TrainerController {
     @ApiResponse(responseCode = "200", description = "Trainer profile retrieved successfully")
     @ApiNotFound("Trainer not found")
     @GetMapping("/{username}")
+    @PreAuthorize("#username == authentication.name")
     public ResponseEntity<TrainerProfileResponse> getTrainerProfile(
             @Parameter(description = "Username of the trainer", required = true)
             @PathVariable(value = "username") String username
@@ -73,6 +77,7 @@ public class TrainerController {
     @ApiNotFound("Trainer not found")
     @ApiValidationErrors
     @PutMapping
+    @PreAuthorize("#updateTrainer.username() == authentication.name")
     public ResponseEntity<TrainerProfileResponse> updateTrainerProfile(
             @Parameter(description = "Updated trainer profile payload", required = true)
             @Valid @RequestBody UpdateTrainer updateTrainer
@@ -89,6 +94,7 @@ public class TrainerController {
     @ApiNotFound("Trainer user not found")
     @ApiValidationErrors
     @GetMapping("/trainings")
+    @PreAuthorize("#trainerTrainingFilter.trainerUsername() == authentication.name")
     public ResponseEntity<List<TrainerTrainings>> getTrainerTrainings(
             @Parameter(description = "Filter parameters including trainer username, date range, trainee name, and training type")
             @Valid @ModelAttribute TrainerTrainingFilter trainerTrainingFilter
@@ -105,6 +111,7 @@ public class TrainerController {
     @ApiNotFound("Trainer or trainee user not found")
     @ApiValidationErrors
     @PostMapping("/trainings/training")
+    @PreAuthorize("#createTraining.trainerUsername() == authentication.name")
     public ResponseEntity<Void> createTraining(
             @Parameter(description = "Training creation payload", required = true)
             @Valid @RequestBody CreateTraining createTraining
@@ -113,26 +120,5 @@ public class TrainerController {
         logger.info("The trainer: {} is creating new training", createTraining.trainerUsername());
         trainingService.createTraining(createTraining);
         return ResponseEntity.ok().build();
-    }
-
-
-    @Autowired
-    public void setTrainingResponseMapper(TrainingResponseMapper trainingResponseMapper) {
-        this.trainingResponseMapper = trainingResponseMapper;
-    }
-
-    @Autowired
-    public void setTrainingService(TrainingService trainingService) {
-        this.trainingService = trainingService;
-    }
-
-    @Autowired
-    public void setTrainerService(TrainerService trainerService) {
-        this.trainerService = trainerService;
-    }
-
-    @Autowired
-    public void setTrainerResponseMapper(TrainerResponseMapper trainerResponseMapper) {
-        this.trainerResponseMapper = trainerResponseMapper;
     }
 }

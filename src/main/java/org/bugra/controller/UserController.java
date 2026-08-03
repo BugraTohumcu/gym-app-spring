@@ -11,6 +11,7 @@ import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.UpdateUserStatus;
 import org.bugra.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Management", description = "Endpoints for managing user accounts and status updates")
@@ -26,6 +27,7 @@ public class UserController {
     @ApiNotFound("User not found")
     @ApiValidationErrors
     @PatchMapping("/{username}/status")
+    @PreAuthorize("#username == authentication.name")
     public ResponseEntity<Void> toggleActiveStatus(
             @Parameter(description = "Username of the user", required = true)
             @PathVariable(value = "username") String username,
