@@ -3,15 +3,20 @@ package org.bugra.filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.bugra.service.AuthService;
+import org.bugra.security.JwtTokenProvider;
+import org.bugra.service.impl.UserDetailsServiceImp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Base64;
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,119 +32,130 @@ class AuthFilterTest {
     private FilterChain filterChain;
 
     @Mock
-    private AuthService authService;
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    private UserDetailsServiceImp userDetailsService;
 
     private AuthFilter authFilter;
 
     @BeforeEach
     void setUp() {
-        authFilter = new AuthFilter();
-        authFilter.setAuthService(authService);
+        authFilter = new AuthFilter(jwtTokenProvider, userDetailsService);
     }
 
-    private String encode(String username, String password) {
-        return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+    @AfterEach
+    void tearDown() {
+        // Testlerin birbirini etkilememesi için Context'i temizliyoruz
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    void shouldSkipAuth_whenPathContainsLogin() throws Exception {
+    @DisplayName("Should skip when path contains login")
+    void doFilterInternal_shouldSkipWhenLogin() throws Exception {
         when(request.getRequestURI()).thenReturn("/login");
 
         authFilter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain, times(1)).doFilter(request, response);
         verify(response, never()).setStatus(anyInt());
-        verifyNoInteractions(authService);
+        verifyNoInteractions(jwtTokenProvider, userDetailsService);
     }
 
     @Test
-    void shouldSkipAuth_whenPathContainsRegister() throws Exception {
+    @DisplayName("Should skip when path contains register")
+    void doFilterInternal_shouldSkipWhenRegister() throws Exception {
         when(request.getRequestURI()).thenReturn("/register");
 
         authFilter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain, times(1)).doFilter(request, response);
         verify(response, never()).setStatus(anyInt());
-        verifyNoInteractions(authService);
+        verifyNoInteractions(jwtTokenProvider, userDetailsService);
     }
 
     @Test
-    void shouldAllowRequest_whenTokenIsValid() throws Exception {
-        String token = encode("john.doe", "123");
+    @DisplayName("Should allow and set authentication when token is valid")
+    void doFilterInternal_shouldAllowWhenTokenValid() throws Exception {
+        String token = "valid-dummy-token";
+        String username = "john.doe";
+        UserDetails userDetails = mock(UserDetails.class);
 
         when(request.getRequestURI()).thenReturn("/trainee/john.doe");
-        when(request.getHeader("Authorization")).thenReturn(token);
-        when(authService.isAuthenticated("john.doe", "123")).thenReturn(true);
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+
+        when(jwtTokenProvider.extractUsername(token)).thenReturn(username);
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        when(jwtTokenProvider.isValid(token, userDetails)).thenReturn(true);
+        when(userDetails.getAuthorities()).thenReturn(null);
 
         authFilter.doFilterInternal(request, response, filterChain);
 
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(response, never()).setStatus(anyInt());
     }
 
     @Test
-    void shouldReturn401_whenAuthHeaderIsMissing() throws Exception {
+    @DisplayName("Should pass to next filter without authenticating when auth header is missing")
+    void shouldPassToNextFilter_whenAuthHeaderIsMissing() throws Exception {
         when(request.getRequestURI()).thenReturn("/trainee/john.doe");
         when(request.getHeader("Authorization")).thenReturn(null);
 
         authFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain, never()).doFilter(any(), any());
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        verifyNoInteractions(authService);
+        verify(filterChain, times(1)).doFilter(request, response);
+        verify(response, never()).setStatus(anyInt());
+        verifyNoInteractions(jwtTokenProvider, userDetailsService);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
-    void shouldReturn401_whenTokenIsNotValidBase64() throws Exception {
+    @DisplayName("Should pass to next filter without authenticating when token does not start with Bearer")
+    void shouldPassToNextFilter_whenHeaderDoesNotStartWithBearer() throws Exception {
         when(request.getRequestURI()).thenReturn("/trainee/john.doe");
-        when(request.getHeader("Authorization")).thenReturn("not-a-valid-base64!!");
+        when(request.getHeader("Authorization")).thenReturn("not-a-valid-bearer-token!!");
 
         authFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain, never()).doFilter(any(), any());
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        verify(filterChain, times(1)).doFilter(request, response);
+        verify(response, never()).setStatus(anyInt());
+        verifyNoInteractions(jwtTokenProvider, userDetailsService);
     }
 
     @Test
-    void shouldReturn401_whenDecodedTokenHasWrongFormat() throws Exception {
-        String token = Base64.getEncoder().encodeToString("invalidFormat".getBytes());
+    @DisplayName("Should catch exception, set error attribute and pass to next filter when token is malformed")
+    void shouldCatchException_whenDecodedTokenHasWrongFormat() throws Exception {
+        String token = "malformed-token";
 
         when(request.getRequestURI()).thenReturn("/trainee/john.doe");
-        when(request.getHeader("Authorization")).thenReturn(token);
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtTokenProvider.extractUsername(token)).thenThrow(new RuntimeException("Malformed token"));
 
         authFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain, never()).doFilter(any(), any());
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        verifyNoInteractions(authService);
+        verify(request).setAttribute(eq("jwt_error"), anyString());
+        verify(filterChain, times(1)).doFilter(request, response);
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
-    void shouldReturn401_whenCredentialsAreInvalid() throws Exception {
-        String token = encode("john.doe", "wrong-password");
+    @DisplayName("Should pass to next filter without authenticating when token is invalid")
+    void shouldNotAuthenticate_whenTokenIsInvalid() throws Exception {
+        String token = "invalid-token";
+        String username = "john.doe";
+        UserDetails userDetails = mock(UserDetails.class);
 
         when(request.getRequestURI()).thenReturn("/trainee/john.doe");
-        when(request.getHeader("Authorization")).thenReturn(token);
-        when(authService.isAuthenticated("john.doe", "wrong-password")).thenReturn(false);
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtTokenProvider.extractUsername(token)).thenReturn(username);
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+
+        when(jwtTokenProvider.isValid(token, userDetails)).thenReturn(false);
 
         authFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain, never()).doFilter(any(), any());
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    }
-
-    @Test
-    void shouldReturn401_whenAuthServiceThrowsException() throws Exception {
-        String token = encode("john.doe", "123");
-
-        when(request.getRequestURI()).thenReturn("/trainee/john.doe");
-        when(request.getHeader("Authorization")).thenReturn(token);
-        when(authService.isAuthenticated("john.doe", "123"))
-                .thenThrow(new RuntimeException("DB error"));
-
-        authFilter.doFilterInternal(request, response, filterChain);
-
-        verify(filterChain, never()).doFilter(any(), any());
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain, times(1)).doFilter(request, response);
     }
 }
