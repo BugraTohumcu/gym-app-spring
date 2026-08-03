@@ -80,7 +80,8 @@ class TrainerControllerTest {
         );
         UserResponse userResponse = new UserResponse(
           "john.doe",
-          "123"
+          "123",
+                "dummy_token"
         );
 
         when(trainerService.createTrainer(any())).thenReturn(userResponse);

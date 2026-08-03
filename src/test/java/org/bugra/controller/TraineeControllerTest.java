@@ -79,7 +79,7 @@ class TraineeControllerTest {
                 LocalDate.of(2000, 1, 1),
                 "USA road");
 
-        UserResponse userResponse = new UserResponse("john.doe", "123");
+        UserResponse userResponse = new UserResponse("john.doe", "123", "dummy_token");
 
         when(traineeService.createTrainee(any())).thenReturn(userResponse);
 
