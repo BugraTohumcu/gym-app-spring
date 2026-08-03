@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.bugra.annotation.ApiNotFound;
 import org.bugra.annotation.ApiValidationErrors;
 import org.bugra.dto.request.RegisterTrainee;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,14 +38,15 @@ import java.util.Set;
 @Tag(name = "Trainee Management", description = "Endpoints for managing trainee profiles, registration, and training associations")
 @RestController
 @RequestMapping(value = "/trainee")
+@RequiredArgsConstructor
 public class TraineeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TraineeController.class);
-    private TraineeService traineeService;
-    private TrainerService trainerService;
-    private TraineeResponseMapper traineeResponseMapper;
-    private TrainingService trainingService;
-    private TrainingResponseMapper trainingResponseMapper;
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
+    private final TraineeResponseMapper traineeResponseMapper;
+    private final TrainingService trainingService;
+    private final TrainingResponseMapper trainingResponseMapper;
 
     @Operation(summary = "Register a new trainee", description = "Creates a new trainee profile and returns generated credentials.")
     @ApiResponse(responseCode = "200", description = "Trainee registered successfully")
@@ -62,6 +65,7 @@ public class TraineeController {
     @ApiResponse(responseCode = "200", description = "Trainee profile retrieved successfully")
     @ApiNotFound("Trainee user not found")
     @GetMapping("/{username}")
+    @PreAuthorize("#username == authentication.name")
     public ResponseEntity<TraineeProfileResponse> getTraineeProfile(
             @Parameter(description = "Username of the trainee", required = true)
             @PathVariable(value = "username") String username
@@ -77,6 +81,7 @@ public class TraineeController {
     @ApiNotFound("Trainee user not found")
     @ApiValidationErrors
     @PutMapping
+    @PreAuthorize("#updateTrainee.username() == authentication.name")
     public ResponseEntity<TraineeProfileResponse> updateTraineeProfile(
             @Parameter(description = "Updated trainee profile payload", required = true)
             @Valid @RequestBody UpdateTrainee updateTrainee
@@ -91,6 +96,7 @@ public class TraineeController {
     @ApiResponse(responseCode = "204", description = "Trainee profile deleted successfully", content = @Content)
     @ApiNotFound("Trainee user not found")
     @DeleteMapping("/{username}")
+    @PreAuthorize("#username == authentication.name")
     public ResponseEntity<Void> deleteTrainee(
             @Parameter(description = "Username of the trainee to delete", required = true)
             @PathVariable(value = "username") String username
@@ -106,6 +112,7 @@ public class TraineeController {
     @ApiResponse(responseCode = "200", description = "List of unassigned trainers retrieved successfully")
     @ApiNotFound("Trainee user not found")
     @GetMapping("/not-assigned")
+    @PreAuthorize("#username == authentication.name")
     public ResponseEntity<List<TraineeProfileResponse.TrainerSummary>> getAvailableTrainers(
             @Parameter(description = "Username of the trainee", required = true)
             @RequestParam(value = "username") String username
@@ -121,6 +128,7 @@ public class TraineeController {
     @ApiNotFound("Trainee or trainer user not found")
     @ApiValidationErrors
     @PutMapping("/trainers")
+    @PreAuthorize("#updateTrainersList.username() == authentication.name")
     public ResponseEntity<List<TraineeProfileResponse.TrainerSummary>> updateTrainers(
             @Parameter(description = "Payload containing trainee username and updated list of trainer usernames", required = true)
             @Valid @RequestBody UpdateTrainersList updateTrainersList
@@ -137,6 +145,7 @@ public class TraineeController {
     @ApiNotFound("Trainee user or training type not found")
     @ApiValidationErrors
     @GetMapping("/trainings")
+    @PreAuthorize("#traineeTrainingFilter.traineeUsername() == authentication.name")
     public ResponseEntity<List<TraineeTrainings>> getTraineeTrainings(
             @Parameter(description = "Filter parameters including trainee username, date range, trainer name, and training type")
             @Valid @ModelAttribute TraineeTrainingFilter traineeTrainingFilter
@@ -145,30 +154,5 @@ public class TraineeController {
         List<Training> trainings = trainingService.getTraineeTrainings(traineeTrainingFilter);
         List<TraineeTrainings> response = trainingResponseMapper.mapToTraineeTrainings(trainings);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @Autowired
-    public void setTrainingResponseMapper(TrainingResponseMapper trainingResponseMapper) {
-        this.trainingResponseMapper = trainingResponseMapper;
-    }
-
-    @Autowired
-    public void setTrainingService(TrainingService trainingService) {
-        this.trainingService = trainingService;
-    }
-
-    @Autowired
-    public void setTraineeService(TraineeService traineeService) {
-        this.traineeService = traineeService;
-    }
-
-    @Autowired
-    public void setTrainerService(TrainerService trainerService) {
-        this.trainerService = trainerService;
-    }
-
-    @Autowired
-    public void setTraineeResponseMapper(TraineeResponseMapper traineeResponseMapper) {
-        this.traineeResponseMapper = traineeResponseMapper;
     }
 }
