@@ -6,6 +6,7 @@ import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
+import org.bugra.security.JwtTokenProvider;
 import org.bugra.security.UserPrincipal;
 import org.bugra.service.impl.AuthServiceImp;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,9 @@ class AuthServiceImpTest {
 
     @Mock
     UserRepo mockUserRepo;
+
+    @Mock
+    JwtTokenProvider tokenProvider;
 
     @Mock
     PasswordEncoder passwordEncoder;

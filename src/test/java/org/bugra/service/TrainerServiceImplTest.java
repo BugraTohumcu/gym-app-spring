@@ -10,6 +10,7 @@ import org.bugra.model.TrainingType;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TrainerRepo;
 import org.bugra.persistence.repo.TrainingTypeRepo;
+import org.bugra.security.JwtTokenProvider;
 import org.bugra.service.impl.TrainerServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerServiceImplTest {
+
+    @Mock
+    JwtTokenProvider tokenProvider;
 
     @Mock
     PasswordEncoder passwordEncoder;
