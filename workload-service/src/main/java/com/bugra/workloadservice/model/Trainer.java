@@ -26,6 +26,9 @@ public class Trainer {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false)
+    private boolean isActive;
+
     @OneToMany(
             cascade = {CascadeType.ALL},
             mappedBy = "trainer"
