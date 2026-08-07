@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/trainer")
+@RequestMapping("/workload")
 @RequiredArgsConstructor
 public class TrainerController {
 
@@ -34,7 +34,7 @@ public class TrainerController {
     }
 
     @ApiResponse(responseCode = "200", description = "Get trainer workload")
-    @GetMapping("/workload")
+    @GetMapping
     public ResponseEntity<TrainerWorkloadResponse> getWorkload
             (
                     @RequestParam("username") String username

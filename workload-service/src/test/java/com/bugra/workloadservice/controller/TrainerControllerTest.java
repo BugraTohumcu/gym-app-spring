@@ -58,7 +58,7 @@ class TrainerControllerTest {
 
         doNothing().when(trainerService).saveTrainerRecord(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+        mockMvc.perform(MockMvcRequestBuilders.post("/workload")
                 .content(objectMapper.writeValueAsString(dto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -79,7 +79,7 @@ class TrainerControllerTest {
 
         doNothing().when(trainerService).saveTrainerRecord(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+        mockMvc.perform(MockMvcRequestBuilders.post("/workload")
                         .content(objectMapper.writeValueAsString(dto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
@@ -100,7 +100,7 @@ class TrainerControllerTest {
         );
         doNothing().when(trainerService).saveTrainerRecord(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+        mockMvc.perform(MockMvcRequestBuilders.post("/workload")
                         .content(objectMapper.writeValueAsString(trainerDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
@@ -134,7 +134,7 @@ class TrainerControllerTest {
 
         when(trainerService.getTrainerWorkload(eq(username))).thenReturn(mockResponse);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/trainer/workload")
+        mockMvc.perform(MockMvcRequestBuilders.get("/workload")
                         .param("username",username)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
