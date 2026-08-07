@@ -3,6 +3,7 @@ package com.bugra.workloadservice.controller;
 
 import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.service.TrainerService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ public class TrainerController {
 
     private final TrainerService trainerService;
 
+    @ApiResponse(responseCode = "200", description = "Create new trainer workload record")
+    @ApiResponse(responseCode = "422", description = "Invalid request input")
     @PostMapping
     public ResponseEntity<Void> createTrainerRecord
             (
