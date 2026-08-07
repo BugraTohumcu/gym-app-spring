@@ -1,0 +1,117 @@
+package com.bugra.workloadservice.controller;
+
+import com.bugra.workloadservice.dto.TrainerDto;
+import com.bugra.workloadservice.enums.ActionType;
+import com.bugra.workloadservice.service.TrainerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
+@WebMvcTest(TrainerController.class)
+class TrainerControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private TrainerService trainerServiceImp;
+
+
+
+    @Test
+    @DisplayName("Post: /trainer - Should return 200")
+    void createTrainerRecord_shouldCreateTrainer() throws Exception {
+        TrainerDto dto = new TrainerDto(
+                "John",
+                "Doe",
+                "joh.doe",
+                true,
+                LocalDateTime.now().plusDays(2),
+                120,
+                ActionType.ADD
+        );
+
+        doNothing().when(trainerServiceImp).saveTrainerRecord(any());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+                .content(objectMapper.writeValueAsString(dto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Post: /trainer - Should return 400 when validation failed")
+    void createTrainerRecord_shouldReturn400() throws Exception {
+        TrainerDto dto = new TrainerDto(
+                "John",
+                "Doe",
+                "joh.doe",
+                true,
+                LocalDateTime.now().minusDays(2),
+                120,
+                ActionType.ADD
+        );
+
+        doNothing().when(trainerServiceImp).saveTrainerRecord(any());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+                        .content(objectMapper.writeValueAsString(dto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDtoForIsBlank")
+    public void createTrainerRecord_shouldReturnFail(String firstName, String lastName, String username) throws Exception {
+
+        TrainerDto trainerDto = new TrainerDto(
+                firstName,
+                lastName,
+                username,
+                true,
+                LocalDateTime.now().plusDays(2),
+                120,
+                ActionType.ADD
+        );
+        doNothing().when(trainerServiceImp).saveTrainerRecord(any());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/trainer")
+                        .content(objectMapper.writeValueAsString(trainerDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    private static Stream<Arguments> provideDtoForIsBlank(){
+        return Stream.of(
+                // Empty username
+                Arguments.of("John", "Doe", ""),
+
+                // Empty first name
+                Arguments.of("", "Doe", "john.doe"),
+
+                // Empty last name
+                Arguments.of("John", "", "john.doe")
+        );
+    }
+}
