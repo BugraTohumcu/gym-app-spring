@@ -73,7 +73,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req.requestMatchers(
                                 "/login", "/trainee/register", "/trainer/register",
-                                        "/swagger-ui/**", "v3/api/docs/**")
+                                        "/swagger-ui/**", "/v3/api-docs","v3/api-docs/**")
+
                                 .permitAll().anyRequest().authenticated()
                 )
                 .logout(logout -> logout
