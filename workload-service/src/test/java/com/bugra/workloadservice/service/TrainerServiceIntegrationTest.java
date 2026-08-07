@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +30,9 @@ class TrainerServiceIntegrationTest {
     @Test
     @DisplayName("Should save trainer with yearly and monthly work loads")
     void saveTrainerRecord_ShouldSaveTrainer() {
-        LocalDateTime testDate = LocalDateTime.of(2026, 8, 15, 10, 0);
+        LocalDateTime testDate = LocalDateTime.now().plusDays(1);
+        String year = String.valueOf(testDate.getYear());
+        Month month = testDate.getMonth();
 
         TrainerDto dto = new TrainerDto(
                 "Bobby",
@@ -51,17 +54,62 @@ class TrainerServiceIntegrationTest {
 
         assertNotNull(savedTrainer.getWorkloads());
         assertEquals(1, savedTrainer.getWorkloads().size());
-        assertTrue(savedTrainer.getWorkloads().containsKey("2026"));
+        assertTrue(savedTrainer.getWorkloads().containsKey(year));
 
-        YearlyWorkload savedYearly = savedTrainer.getWorkloads().get("2026");
-        assertEquals("2026", savedYearly.getYear());
+        YearlyWorkload savedYearly = savedTrainer.getWorkloads().get(year);
+        assertEquals(year, savedYearly.getYear());
         assertNotNull(savedYearly.getTrainer());
 
         assertNotNull(savedYearly.getMonths());
         assertEquals(1, savedYearly.getMonths().size());
-        assertTrue(savedYearly.getMonths().containsKey("AUGUST"));
+        assertTrue(savedYearly.getMonths().containsKey(month.name()));
 
-        int savedDuration = savedYearly.getMonths().get("AUGUST").getDuration();
+        int savedDuration = savedYearly.getMonths().get(month.name()).getDuration();
         assertEquals(10, savedDuration);
+    }
+
+    @Test
+    @DisplayName("Should subtract duration and prevent negative")
+    void saveTrainerRecord_shouldAddDuration(){
+        LocalDateTime testDate = LocalDateTime.now().plusDays(1);
+        String year = String.valueOf(testDate.getYear());
+        Month month = testDate.getMonth();
+
+        // save to db first
+        TrainerDto dto1 = new TrainerDto(
+                "Bobby",
+                "Brown",
+                "bobby.brown",
+                true,
+                testDate,
+                10,
+                ActionType.ADD
+        );
+        trainerService.saveTrainerRecord(dto1);
+
+        // second request
+        TrainerDto dto2 = new TrainerDto(
+                "Bobby",
+                "Brown",
+                "bobby.brown",
+                true,
+                testDate,
+                20,
+                ActionType.DELETE
+        );
+        trainerService.saveTrainerRecord(dto2);
+
+        Trainer savedTrainer = trainerRepo.findByUsername("bobby.brown").orElseThrow();
+
+        assertEquals(dto2.username(), savedTrainer.getUsername());
+
+        YearlyWorkload savedYearly = savedTrainer.getWorkloads().get(year);
+        assertEquals(year, savedYearly.getYear());
+        assertNotNull(savedYearly.getTrainer());
+
+        assertTrue(savedYearly.getMonths().containsKey(month.name()));
+
+        int savedDuration = savedYearly.getMonths().get(month.name()).getDuration();
+        assertEquals(0, savedDuration);
     }
 }
