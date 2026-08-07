@@ -14,25 +14,32 @@ import org.springframework.stereotype.Service;
 public class TrainerServiceImp implements TrainerService {
 
     private final TrainerRepo trainerRepo;
-
-
     @Override
-    public void saveTrainerRecord(TrainerDto trainerDto){
+    public void saveTrainerRecord(TrainerDto trainerDto) {
+
+        // create new trainee if there is no record with provided username
+        Trainer trainer = trainerRepo.findByUsername(trainerDto.username())
+                .orElseGet(() -> {
+                    Trainer newTrainer = new Trainer();
+                    newTrainer.setFirstName(trainerDto.firstName());
+                    newTrainer.setLastName(trainerDto.lastName());
+                    newTrainer.setUsername(trainerDto.username());
+                    newTrainer.setActive(trainerDto.isActive());
+                    return newTrainer;
+                });
+
+
+        // set workload
+        YearlyWorkload yearlyWorkload = new YearlyWorkload();
+        yearlyWorkload.setYear(String.valueOf(trainerDto.trainingDate().getYear()));
+
         MonthlyWorkload monthlyWorkload = new MonthlyWorkload();
         monthlyWorkload.setDuration(trainerDto.duration());
 
-        YearlyWorkload yearlyWorkload = new YearlyWorkload();
-        yearlyWorkload.setYear(String.valueOf(trainerDto.trainingDate().getYear()));
-        yearlyWorkload.addMonthlyWorkload(trainerDto.trainingDate().getMonth(),monthlyWorkload);
+        yearlyWorkload.addMonthlyWorkload(trainerDto.trainingDate().getMonth(), monthlyWorkload);
 
-        Trainer trainer = new Trainer();
-        trainer.setFirstName(trainerDto.firstName());
-        trainer.setLastName(trainerDto.lastName());
-        trainer.setUsername(trainerDto.username());
-        trainer.setActive(trainerDto.isActive());
         trainer.addWorkload(yearlyWorkload);
 
         trainerRepo.save(trainer);
     }
-
 }
