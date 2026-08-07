@@ -35,9 +35,4 @@ public class Trainer {
     )
     @MapKey(name = "year")
     private Map<String, YearlyWorkload> workloads = new HashMap<>();
-
-    public void addWorkload(YearlyWorkload yearlyWorkload){
-        workloads.put(yearlyWorkload.getYear(), yearlyWorkload);
-        yearlyWorkload.setTrainer(this);
-    }
 }
