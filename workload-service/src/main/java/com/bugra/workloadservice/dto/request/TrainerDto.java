@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record TrainerDto(
 
@@ -26,7 +26,7 @@ public record TrainerDto(
         boolean isActive,
 
         @NotNull(message = TrainerMessages.TRAINING_DATE_REQUIRED)
-        LocalDateTime trainingDate,
+        LocalDate trainingDate,
 
         @NotNull(message = TrainerMessages.TRAINING_DURATION)
         int duration,
@@ -38,7 +38,7 @@ public record TrainerDto(
 
     @AssertTrue(message = TrainerMessages.TRAINING_DATE_FUTURE)
     public boolean isFuture(){
-        return trainingDate.isAfter(LocalDateTime.now());
+        return trainingDate.isAfter(LocalDate.now());
     }
 
 

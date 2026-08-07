@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +30,7 @@ class TrainerServiceIntegrationTest {
     @Test
     @DisplayName("Should save trainer with yearly and monthly work loads")
     void saveTrainerRecord_ShouldSaveTrainer() {
-        LocalDateTime testDate = LocalDateTime.now().plusDays(1);
+        LocalDate testDate = LocalDate.now().plusDays(1);
         String year = String.valueOf(testDate.getYear());
         Month month = testDate.getMonth();
 
@@ -71,7 +71,7 @@ class TrainerServiceIntegrationTest {
     @Test
     @DisplayName("Should subtract duration and prevent negative")
     void saveTrainerRecord_shouldAddDuration(){
-        LocalDateTime testDate = LocalDateTime.now().plusDays(1);
+        LocalDate testDate = LocalDate.now().plusDays(1);
         String year = String.valueOf(testDate.getYear());
         Month month = testDate.getMonth();
 
@@ -117,8 +117,8 @@ class TrainerServiceIntegrationTest {
     @Test
     @DisplayName("Should return all yearly and monthly workloads")
     void getTrainerWorkload_shouldReturnWorkload(){
-        LocalDateTime testDate1 = LocalDateTime.now().plusDays(1);
-        LocalDateTime testDate2 = LocalDateTime.now().plusMonths(1);
+        LocalDate testDate1 = LocalDate.now().plusDays(1);
+        LocalDate testDate2 = LocalDate.now().plusMonths(1);
 
         int duration1 = 10;
         int duration2 = 20;

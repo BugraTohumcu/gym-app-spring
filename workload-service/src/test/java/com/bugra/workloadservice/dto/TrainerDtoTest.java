@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +36,7 @@ class TrainerDtoTest {
           "Doe",
           "joh.doe",
           true,
-                LocalDateTime.now().minusDays(2),
+                LocalDate.now().minusDays(2),
           120,
           ActionType.ADD
         );
@@ -59,7 +59,7 @@ class TrainerDtoTest {
                 "Doe",
                 "joh.doe",
                 true,
-                LocalDateTime.now().plusDays(3),
+                LocalDate.now().plusDays(3),
                 -1,
                 ActionType.ADD
         );

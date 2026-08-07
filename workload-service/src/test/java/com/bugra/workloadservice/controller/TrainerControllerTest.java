@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -51,7 +51,7 @@ class TrainerControllerTest {
                 "Doe",
                 "joh.doe",
                 true,
-                LocalDateTime.now().plusDays(2),
+                LocalDate.now().plusDays(2),
                 120,
                 ActionType.ADD
         );
@@ -72,7 +72,7 @@ class TrainerControllerTest {
                 "Doe",
                 "joh.doe",
                 true,
-                LocalDateTime.now().minusDays(2),
+                LocalDate.now().minusDays(2),
                 120,
                 ActionType.ADD
         );
@@ -94,7 +94,7 @@ class TrainerControllerTest {
                 lastName,
                 username,
                 true,
-                LocalDateTime.now().plusDays(2),
+                LocalDate.now().plusDays(2),
                 120,
                 ActionType.ADD
         );

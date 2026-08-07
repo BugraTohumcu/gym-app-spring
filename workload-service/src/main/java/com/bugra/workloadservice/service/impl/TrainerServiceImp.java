@@ -12,7 +12,7 @@ import com.bugra.workloadservice.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,7 +78,7 @@ public class TrainerServiceImp implements TrainerService {
                     return newTrainer;
                 });
     }
-    private YearlyWorkload findOrCreateYearlyWorkload(Trainer trainer, LocalDateTime date) {
+    private YearlyWorkload findOrCreateYearlyWorkload(Trainer trainer, LocalDate date) {
         String year = String.valueOf(date.getYear());
         return trainer.getWorkloads().computeIfAbsent(year, y -> {
             YearlyWorkload yw = new YearlyWorkload();
