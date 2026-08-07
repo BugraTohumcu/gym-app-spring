@@ -19,10 +19,11 @@ public class TransactionFilter extends OncePerRequestFilter {
     {
         try{
             String transactionId =  request.getHeader("transactionId");
-            if(transactionId != null){
-                MDC.put("transactionId", transactionId);
-                filterChain.doFilter(request,response);
+            if(transactionId == null){
+                transactionId = UUID.randomUUID().toString();
             }
+            MDC.put("transactionId", transactionId);
+            filterChain.doFilter(request,response);
         }finally {
             MDC.clear();
         }
