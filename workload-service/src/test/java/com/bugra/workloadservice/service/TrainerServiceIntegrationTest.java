@@ -112,4 +112,59 @@ class TrainerServiceIntegrationTest {
         int savedDuration = savedYearly.getMonths().get(month.name()).getDuration();
         assertEquals(0, savedDuration);
     }
+
+
+    @Test
+    @DisplayName("Should return all yearly and monthly workloads")
+    void getTrainerWorkload_shouldReturnWorkload(){
+        LocalDateTime testDate1 = LocalDateTime.now().plusDays(1);
+        LocalDateTime testDate2 = LocalDateTime.now().plusMonths(1);
+
+        int duration1 = 10;
+        int duration2 = 20;
+
+        String year1 = String.valueOf(testDate1.getYear());
+        String year2 = String.valueOf(testDate2.getYear());
+
+        Month month1 = testDate1.getMonth();
+        Month month2 = testDate2.getMonth();
+
+        // save to db first
+        TrainerDto dto1 = new TrainerDto(
+                "Bobby",
+                "Brown",
+                "bobby.brown",
+                true,
+                testDate1,
+                duration1,
+                ActionType.ADD
+        );
+
+        // second request
+        TrainerDto dto2 = new TrainerDto(
+                "Bobby",
+                "Brown",
+                "bobby.brown",
+                true,
+                testDate2,
+                duration2,
+                ActionType.ADD
+        );
+
+        trainerService.saveTrainerRecord(dto1);
+        trainerService.saveTrainerRecord(dto2);
+
+
+        var response = trainerService.getTrainerWorkload("bobby.brown");
+
+        assertNotNull(response);
+
+        assertEquals(
+                duration1,
+                response.workloads().get(year1).get(month1.name()));
+
+        assertEquals(
+                duration2,
+                response.workloads().get(year2).get(month2.name()));
+    }
 }
