@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +30,4 @@ public class YearlyWorkload {
 
     @MapKeyColumn(name = "workload_month")
     private Map<String, MonthlyWorkload> months = new HashMap<>();
-
-
-    public void addMonthlyWorkload(Month month, MonthlyWorkload monthlyWorkload){
-        months.put(month.name(),monthlyWorkload);
-    }
-
 }
