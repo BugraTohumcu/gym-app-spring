@@ -1,6 +1,6 @@
 package com.bugra.workloadservice.service;
 
-import com.bugra.workloadservice.dto.TrainerDto;
+import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.enums.ActionType;
 import com.bugra.workloadservice.model.Trainer;
 import com.bugra.workloadservice.model.YearlyWorkload;

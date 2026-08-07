@@ -1,7 +1,7 @@
 package com.bugra.workloadservice.controller;
 
 
-import com.bugra.workloadservice.dto.TrainerDto;
+import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.service.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

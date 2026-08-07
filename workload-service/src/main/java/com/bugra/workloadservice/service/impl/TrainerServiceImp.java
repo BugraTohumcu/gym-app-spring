@@ -1,6 +1,6 @@
 package com.bugra.workloadservice.service.impl;
 
-import com.bugra.workloadservice.dto.TrainerDto;
+import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.model.MonthlyWorkload;
 import com.bugra.workloadservice.model.Trainer;
 import com.bugra.workloadservice.model.YearlyWorkload;

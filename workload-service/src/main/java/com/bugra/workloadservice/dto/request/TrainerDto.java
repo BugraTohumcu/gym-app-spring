@@ -1,4 +1,4 @@
-package com.bugra.workloadservice.dto;
+package com.bugra.workloadservice.dto.request;
 
 import com.bugra.workloadservice.enums.ActionType;
 import com.bugra.workloadservice.shared.TrainerMessages;

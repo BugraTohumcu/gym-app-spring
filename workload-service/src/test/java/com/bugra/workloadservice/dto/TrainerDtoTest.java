@@ -1,5 +1,6 @@
 package com.bugra.workloadservice.dto;
 
+import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.enums.ActionType;
 import com.bugra.workloadservice.shared.TrainerMessages;
 import jakarta.validation.ConstraintViolation;

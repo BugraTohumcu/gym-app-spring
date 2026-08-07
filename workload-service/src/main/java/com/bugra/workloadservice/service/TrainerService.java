@@ -1,6 +1,6 @@
 package com.bugra.workloadservice.service;
 
-import com.bugra.workloadservice.dto.TrainerDto;
+import com.bugra.workloadservice.dto.request.TrainerDto;
 
 public interface TrainerService {
 
