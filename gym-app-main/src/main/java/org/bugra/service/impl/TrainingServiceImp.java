@@ -1,9 +1,13 @@
 package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.bugra.client.WorkloadClient;
+import org.bugra.dto.client.SaveTrainerWorkload;
 import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.TrainerTrainingFilter;
+import org.bugra.enums.ActionType;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.TrainingTypeNotFoundException;
 import org.bugra.model.Trainee;
@@ -24,13 +28,15 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TrainingServiceImp implements TrainingService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImp.class);
-    private TrainingRepo trainingRepo;
-    private TrainingTypeRepo trainingTypeRepo;
-    private TraineeRepo traineeRepo;
-    private TrainerRepo trainerRepo;
+    private final WorkloadClient workloadClient;
+    private final TrainingRepo trainingRepo;
+    private final TrainingTypeRepo trainingTypeRepo;
+    private final TraineeRepo traineeRepo;
+    private final TrainerRepo trainerRepo;
 
 
     @Override
@@ -57,6 +63,7 @@ public class TrainingServiceImp implements TrainingService {
         training.setTrainingDate(createTraining.trainingDate());
         training.setTrainingDuration(createTraining.trainingDuration());
 
+        workloadClient.saveTrainerWorkload(buildWorkloadRequest(training, ActionType.ADD));
         Training saved = trainingRepo.save(training);
         logger.info("Training created successfully with ID: {}", saved.getId());
         return saved;
@@ -85,23 +92,16 @@ public class TrainingServiceImp implements TrainingService {
         return trainingRepo.findByTraineeCriteria(filter);
     }
 
-    @Autowired
-    public void setTrainingRepo(TrainingRepo trainingRepo) {
-        this.trainingRepo = trainingRepo;
-    }
+    private SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){
+        return SaveTrainerWorkload.builder()
+                .firstName(training.getTrainer().getUser().getFirstName())
+                .lastName(training.getTrainer().getUser().getLastName())
+                .username(training.getTrainer().getUser().getUsername())
+                .isActive(training.getTrainer().getUser().isActive())
+                .trainingDate(training.getTrainingDate())
+                .actionType(actionType)
+                .duration(training.getTrainingDuration())
+                .build();
 
-    @Autowired
-    public void setTrainingTypeRepo(TrainingTypeRepo trainingTypeRepo) {
-        this.trainingTypeRepo = trainingTypeRepo;
-    }
-
-    @Autowired
-    public void setTraineeRepo(TraineeRepo traineeRepo) {
-        this.traineeRepo = traineeRepo;
-    }
-
-    @Autowired
-    public void setTrainerRepo(TrainerRepo trainerRepo) {
-        this.trainerRepo = trainerRepo;
     }
 }
