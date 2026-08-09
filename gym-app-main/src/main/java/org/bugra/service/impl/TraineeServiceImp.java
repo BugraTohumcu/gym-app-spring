@@ -2,13 +2,18 @@ package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.bugra.client.WorkloadClient;
+import org.bugra.dto.client.SaveTrainerWorkload;
 import org.bugra.dto.request.RegisterTrainee;
+import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.UpdateTrainee;
 import org.bugra.dto.response.UserResponse;
+import org.bugra.enums.ActionType;
 import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
+import org.bugra.model.Training;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.TraineeRepo;
 import org.bugra.persistence.repo.TrainerRepo;
@@ -38,6 +43,7 @@ public class TraineeServiceImp implements TraineeService {
     private final TrainerRepo trainerRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final WorkloadClient workloadClient;
 
 
     @Transactional
@@ -118,6 +124,9 @@ public class TraineeServiceImp implements TraineeService {
 
         Trainee trainee = traineeRepo.findTraineeByUsername(username);
 
+        // remove from workload-service
+        removeWorkload(username);
+
         // Delete trainee's trainings
         if(!trainingRepo.deleteByTraineeId(trainee.getId())){
             logger.warn("Not training deleted for trainee with id: {}", trainee.getId());
@@ -194,5 +203,38 @@ public class TraineeServiceImp implements TraineeService {
 
         return traineeRepo.update(trainee)
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    private void removeWorkload(String username){
+
+        // get all trainings of trainee
+        List<Training> trainings = trainingRepo.findByTraineeCriteria(
+                new TraineeTrainingFilter(
+                        username,
+                        null,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        // send delete message to workload-service
+        for(Training training: trainings){
+            SaveTrainerWorkload workload = buildWorkloadRequest(training, ActionType.DELETE);
+            workloadClient.saveTrainerWorkload(workload);
+        }
+    }
+
+    private SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){
+        return SaveTrainerWorkload.builder()
+                .firstName(training.getTrainer().getUser().getFirstName())
+                .lastName(training.getTrainer().getUser().getLastName())
+                .username(training.getTrainer().getUser().getUsername())
+                .isActive(training.getTrainer().getUser().isActive())
+                .trainingDate(training.getTrainingDate())
+                .actionType(actionType)
+                .duration(training.getTrainingDuration())
+                .build();
+
     }
 }
