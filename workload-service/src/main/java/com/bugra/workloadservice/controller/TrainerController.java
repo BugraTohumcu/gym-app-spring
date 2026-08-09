@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TrainerController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
     private final TrainerService trainerService;
 
     @ApiResponse(responseCode = "200", description = "Create new trainer workload record")
@@ -29,6 +32,7 @@ public class TrainerController {
             @Valid @RequestBody TrainerDto trainerDto
             )
     {
+        logger.info("New workload is creating for trainer: {}", trainerDto.username());
         trainerService.saveTrainerRecord(trainerDto);
         return ResponseEntity.ok().build();
     }
@@ -40,6 +44,7 @@ public class TrainerController {
                     @RequestParam("username") String username
             )
     {
+        logger.info("Getting the workload for trainer: {}", username);
         TrainerWorkloadResponse workloads = trainerService.getTrainerWorkload(username);
         return ResponseEntity.ok().body(workloads);
     }
