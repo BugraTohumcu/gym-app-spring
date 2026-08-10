@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,4 +38,11 @@ public class Trainee{
             inverseJoinColumns = @JoinColumn(name = "trainer_id")
     )
     private Set<Trainer> trainers;
+
+    @OneToMany(
+            mappedBy = "trainee",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Training> trainings;
 }
