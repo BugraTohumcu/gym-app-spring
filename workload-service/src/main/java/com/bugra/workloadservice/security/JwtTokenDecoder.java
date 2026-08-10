@@ -45,11 +45,10 @@ public class JwtTokenDecoder {
                 .build().parseClaimsJws(token).getBody();
     }
 
-    public boolean isValid(String token, UserDetails userDetails){
+    public boolean isValid(String token){
         try {
-            String username = extractUsername(token);
-
-            return userDetails.getUsername().equals(username);
+            extractUsername(token);
+            return true;
         } catch (JwtException e) {
             return false;
         }
