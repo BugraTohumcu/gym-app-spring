@@ -1,8 +1,10 @@
 package com.bugra.workloadservice.controller;
 
+import com.bugra.workloadservice.config.SecurityConfig;
 import com.bugra.workloadservice.dto.request.TrainerDto;
 import com.bugra.workloadservice.dto.response.TrainerWorkloadResponse;
 import com.bugra.workloadservice.enums.ActionType;
+import com.bugra.workloadservice.filter.JwtAuthFilter;
 import com.bugra.workloadservice.service.TrainerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -11,8 +13,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,8 +35,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(TrainerController.class)
-class TrainerControllerTest {
+@WebMvcTest(
+        controllers = WorkloadController.class,
+        excludeAutoConfiguration = {
+                SecurityAutoConfiguration.class,
+                SecurityFilterAutoConfiguration.class
+        },
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = {
+                        SecurityConfig.class,
+                        JwtAuthFilter.class
+                }
+        )
+)
+class WorkloadControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
