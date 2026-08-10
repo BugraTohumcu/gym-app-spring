@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -24,18 +22,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
     private final JwtTokenDecoder tokenDecoder;
-    private final UserDetailsService userDetailsService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-
-        if (path.contains("/register") || path.contains("/login") || path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs") ||
-                path.contains("swagger") || path.contains("/actuator")) {
-            filterChain.doFilter(request, response);
+        if(path.contains("/h2-console")){
+            filterChain.doFilter(request,response);
             return;
         }
 
@@ -52,15 +45,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             // check username is found and if the user is already authenticated
             if(StringUtils.hasText(username) && SecurityContextHolder.getContext().getAuthentication() == null){
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
                 // token validation
-                if(tokenDecoder.isValid(accessToken,userDetails)){
+                if(tokenDecoder.isValid(accessToken)){
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails.getUsername(),
+                                    username,
                                     null,
-                                    userDetails.getAuthorities()
+                                    null
                             );
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -70,7 +61,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
 
         }catch (Exception e){
-            logger.error(e.getMessage());
+            logger.error("Auth Error: {}", e.getMessage());
             request.setAttribute("jwt_error", e.getMessage());
             filterChain.doFilter(request, response);
         }
