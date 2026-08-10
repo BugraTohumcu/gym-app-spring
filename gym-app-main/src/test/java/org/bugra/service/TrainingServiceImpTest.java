@@ -1,5 +1,6 @@
 package org.bugra.service;
 
+import org.bugra.client.WorkloadClient;
 import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.TrainerTrainingFilter;
@@ -33,6 +34,9 @@ class TrainingServiceImpTest {
 
     @Mock
     TrainingRepo trainingRepo;
+
+    @Mock
+    WorkloadClient workloadClient;
 
     @Mock
     TrainingTypeRepo trainingTypeRepo;
@@ -87,6 +91,7 @@ class TrainingServiceImpTest {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
         when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        doNothing().when(workloadClient).saveTrainerWorkload(any());
 
         Training saved = new Training();
         saved.setId(1L);
@@ -137,6 +142,7 @@ class TrainingServiceImpTest {
         when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
         when(trainingRepo.save(any(Training.class))).thenReturn(new Training());
+        doNothing().when(workloadClient).saveTrainerWorkload(any());
 
         trainingService.createTraining(validRequest());
 
