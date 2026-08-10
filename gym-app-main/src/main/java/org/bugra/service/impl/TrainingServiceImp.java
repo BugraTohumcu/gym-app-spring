@@ -2,8 +2,7 @@ package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.bugra.client.WorkloadClient;
-import org.bugra.dto.client.SaveTrainerWorkload;
+import org.bugra.client.WorkloadClientFacade;
 import org.bugra.dto.request.CreateTraining;
 import org.bugra.dto.request.TraineeTrainingFilter;
 import org.bugra.dto.request.TrainerTrainingFilter;
@@ -31,11 +30,11 @@ import java.util.List;
 public class TrainingServiceImp implements TrainingService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImp.class);
-    private final WorkloadClient workloadClient;
     private final TrainingRepo trainingRepo;
     private final TrainingTypeRepo trainingTypeRepo;
     private final TraineeRepo traineeRepo;
     private final TrainerRepo trainerRepo;
+    private final WorkloadClientFacade workloadClient;
 
 
     @Override
@@ -61,7 +60,9 @@ public class TrainingServiceImp implements TrainingService {
         training.setTrainingDate(createTraining.trainingDate());
         training.setTrainingDuration(createTraining.trainingDuration());
 
-        workloadClient.saveTrainerWorkload(buildWorkloadRequest(training, ActionType.ADD));
+        workloadClient.sendWorkload(
+                workloadClient.buildWorkloadRequest(training, ActionType.ADD)
+        );
         Training saved = trainingRepo.save(training);
         logger.info("Training created successfully with ID: {}", saved.getId());
         return saved;
@@ -88,18 +89,5 @@ public class TrainingServiceImp implements TrainingService {
     @Override
     public List<Training> getTraineeTrainings(TraineeTrainingFilter filter) {
         return trainingRepo.findByTraineeCriteria(filter);
-    }
-
-    private SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){
-        return SaveTrainerWorkload.builder()
-                .firstName(training.getTrainer().getUser().getFirstName())
-                .lastName(training.getTrainer().getUser().getLastName())
-                .username(training.getTrainer().getUser().getUsername())
-                .isActive(training.getTrainer().getUser().isActive())
-                .trainingDate(training.getTrainingDate())
-                .actionType(actionType)
-                .duration(training.getTrainingDuration())
-                .build();
-
     }
 }

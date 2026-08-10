@@ -2,7 +2,7 @@ package org.bugra.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.bugra.client.WorkloadClient;
+import org.bugra.client.WorkloadClientFacade;
 import org.bugra.dto.client.SaveTrainerWorkload;
 import org.bugra.dto.request.RegisterTrainee;
 import org.bugra.dto.request.TraineeTrainingFilter;
@@ -43,7 +43,7 @@ public class TraineeServiceImp implements TraineeService {
     private final TrainerRepo trainerRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
-    private final WorkloadClient workloadClient;
+    private final WorkloadClientFacade workloadClient;
 
 
     @Transactional
@@ -207,7 +207,7 @@ public class TraineeServiceImp implements TraineeService {
 
     private void removeWorkload(String username){
 
-        // get all trainings of trainee
+        // get all trainings of trainee by username
         List<Training> trainings = trainingRepo.findByTraineeCriteria(
                 new TraineeTrainingFilter(
                         username,
@@ -220,21 +220,8 @@ public class TraineeServiceImp implements TraineeService {
 
         // send delete message to workload-service
         for(Training training: trainings){
-            SaveTrainerWorkload workload = buildWorkloadRequest(training, ActionType.DELETE);
-            workloadClient.saveTrainerWorkload(workload);
+            SaveTrainerWorkload workload = workloadClient.buildWorkloadRequest(training, ActionType.DELETE);
+            workloadClient.sendWorkload(workload);
         }
-    }
-
-    private SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){
-        return SaveTrainerWorkload.builder()
-                .firstName(training.getTrainer().getUser().getFirstName())
-                .lastName(training.getTrainer().getUser().getLastName())
-                .username(training.getTrainer().getUser().getUsername())
-                .isActive(training.getTrainer().getUser().isActive())
-                .trainingDate(training.getTrainingDate())
-                .actionType(actionType)
-                .duration(training.getTrainingDuration())
-                .build();
-
     }
 }
