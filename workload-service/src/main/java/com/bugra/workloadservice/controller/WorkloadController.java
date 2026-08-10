@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/workload")
 @RequiredArgsConstructor
-public class TrainerController {
+public class WorkloadController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkloadController.class);
     private final TrainerService trainerService;
 
     @ApiResponse(responseCode = "200", description = "Create new trainer workload record")
