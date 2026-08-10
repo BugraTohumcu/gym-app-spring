@@ -27,10 +27,10 @@ public class Training {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private TrainingType trainingType;
 
-    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Trainee trainee;
 
-    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Trainer trainer;
 
 }
