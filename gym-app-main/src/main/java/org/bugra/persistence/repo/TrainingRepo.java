@@ -116,7 +116,17 @@ public class TrainingRepo extends AbstractRepository<Training, Long> {
                 .setParameter("id",traineeId)
                 .executeUpdate();
 
+        // Force stale entities out of the persistence context
+        entityManager.flush();
+        entityManager.clear();
+
         return deleted > 0;
+    }
+
+    public void deleteAllTrainings(List<Training> trainings) {
+        for (Training training : trainings) {
+            entityManager.remove(entityManager.contains(training) ? training : entityManager.merge(training));
+        }
     }
 
 
