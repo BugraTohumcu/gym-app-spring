@@ -21,7 +21,6 @@ import org.bugra.persistence.repo.TrainingTypeRepo;
 import org.bugra.service.TrainingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,7 +47,6 @@ public class TrainingServiceImp implements TrainingService {
 
         Trainee managedTrainee = traineeRepo.findTraineeByUsername(createTraining.traineeUsername());
 
-        // Already checks if the user exists
         Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername());
 
         // Update trainee_trainer table
