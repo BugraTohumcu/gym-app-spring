@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,11 +27,16 @@ public class SecurityConfig {
                     .formLogin(AbstractHttpConfigurer::disable)
                     .csrf(AbstractHttpConfigurer::disable)
                     .cors(Customizer.withDefaults())
-                    .authorizeHttpRequests(req -> req.anyRequest().authenticated())
+                    .authorizeHttpRequests(req ->
+                            req
+                                    .requestMatchers("/h2-console/**").permitAll()
+                                    .anyRequest().authenticated())
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .headers(headers ->
+                            headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                     .addFilterAfter(new TransactionFilter(), UsernamePasswordAuthenticationFilter.class)
                     .addFilterAfter(new RestLoggingFilter(), TransactionFilter.class)
-                    .addFilterAfter(jwtAuthFilter, RestLoggingFilter.class)
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                     .build();
     }
 }
