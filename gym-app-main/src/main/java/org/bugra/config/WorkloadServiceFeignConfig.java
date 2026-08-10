@@ -23,8 +23,7 @@ public class WorkloadServiceFeignConfig {
                 String header = requestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
 
                 if(header != null && header.startsWith("Bearer ")){
-                    String accessToken = header.substring(7);
-                    requestTemplate.header(HttpHeaders.AUTHORIZATION, accessToken);
+                    requestTemplate.header(HttpHeaders.AUTHORIZATION, header);
                 }
             }
         };
