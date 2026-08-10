@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,4 +34,12 @@ public class Trainer{
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             fetch = FetchType.LAZY)
     private Set<Trainee> trainees;
+
+
+    @OneToMany
+            (
+            mappedBy = "trainer",
+            cascade = CascadeType.ALL
+            )
+    private List<Training> trainings;
 }
