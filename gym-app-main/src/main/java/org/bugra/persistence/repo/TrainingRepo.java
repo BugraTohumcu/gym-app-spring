@@ -122,14 +122,6 @@ public class TrainingRepo extends AbstractRepository<Training, Long> {
 
         return deleted > 0;
     }
-
-    public void deleteAllTrainings(List<Training> trainings) {
-        for (Training training : trainings) {
-            entityManager.remove(entityManager.contains(training) ? training : entityManager.merge(training));
-        }
-    }
-
-
     private record TrainingJoins(
             Join<?, User> traineeUser,
             Join<?, User> trainerUser,
