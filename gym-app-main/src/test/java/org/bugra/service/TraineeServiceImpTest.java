@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 class TraineeServiceImpTest {
 
     @Mock
-    JwtTokenProvider tokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -274,13 +274,11 @@ class TraineeServiceImpTest {
     @Test
     @DisplayName("Should throw UserNotFoundException when trainee username does not exist")
     void updateTraineeTrainers_shouldThrowWhenTraineeNotFound() {
-        // Arrange
         String traineeUsername = "nonexistent.trainee";
         List<String> trainerUsernames = List.of("jane.smith", "bob.brown");
 
         when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(null);
 
-        // Act & Assert
         assertThrows(UserNotFoundException.class,
                 () -> traineeService.updateTraineeTrainers(traineeUsername, trainerUsernames));
 
