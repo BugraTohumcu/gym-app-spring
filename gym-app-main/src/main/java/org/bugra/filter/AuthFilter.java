@@ -42,7 +42,6 @@ public class AuthFilter extends OncePerRequestFilter {
         try{
             String authHeader = request.getHeader("Authorization");
 
-            logger.debug("Header is here "+ authHeader);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
