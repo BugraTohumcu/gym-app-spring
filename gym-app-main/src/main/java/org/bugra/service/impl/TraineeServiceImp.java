@@ -127,15 +127,16 @@ public class TraineeServiceImp implements TraineeService {
         // remove from workload-service
         removeWorkload(username);
 
-        // Delete trainee's trainings
-        if(!trainingRepo.deleteByTraineeId(trainee.getId())){
-            logger.warn("Not training deleted for trainee with id: {}", trainee.getId());
+        Set<Trainer> trainers = trainee.getTrainers();
+        // Clean trainer list
+        if (trainers != null) {
+            trainers.forEach(trainer -> trainer.getTrainees().remove(trainee));
+            trainers.clear();
         }
 
-        // Clean trainer list
-        if (trainee.getTrainers() != null) {
-            trainee.getTrainers().forEach(trainer -> trainer.getTrainees().remove(trainee));
-            trainee.getTrainers().clear();
+        // Delete trainee's trainings
+        if(!trainingRepo.deleteByTraineeId(trainee.getId())){
+            logger.warn("No training deleted for trainee with id: {}", trainee.getId());
         }
 
         return traineeRepo.deleteById(trainee.getId());
