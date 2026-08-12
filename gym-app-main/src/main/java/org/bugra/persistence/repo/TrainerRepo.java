@@ -1,7 +1,6 @@
 package org.bugra.persistence.repo;
 
 import jakarta.persistence.criteria.*;
-import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.User;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class TrainerRepo extends AbstractRepository<Trainer, Long> {
@@ -17,7 +17,7 @@ public class TrainerRepo extends AbstractRepository<Trainer, Long> {
         super(Trainer.class, Trainer::getId);
     }
 
-    public Trainer findTrainerByUsername(String username) {
+    public Optional<Trainer> findTrainerByUsername(String username) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
@@ -34,8 +34,7 @@ public class TrainerRepo extends AbstractRepository<Trainer, Long> {
         return entityManager.createQuery(cq)
                 .getResultList()
                 .stream()
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException("Trainee not found with username: " + username));
+                .findFirst();
     }
 
     public List<Trainer> findAllNotAssignedToTrainee(String traineeUsername) {

@@ -81,7 +81,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer updateTrainer(UpdateTrainer updateTrainer) {
 
-        Trainer trainer = trainerRepo.findTrainerByUsername(updateTrainer.username());
+        Trainer trainer = trainerRepo.findTrainerByUsername(updateTrainer.username())
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found with username: " + updateTrainer.username()));
 
         trainer.getUser().setUsername(updateTrainer.username());
         trainer.getUser().setFirstName(updateTrainer.firstName());
@@ -118,7 +119,8 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     @Override
     public Trainer getTrainerByUsername(String username) {
-        return trainerRepo.findTrainerByUsername(username);
+        return trainerRepo.findTrainerByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found with username: " + username));
     }
 
     @Transactional

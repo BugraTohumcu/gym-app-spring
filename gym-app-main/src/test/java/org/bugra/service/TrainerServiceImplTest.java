@@ -3,7 +3,6 @@ package org.bugra.service;
 import org.bugra.dto.request.RegisterTrainer;
 import org.bugra.dto.request.UpdateTrainer;
 import org.bugra.dto.response.UserResponse;
-import org.bugra.enums.UserRole;
 import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainer;
 import org.bugra.model.TrainingType;
@@ -107,7 +106,7 @@ class TrainerServiceImplTest {
         UpdateTrainer updateTrainer = createValidUpdateTrainer();
 
         Trainer trainer = validTrainer(1L);
-        when(trainerRepo.findTrainerByUsername(anyString())).thenReturn(trainer);
+        when(trainerRepo.findTrainerByUsername(anyString())).thenReturn(Optional.of(trainer));
         when(trainerRepo.update(trainer)).thenReturn(Optional.of(trainer));
 
         Trainer updated = trainerService.updateTrainer(updateTrainer);

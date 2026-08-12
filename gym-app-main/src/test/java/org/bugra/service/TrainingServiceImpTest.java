@@ -90,7 +90,7 @@ class TrainingServiceImpTest {
     void createTraining_shouldSaveSuccessfully() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
         when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(Optional.of(mockTrainee));
-        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(Optional.of(mockTrainer));
         doNothing().when(workloadClient).sendWorkload(any());
 
         Training saved = new Training();
@@ -140,7 +140,7 @@ class TrainingServiceImpTest {
     void createTraining_shouldUpdateBidirectionalRelationship() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
         when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(Optional.of(mockTrainee));
-        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
+        when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(Optional.of(mockTrainer));
         when(trainingRepo.save(any(Training.class))).thenReturn(new Training());
         doNothing().when(workloadClient).sendWorkload(any());
 

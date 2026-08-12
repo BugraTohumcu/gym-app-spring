@@ -48,7 +48,8 @@ public class TrainingServiceImp implements TrainingService {
         Trainee managedTrainee = traineeRepo.findTraineeByUsername(createTraining.traineeUsername())
                 .orElseThrow(UserNotFoundException::new);
 
-        Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername());
+        Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername())
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found with the username: " + createTraining.trainerUsername()));
 
         // Update trainee_trainer table
         managedTrainer.getTrainees().add(managedTrainee);
