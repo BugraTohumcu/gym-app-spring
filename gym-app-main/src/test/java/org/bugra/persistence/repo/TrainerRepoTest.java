@@ -8,10 +8,13 @@ import org.bugra.persistence.BaseJpaTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,6 +36,32 @@ class TrainerRepoTest extends BaseJpaTest {
         trainer.setUser(user);
         em.persist(trainer);
         return trainer;
+    }
+
+    @ParameterizedTest(name = "Should throw IllegalArgumentException when username is null or blank")
+    @NullAndEmptySource
+    void findTrainerByUsername_shouldThrowWhenUsernameInvalid(String username){
+        assertThrows(IllegalArgumentException.class,
+                () -> trainerRepo.findTrainerByUsername(username));
+    }
+
+    @Test
+    @DisplayName("Should return Optional empty when trainer not found")
+    void findTrainerByUsername_shouldReturnEmptyWhenNotFound(){
+        Optional<Trainer> trainer = trainerRepo.findTrainerByUsername("test");
+        assertTrue(trainer.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return correct trainer")
+    void findTrainerByUsername_shouldReturnTrainer(){
+        createAndSaveTrainer("john.doe");
+
+        Optional<Trainer> fetchedTrainer = trainerRepo.findTrainerByUsername("john.doe");
+
+        assertTrue(fetchedTrainer.isPresent());
+        assertEquals("john.doe", fetchedTrainer.get().getUser().getUsername());
+
     }
 
     @Test
