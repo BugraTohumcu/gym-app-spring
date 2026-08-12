@@ -89,7 +89,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should successfully create training when data is valid")
     void createTraining_shouldSaveSuccessfully() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(Optional.of(mockTrainee));
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
         doNothing().when(workloadClient).sendWorkload(any());
 
@@ -126,7 +126,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when trainer not found")
     void createTraining_shouldThrowWhenTrainerNotFound() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(Optional.of(mockTrainee));
         when(trainerRepo.findTrainerByUsername("jane.smith"))
                 .thenThrow(new UserNotFoundException("Trainer not found"));
 
@@ -139,7 +139,7 @@ class TrainingServiceImpTest {
     @DisplayName("Should add trainee to trainer's list and trainer to trainee's list")
     void createTraining_shouldUpdateBidirectionalRelationship() {
         when(trainingTypeRepo.findByTrainingTypeName("Yoga")).thenReturn(Optional.of(mockType));
-        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(mockTrainee);
+        when(traineeRepo.findTraineeByUsername("john.doe")).thenReturn(Optional.of(mockTrainee));
         when(trainerRepo.findTrainerByUsername("jane.smith")).thenReturn(mockTrainer);
         when(trainingRepo.save(any(Training.class))).thenReturn(new Training());
         doNothing().when(workloadClient).sendWorkload(any());

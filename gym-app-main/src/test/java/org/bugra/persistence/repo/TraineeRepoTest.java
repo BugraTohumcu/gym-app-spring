@@ -94,19 +94,10 @@ class TraineeRepoTest  extends BaseJpaTest {
         em.flush();
         em.clear();
 
-        Trainee result = fakeRepo.findTraineeByUsername("john.doe");
+        Optional<Trainee> result = fakeRepo.findTraineeByUsername("john.doe");
 
-        assertNotNull(result);
-        assertEquals("john.doe", result.getUser().getUsername());
-    }
-
-    @Test
-    @DisplayName("Should throw UserNotFoundException when trainee does not exist")
-    void findTraineeByUsername_shouldThrowExceptionWhenNotFound() {
-        em.flush();
-        em.clear();
-
-        assertThrows(UserNotFoundException.class, () -> fakeRepo.findTraineeByUsername("non.existent"));
+        assertTrue(result.isPresent());
+        assertEquals("john.doe", result.get().getUser().getUsername());
     }
 
     @Test

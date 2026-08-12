@@ -9,6 +9,7 @@ import org.bugra.dto.request.TrainerTrainingFilter;
 import org.bugra.enums.ActionType;
 import org.bugra.exception.TrainingNotFoundException;
 import org.bugra.exception.TrainingTypeNotFoundException;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.Trainee;
 import org.bugra.model.Trainer;
 import org.bugra.model.Training;
@@ -44,7 +45,8 @@ public class TrainingServiceImp implements TrainingService {
         TrainingType type = trainingTypeRepo.findByTrainingTypeName(createTraining.trainingTypeName())
                 .orElseThrow(TrainingTypeNotFoundException::new);
 
-        Trainee managedTrainee = traineeRepo.findTraineeByUsername(createTraining.traineeUsername());
+        Trainee managedTrainee = traineeRepo.findTraineeByUsername(createTraining.traineeUsername())
+                .orElseThrow(UserNotFoundException::new);
 
         Trainer managedTrainer = trainerRepo.findTrainerByUsername(createTraining.trainerUsername());
 

@@ -6,6 +6,8 @@ import org.bugra.model.Trainee;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public class TraineeRepo extends AbstractRepository<Trainee, Long> {
@@ -15,7 +17,7 @@ public class TraineeRepo extends AbstractRepository<Trainee, Long> {
     }
 
 
-    public Trainee findTraineeByUsername(String username) {
+    public Optional<Trainee> findTraineeByUsername(String username) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
@@ -32,7 +34,6 @@ public class TraineeRepo extends AbstractRepository<Trainee, Long> {
 
         return entityManager.createQuery(cq)
                 .getResultStream()
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException("Trainee not found with username: " + username));
+                .findFirst();
     }
 }

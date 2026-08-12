@@ -91,7 +91,8 @@ public class TraineeServiceImp implements TraineeService {
     @Transactional
     @Override
     public Trainee updateTrainee(UpdateTrainee updateTrainee) {
-        Trainee existingTrainee = traineeRepo.findTraineeByUsername(updateTrainee.username());
+        Trainee existingTrainee = traineeRepo.findTraineeByUsername(updateTrainee.username())
+                .orElseThrow(UserNotFoundException::new);
 
         existingTrainee.setAddress(updateTrainee.address());
         existingTrainee.setDateOfBirth(updateTrainee.dateOfBirth());
@@ -121,7 +122,8 @@ public class TraineeServiceImp implements TraineeService {
     public boolean deleteTraineeByUsername(String username) {
         logger.info("The user with the username: {} is deleting the account", username);
 
-        Trainee trainee = traineeRepo.findTraineeByUsername(username);
+        Trainee trainee = traineeRepo.findTraineeByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
 
         // remove from workload-service
         removeWorkload(username);
@@ -168,7 +170,8 @@ public class TraineeServiceImp implements TraineeService {
     @Transactional
     @Override
     public Trainee getTraineeByUsername(String username) {
-        return traineeRepo.findTraineeByUsername(username);
+        return traineeRepo.findTraineeByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Transactional
@@ -177,10 +180,8 @@ public class TraineeServiceImp implements TraineeService {
         logger.info("Updating trainers list for trainee: {}", traineeUsername);
 
         // Trainee check
-        Trainee trainee = traineeRepo.findTraineeByUsername(traineeUsername);
-        if (trainee == null) {
-            throw new UserNotFoundException("Trainee not found with username: " + traineeUsername);
-        }
+        Trainee trainee = traineeRepo.findTraineeByUsername(traineeUsername)
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found with username"+ traineeUsername));
 
         List<Trainer> foundTrainers = trainerRepo.findAllByUsernames(newTrainerUsernames);
 

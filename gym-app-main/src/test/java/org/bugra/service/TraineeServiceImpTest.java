@@ -117,7 +117,7 @@ class TraineeServiceImpTest {
     @DisplayName("Should successfully update trainee when valid")
     void updateTrainee_shouldReturnUpdatedTrainee() {
         Trainee trainee = validTrainee(1L);
-        when(traineeRepo.findTraineeByUsername(any())).thenReturn(trainee);
+        when(traineeRepo.findTraineeByUsername(any())).thenReturn(Optional.of(trainee));
         when(traineeRepo.update(trainee)).thenReturn(Optional.of(trainee));
 
         Trainee result = traineeService.updateTrainee(createValidUpdateTrainee());
@@ -131,7 +131,7 @@ class TraineeServiceImpTest {
     @DisplayName("Should throw UserNotFoundException when updating non-existing trainee")
     void updateTrainee_shouldThrowWhenNotFound() {
         Trainee trainee = validTrainee(99L);
-        when(traineeRepo.findTraineeByUsername(any())).thenReturn(trainee);
+        when(traineeRepo.findTraineeByUsername(any())).thenReturn(Optional.of(trainee));
         when(traineeRepo.update(trainee)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainee(createValidUpdateTrainee()));
@@ -206,7 +206,7 @@ class TraineeServiceImpTest {
         trainers.add(trainer);
         trainee.setTrainers(trainers);
 
-        when(traineeRepo.findTraineeByUsername(username)).thenReturn(trainee);
+        when(traineeRepo.findTraineeByUsername(username)).thenReturn(Optional.of(trainee));
         when(trainingRepo.deleteByTraineeId(1L)).thenReturn(true);
         when(traineeRepo.deleteById(1L)).thenReturn(true);
 
@@ -228,7 +228,7 @@ class TraineeServiceImpTest {
         trainee.setId(1L);
         trainee.setTrainers(new HashSet<>());
 
-        when(traineeRepo.findTraineeByUsername(username)).thenReturn(trainee);
+        when(traineeRepo.findTraineeByUsername(username)).thenReturn(Optional.of(trainee));
         when(trainingRepo.deleteByTraineeId(1L)).thenReturn(false);
         when(traineeRepo.deleteById(1L)).thenReturn(true);
 
@@ -248,7 +248,7 @@ class TraineeServiceImpTest {
         trainee.setId(1L);
         trainee.setTrainers(null);
 
-        when(traineeRepo.findTraineeByUsername(username)).thenReturn(trainee);
+        when(traineeRepo.findTraineeByUsername(username)).thenReturn(Optional.of(trainee));
         when(trainingRepo.deleteByTraineeId(1L)).thenReturn(true);
         when(traineeRepo.deleteById(1L)).thenReturn(false);
 
@@ -277,7 +277,7 @@ class TraineeServiceImpTest {
         String traineeUsername = "nonexistent.trainee";
         List<String> trainerUsernames = List.of("jane.smith", "bob.brown");
 
-        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(null);
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
                 () -> traineeService.updateTraineeTrainers(traineeUsername, trainerUsernames));
@@ -301,7 +301,7 @@ class TraineeServiceImpTest {
         foundTrainer.setUser(user);
         List<Trainer> dbResult = List.of(foundTrainer);
 
-        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(mockTrainee);
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(Optional.of(mockTrainee));
         when(trainerRepo.findAllByUsernames(requestedTrainers)).thenReturn(dbResult);
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
@@ -330,7 +330,7 @@ class TraineeServiceImpTest {
         Trainer trainer2 = new Trainer();
         List<Trainer> foundTrainersFromDb = List.of(trainer1, trainer2);
 
-        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(mockTrainee);
+        when(traineeRepo.findTraineeByUsername(traineeUsername)).thenReturn(Optional.of(mockTrainee));
         when(trainerRepo.findAllByUsernames(newTrainersInput)).thenReturn(foundTrainersFromDb);
         when(traineeRepo.update(mockTrainee)).thenReturn(java.util.Optional.of(mockTrainee));
 
