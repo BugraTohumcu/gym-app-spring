@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +40,7 @@ class UserServiceImpTest {
         User user = new User();
         user.setActive(true);
         UpdateUserStatus userStatus = new UpdateUserStatus(false);
-        when(userRepo.findByUsername("test")).thenReturn(user);
+        when(userRepo.findByUsername("test")).thenReturn(Optional.of(user));
 
         userService.toggleActiveStatus("test", userStatus);
 
@@ -52,7 +54,7 @@ class UserServiceImpTest {
         User user = new User();
         user.setActive(false);
         UpdateUserStatus userStatus = new UpdateUserStatus(true);
-        when(userRepo.findByUsername("test")).thenReturn(user);
+        when(userRepo.findByUsername("test")).thenReturn(Optional.of(user));
 
         userService.toggleActiveStatus("test",userStatus);
 

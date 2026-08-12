@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -99,7 +100,8 @@ class UserRepoTest extends BaseJpaTest {
         em.flush();
         em.clear();
 
-        User fetchedUser = fakeUserRepo.findByUsername(user.getUsername());
+        User fetchedUser = fakeUserRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User not found with the username: " + user.getUsername()));
 
         assertEquals("john.doe", fetchedUser.getUsername());
     }
@@ -163,8 +165,10 @@ class UserRepoTest extends BaseJpaTest {
         assertThrows(UserNotFoundException.class,
                 () -> fakeUserRepo.findByUsername("john.doe"));
 
-        User remaining = fakeUserRepo.findByUsername("john.doe1");
-        assertEquals("john.doe1", remaining.getUsername());
+        Optional<User> remaining = fakeUserRepo.findByUsername("john.doe1");
+
+        assertTrue(remaining.isPresent());
+        assertEquals("john.doe1", remaining.get().getUsername());
     }
 
     @Test

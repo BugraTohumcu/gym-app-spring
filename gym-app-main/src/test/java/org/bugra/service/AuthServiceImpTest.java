@@ -22,9 +22,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,7 +99,7 @@ class AuthServiceImpTest {
         currentUser.setPassword("123");
 
         when(passwordEncoder.matches(any(),any())).thenReturn(false);
-        when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
+        when(mockUserRepo.findByUsername(any())).thenReturn(Optional.of(currentUser));
 
         // Provide invalid password
         changePassword = new ChangePassword(
@@ -120,7 +121,7 @@ class AuthServiceImpTest {
 
         when(passwordEncoder.encode(any())).thenReturn("54321");
         when(passwordEncoder.matches(any(),any())).thenReturn(true);
-        when(mockUserRepo.findByUsername(any())).thenReturn(currentUser);
+        when(mockUserRepo.findByUsername(any())).thenReturn(Optional.of(currentUser));
         // Provide invalid password
         changePassword = new ChangePassword(
                 "john.doe",

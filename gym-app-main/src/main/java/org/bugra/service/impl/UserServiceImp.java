@@ -21,7 +21,8 @@ public class UserServiceImp implements UserService {
     @Transactional
     @Override
     public User findByUsername(String username) {
-        return userRepo.findByUsername(username);
+        return userRepo.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with provided username: " + username));
     }
 
     @Transactional
@@ -52,7 +53,8 @@ public class UserServiceImp implements UserService {
         }
 
         logger.info("Toggling active status for user: {}", username);
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with provided username: " + username));
 
         boolean newStatus = userStatus.status();
         user.setActive(newStatus);

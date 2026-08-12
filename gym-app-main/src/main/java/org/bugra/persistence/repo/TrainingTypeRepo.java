@@ -5,7 +5,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.bugra.model.TrainingType;
-import org.hibernate.dialect.function.ListaggStringAggEmulation;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public class TrainingTypeRepo extends AbstractRepository<TrainingType, Long> {
     }
 
     public List<TrainingType> findAllTypes() {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         TypedQuery<TrainingType> query = entityManager.createQuery("SELECT t from TrainingType t", TrainingType.class);
 
         return query.getResultList();

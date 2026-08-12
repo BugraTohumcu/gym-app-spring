@@ -25,7 +25,9 @@ public class UserDetailsServiceImp implements UserDetailsService {
             if(loginAttemptService.isBlocked(username)){
                 throw new LockedException("Too many attempts! Please wait for five minutes");
             }
-                User user = userRepo.findByUsername(username);
+                User user = userRepo.findByUsername(username)
+                        .orElseThrow(() -> new UserNotFoundException("User not found with provided username: " + username));
+
                 return new UserPrincipal(user);
         }catch(UserNotFoundException ex){
             throw new UsernameNotFoundException(ex.getMessage());

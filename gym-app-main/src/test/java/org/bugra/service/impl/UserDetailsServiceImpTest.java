@@ -17,6 +17,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -62,7 +64,7 @@ class UserDetailsServiceImpTest {
         user.setRole(UserRole.TRAINEE);
 
         when(loginAttemptService.isBlocked(anyString())).thenReturn(false);
-        when(userRepo.findByUsername(anyString())).thenReturn(user);
+        when(userRepo.findByUsername(anyString())).thenReturn(Optional.of(user));
 
         UserPrincipal principal = (UserPrincipal) userDetailsService.loadUserByUsername("john.doe");
 

@@ -3,15 +3,14 @@ package org.bugra.persistence.repo;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.bugra.enums.UserRole;
-import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>Abstract repository for {@link User} entities.</p>
@@ -65,7 +64,7 @@ public class UserRepo
     }
 
     @Override
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         if(username == null) {
             throw new IllegalArgumentException("Username can not be null");
         }
@@ -82,8 +81,7 @@ public class UserRepo
                 .createQuery(cq)
                 .getResultList()
                 .stream()
-                .findFirst()
-                .orElseThrow(UserNotFoundException::new);
+                .findFirst();
     }
 
     @Override

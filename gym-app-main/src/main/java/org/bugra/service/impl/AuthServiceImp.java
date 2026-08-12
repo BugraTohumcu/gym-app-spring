@@ -7,6 +7,7 @@ import org.bugra.dto.request.ChangePassword;
 import org.bugra.dto.request.LoginUser;
 import org.bugra.dto.response.UserResponse;
 import org.bugra.exception.InvalidPasswordException;
+import org.bugra.exception.UserNotFoundException;
 import org.bugra.model.User;
 import org.bugra.persistence.repo.UserRepo;
 import org.bugra.security.JwtTokenProvider;
@@ -65,7 +66,8 @@ public class AuthServiceImp implements AuthService {
                 changePassword.username()
                 );
 
-        User currentUser = userRepo.findByUsername(changePassword.username());
+        User currentUser = userRepo.findByUsername(changePassword.username())
+                .orElseThrow(() -> new UserNotFoundException("User not found with provided username: " + changePassword.username()));
         // Password check
         if(!passwordEncoder.matches(changePassword.currentPassword(), currentUser.getPassword())){
             logger.warn("The provided password for user with username: {} is invalid",
@@ -83,7 +85,8 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public boolean isAuthenticated(String username, String password) {
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with provided username: " + username));
         return user.getPassword().equals(password);
     }
 }
