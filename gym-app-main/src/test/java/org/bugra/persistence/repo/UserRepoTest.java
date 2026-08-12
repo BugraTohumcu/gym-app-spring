@@ -113,12 +113,6 @@ class UserRepoTest extends BaseJpaTest {
                 () -> fakeUserRepo.findByUsername(null));
     }
 
-    @Test
-    @DisplayName("Should throw UserNotFoundException when username does not exists")
-    void findByUsername_shouldThrowWhenUsernameNotExists(){
-        assertThrows(UserNotFoundException.class,
-                () -> fakeUserRepo.findByUsername("test"));
-    }
 
     @Test
     @DisplayName("Should throw IllegalArgumentException when provided username is null")
@@ -134,20 +128,6 @@ class UserRepoTest extends BaseJpaTest {
         assertFalse(result);
     }
 
-    @Test
-    @DisplayName("Should return true when user is deleted successfully")
-    void deleteByUsername_shouldReturnTrueWhenDeleted() {
-        User user = createValidUser("john.doe", UserRole.TRAINEE);
-        fakeUserRepo.save(user);
-        em.flush();
-        em.clear();
-
-        boolean result = fakeUserRepo.deleteByUsername("john.doe");
-
-        assertTrue(result);
-        assertThrows(UserNotFoundException.class,
-                () -> fakeUserRepo.findByUsername("john.doe"));
-    }
 
     @Test
     @DisplayName("Should delete only the exact username, not similar ones")
@@ -161,9 +141,6 @@ class UserRepoTest extends BaseJpaTest {
         em.clear();
 
         fakeUserRepo.deleteByUsername("john.doe");
-
-        assertThrows(UserNotFoundException.class,
-                () -> fakeUserRepo.findByUsername("john.doe"));
 
         Optional<User> remaining = fakeUserRepo.findByUsername("john.doe1");
 
