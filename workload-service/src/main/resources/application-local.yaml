@@ -18,6 +18,12 @@ spring:
     user: admin
     password: admin
 
+app:
+  activemq:
+    queues:
+      workload: "workload-service-queue"
+
+
 server:
   port: 8081
 
