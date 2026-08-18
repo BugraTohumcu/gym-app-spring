@@ -1,8 +1,8 @@
 package com.bugra.workloadservice.config;
 
+import com.bugra.workloadservice.messaging.converter.TransactionAwareMessageConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.ConnectionFactory;
-import lombok.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +35,7 @@ public class ActiveMQConfig {
     @Bean
     public MessageConverter messageConverter(ObjectMapper objectMapper){
         MappingJackson2MessageConverter converter =
-                new MappingJackson2MessageConverter();
+                new TransactionAwareMessageConverter();
 
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
