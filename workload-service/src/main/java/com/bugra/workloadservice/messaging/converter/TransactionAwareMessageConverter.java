@@ -20,13 +20,18 @@ public class TransactionAwareMessageConverter extends MappingJackson2MessageConv
 
     @Override
     public Object fromMessage(Message message) throws JMSException, MessageConversionException {
+        extractAndSetTransactionId(message);
+
+        return super.fromMessage(message);
+    }
+
+    void extractAndSetTransactionId(Message message) throws JMSException {
         String tx = message.getStringProperty(HEADER_TX_ID);
 
-        if(tx == null){
+        if (tx == null) {
             tx = UUID.randomUUID().toString();
         }
 
         MDC.put(MDC_TX_KEY, tx);
-        return super.fromMessage(message);
     }
 }
