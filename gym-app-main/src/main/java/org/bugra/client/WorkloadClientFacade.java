@@ -18,7 +18,7 @@ public class WorkloadClientFacade {
 
     public void sendWorkload(SaveTrainerWorkload saveTrainerWorkload) {
         logger.info("Sending workload for trainer: {}", saveTrainerWorkload.username());
-        jmsTemplate.convertAndSend("workload-service",saveTrainerWorkload);
+        jmsTemplate.convertAndSend("workload-service-queue", saveTrainerWorkload);
     }
 
     public SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){

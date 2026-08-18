@@ -1,6 +1,7 @@
 package org.bugra.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bugra.messaging.TransactionAwareMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
@@ -16,13 +17,13 @@ public class ActiveMQConfig {
     @Bean
     public MessageConverter messageConverter(ObjectMapper objectMapper){
         MappingJackson2MessageConverter converter =
-                new MappingJackson2MessageConverter();
+                new TransactionAwareMessageConverter();
 
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
 
         Map<String, Class<?>> typeIdMappings = new HashMap<>();
-        typeIdMappings.put("SaveTrainerWorkload", org.bugra.dto.client.SaveTrainerWorkload.class);
+        typeIdMappings.put("SaveTrainingWorkload", org.bugra.dto.client.SaveTrainerWorkload.class);
 
         converter.setTypeIdMappings(typeIdMappings);
         converter.setObjectMapper(objectMapper);
