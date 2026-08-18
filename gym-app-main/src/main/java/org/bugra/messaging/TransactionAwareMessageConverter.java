@@ -24,13 +24,18 @@ public class TransactionAwareMessageConverter extends MappingJackson2MessageConv
     protected Message toMessage(Object object, Session session, ObjectWriter objectWriter) throws JMSException, MessageConversionException {
         Message message = super.toMessage(object, session, objectWriter);
 
-        String transactionId = MDC.get(MDC_TX_KEY);
-        if(transactionId == null){
-            transactionId = UUID.randomUUID().toString();
-            MDC.put(MDC_TX_KEY, transactionId);
-        }
+        String transactionId = getOrCreateTransactionId();
 
         message.setStringProperty(HEADER_TX_ID, transactionId);
         return message;
+    }
+
+    String getOrCreateTransactionId() {
+        String transactionId = MDC.get(MDC_TX_KEY);
+        if (transactionId == null) {
+            transactionId = UUID.randomUUID().toString();
+            MDC.put(MDC_TX_KEY, transactionId);
+        }
+        return transactionId;
     }
 }
