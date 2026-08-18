@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jms.core.JmsTemplate;
 
 import java.time.LocalDate;
 
@@ -24,7 +25,7 @@ class WorkloadClientFacadeTest {
 
 
     @Mock
-    private WorkloadClient workloadClient;
+    private JmsTemplate jmsTemplate;
 
     @InjectMocks
     private WorkloadClientFacade workloadClientFacade;
@@ -33,11 +34,11 @@ class WorkloadClientFacadeTest {
     @Test
     @DisplayName("Should send to workload-service")
     void sendWorkload_shouldSenToWorkloadClient(){
-        doNothing().when(workloadClient).saveTrainerWorkload(any());
+        SaveTrainerWorkload workload = SaveTrainerWorkload.builder().username("john.doe").build();
 
-        workloadClientFacade.sendWorkload(any());
+        workloadClientFacade.sendWorkload(workload);
 
-        verify(workloadClient, times(1)).saveTrainerWorkload(any());
+        verify(jmsTemplate, times(1)).convertAndSend((String) any(), (Object) any());
     }
 
     @Test
@@ -79,7 +80,7 @@ class WorkloadClientFacadeTest {
                 .build();
 
         doThrow(new RuntimeException("service down"))
-                .when(workloadClient).saveTrainerWorkload(workload);
+                .when(jmsTemplate).convertAndSend(workload);
 
         assertThrows(RuntimeException.class,
                 () -> workloadClientFacade.sendWorkload(workload));
