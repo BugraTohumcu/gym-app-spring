@@ -24,9 +24,9 @@ public class TransactionAwareMessageConverter extends MappingJackson2MessageConv
 
         if(tx == null){
             tx = UUID.randomUUID().toString();
-            MDC.put(MDC_TX_KEY, tx);
         }
 
+        MDC.put(MDC_TX_KEY, tx);
         return super.fromMessage(message);
     }
 }
