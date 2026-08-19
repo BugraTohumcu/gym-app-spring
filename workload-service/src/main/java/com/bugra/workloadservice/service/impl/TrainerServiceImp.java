@@ -26,7 +26,6 @@ public class TrainerServiceImp implements TrainerService {
     private final TrainerRepo trainerRepo;
 
     @Override
-    @JmsListener(destination = "${app.activemq.queues.workload}", containerFactory = "jmsListenerContainerFactory")
     public void saveTrainerRecord(TrainerDto trainerDto) {
         Trainer trainer = findOrElseCreateTrainer(trainerDto);
 
