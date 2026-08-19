@@ -38,7 +38,7 @@ public record TrainerDto(
 
     @AssertTrue(message = TrainerMessages.TRAINING_DATE_FUTURE)
     public boolean isFuture(){
-        return trainingDate.isAfter(LocalDate.now());
+        return trainingDate == null || trainingDate.isAfter(LocalDate.now());
     }
 
 
