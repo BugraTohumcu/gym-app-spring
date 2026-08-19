@@ -3,11 +3,14 @@ package com.bugra.workloadservice.config;
 import com.bugra.workloadservice.messaging.converter.TransactionAwareMessageConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.ConnectionFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
@@ -15,8 +18,12 @@ import org.springframework.jms.support.converter.MessageType;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class ActiveMQConfig {
+
+    private JmsTemplate jmsTemplate;
 
     @Bean
     public JmsListenerContainerFactory<?> jmsListenerContainerFactory
@@ -27,6 +34,11 @@ public class ActiveMQConfig {
     {
         DefaultJmsListenerContainerFactory factory =
                 new DefaultJmsListenerContainerFactory();
+
+        factory.setErrorHandler( t -> {
+            log.error("[Error Handler] - uncaught error {}", t.getMessage());
+        });
+
         configurer.configure(factory, connectionFactory);
 
         return factory;
