@@ -10,8 +10,6 @@ import com.bugra.workloadservice.model.YearlyWorkload;
 import com.bugra.workloadservice.repo.TrainerRepo;
 import com.bugra.workloadservice.service.TrainerService;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
