@@ -22,6 +22,7 @@ app:
   activemq:
     queues:
       workload: "workload-service-queue"
+      workload-dlq: "workload-dlq"
 
 
 server:
