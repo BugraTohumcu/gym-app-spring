@@ -10,6 +10,7 @@ import com.bugra.workloadservice.model.YearlyWorkload;
 import com.bugra.workloadservice.repo.TrainerRepo;
 import com.bugra.workloadservice.service.TrainerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,12 +20,14 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TrainerServiceImp implements TrainerService {
 
     private final TrainerRepo trainerRepo;
 
     @Override
     public void saveTrainerRecord(TrainerDto trainerDto) {
+        log.info("New Trainer record saving for trainer: {}", trainerDto.username());
         Trainer trainer = findOrElseCreateTrainer(trainerDto);
 
         YearlyWorkload yearlyWorkload = findOrCreateYearlyWorkload(trainer, trainerDto.trainingDate());
@@ -38,6 +41,8 @@ public class TrainerServiceImp implements TrainerService {
 
     @Override
     public TrainerWorkloadResponse getTrainerWorkload(String username) {
+        log.info("Trainer record fetching for trainer: {}", username);
+
         Trainer trainer = trainerRepo.findByUsername(username)
                 .orElseThrow(UsernameNotFoundException::new);
 
