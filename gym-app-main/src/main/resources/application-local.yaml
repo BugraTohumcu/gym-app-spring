@@ -34,12 +34,12 @@ jwt:
   secret: Dlz1HK5Fze/mIG+cMkrYuDuhfRjU3i0jeN6rRGlOqmw=
   access-expiration: 15
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-  instance:
-    prefer-ip-address: true
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+#  instance:
+#    prefer-ip-address: true
 
 resilience4j:
   circuitbreaker:

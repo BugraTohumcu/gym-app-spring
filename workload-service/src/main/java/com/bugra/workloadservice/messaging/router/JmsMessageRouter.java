@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JmsMessageRouter {
+public class JmsMessageRouter  {
     private final MessageConverter messageConverter;
     private final JmsMessageValidator validator;
     private final JmsTemplate jmsTemplate;
