@@ -6,9 +6,11 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.time.LocalDate;
 
+@Builder
 public record TrainerDto(
 
         @NotBlank(message = TrainerMessages.FIRST_NAME_REQUIRED)
