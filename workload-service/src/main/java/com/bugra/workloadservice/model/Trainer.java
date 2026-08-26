@@ -2,6 +2,7 @@ package com.bugra.workloadservice.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 @Data
 @Document(collection = "trainers")
+@CompoundIndex(name = "fname-lname-idx", def = "{ firstName: 1, lastName: 1}")
 public class Trainer {
 
     @Id
