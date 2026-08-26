@@ -1,6 +1,5 @@
 package com.bugra.workloadservice.dto.response;
 
-import com.bugra.workloadservice.model.YearlyWorkload;
 import lombok.Builder;
 
 import java.util.Map;
