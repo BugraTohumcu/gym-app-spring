@@ -38,7 +38,7 @@ class WorkloadClientFacadeTest {
 
         workloadClientFacade.sendWorkload(workload);
 
-        verify(jmsTemplate, times(1)).convertAndSend((String) any(), (Object) any());
+        verify(jmsTemplate, times(1)).convertAndSend((String) any(), (Object) any(), any());
     }
 
     @Test
