@@ -1,38 +1,29 @@
 package com.bugra.workloadservice.model;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-@Entity
-@Getter
-@Setter
+@Data
+@Document(collection = "trainers")
+@CompoundIndex(name = "fname-lname-idx", def = "{ firstName: 1, lastName: 1}")
 public class Trainer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
     private boolean isActive;
 
-    @OneToMany(
-            cascade = {CascadeType.ALL},
-            mappedBy = "trainer"
-    )
-    @MapKey(name = "year")
-    private Map<String, YearlyWorkload> workloads = new HashMap<>();
+    private Map<String, Map<String, Integer>> workloads = new HashMap<>();
 }

@@ -1,13 +1,12 @@
 package com.bugra.workloadservice.repo;
 
 import com.bugra.workloadservice.model.Trainer;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
 
 import java.util.Optional;
 
-public interface TrainerRepo extends JpaRepository<Trainer, Long> {
+public interface TrainerRepo extends MongoRepository<Trainer, Long> {
 
-    @EntityGraph(attributePaths = {"workloads", "workloads.months"})
     Optional<Trainer> findByUsername(String username);
 }

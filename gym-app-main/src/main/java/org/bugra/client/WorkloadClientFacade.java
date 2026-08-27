@@ -1,12 +1,13 @@
 package org.bugra.client;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.bugra.dto.client.SaveTrainerWorkload;
 import org.bugra.enums.ActionType;
 import org.bugra.model.Training;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,11 +15,15 @@ import org.springframework.stereotype.Service;
 public class WorkloadClientFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkloadClientFacade.class);
-    private final WorkloadClient workloadClient;
+    private final JmsTemplate jmsTemplate;
 
-    @CircuitBreaker(name = "workload-service", fallbackMethod = "workloadServiceFallback")
     public void sendWorkload(SaveTrainerWorkload saveTrainerWorkload) {
-        workloadClient.saveTrainerWorkload(saveTrainerWorkload);
+        logger.info("Sending workload for trainer: {}", saveTrainerWorkload.username());
+        String transactionId = MDC.get("transactionId");
+        jmsTemplate.convertAndSend("workload-service-queue", saveTrainerWorkload, message -> {
+            message.setStringProperty("X-Transaction-ID", transactionId);
+            return message;
+        });
     }
 
     public SaveTrainerWorkload buildWorkloadRequest(Training training, ActionType actionType){
@@ -34,9 +39,4 @@ public class WorkloadClientFacade {
 
     }
 
-    public void workloadServiceFallback(SaveTrainerWorkload saveTrainerWorkload, Throwable throwable) {
-        logger.warn("Can not reach the workload-service for user: {} {}",
-                saveTrainerWorkload.username(),
-                throwable.getMessage());
-    }
 }
