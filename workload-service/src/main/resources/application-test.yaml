@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/workload-db-test
+      auto-index-creation: true
+jwt:
+  secret: Dlz1HK5Fze/mIG+cMkrYuDuhfRjU3i0jeN6rRGlOqmw=
+
+app:
+  activemq:
+    queues:
+      workload: "workload-service-queue-test"
+      workload-dlq: "workload-dlq-test"
