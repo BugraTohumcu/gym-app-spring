@@ -13,7 +13,7 @@ spring:
 app:
   activemq:
     queues:
-      workload: "workload-service-queue-test"
+      workload: "workload-service-queue"
 
 jwt:
   secret: Dlz1HK5Fze/mIG+cMkrYuDuhfRjU3i0jeN6rRGlOqmw=
